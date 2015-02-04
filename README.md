@@ -42,8 +42,8 @@ Fathom provides a set of network measurement oriented javascript APIs for regula
 
 ### Contributors
 
-- Anna-Kaisa Pietilainen <anna-kaisa.pietilainen@inria.fr>
-- Stephane Archer <stephane.archer@epita.fr>
-- Mohan Dhawan <mohan.dhawan@gmail.com>
-- Christian Kreibich <christian@icir.org>
-- Renata Teixeira <renata.teixeira@inria.fr>
+- Anna-Kaisa Pietilainen <anna-kaisa.pietilainen_AT_inria.fr>
+- Stephane Archer <stephane.archer_AT_epita.fr>
+- Mohan Dhawan <mohan.dhawan_AT_gmail.com>
+- Christian Kreibich <christian_AT_icir.org>
+- Renata Teixeira <renata.teixeira_AT_inria.fr>
