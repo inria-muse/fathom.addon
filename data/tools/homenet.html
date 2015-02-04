@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Homenet Discovery</title>
+
+  <link rel="icon" type="image/png" id="favicon" href="../icons/icon-16.png"/>
+  
+  <link href="../stylesheets/pure-min.css" type="text/css" rel="stylesheet">
+  <link href="../stylesheets/grids-responsive-min.css" type="text/css" rel="stylesheet">
+  <link href="../stylesheets/font-awesome.min.css" type="text/css" rel="stylesheet">
+  <link href="../stylesheets/fathom.css" type="text/css" rel="stylesheet">
+  </head>
+  
+  <body>
+    <div id="container">
+      <div class="header">
+        <h1><i class="fa fa-home"></i>&nbsp;Homenet Discovery</h1>
+        <h2>Sit back while we are checking your network</h2>
+      </div>
+    </div>
+
+    <div class="center">
+
+      <!-- the canvas -->
+      <div id="canvas"></div>
+
+      <button class="pure-button pure-button-primary" 
+	      onclick="location.reload();">
+	<i class="fa fa-refresh"></i> Run Again
+      </button>
+
+    </div> <!-- center -->
+    
+    <!-- UI library scripts -->
+    <script src="../scripts/ext/jquery.min.js"></script>
+    <script src="../scripts/ext/underscore-min.js"></script>
+    <script src="../scripts/ext/d3.v3.min.js"></script>
+    <!-- main test script -->
+    <script src="./homenet.js"></script>
+  </body>
+</html>

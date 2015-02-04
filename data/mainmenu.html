@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link href="stylesheets/pure-min.css" type="text/css" rel="stylesheet">
+    <link href="stylesheets/font-awesome.min.css" type="text/css" rel="stylesheet">
+    <link href="stylesheets/fathom.css" type="text/css" rel="stylesheet">
+  </head>
+
+  <body style="overflow:hidden;">
+    <div class="pure-menu pure-menu-open">
+      <a class="pure-menu-heading">Tools</a>
+      <ul>
+	<li><a href="#" onclick="opentab('tools/debugtool.html');">
+	    <i class="fa fa-wrench"></i>
+	    Debug My Connection
+	</a></li>
+	<li><a href="#" onclick="opentab('tools/homenet.html');">
+	    <i class="fa fa-home"></i>
+	    Homenet Discovery
+	</a></li>
+	<li><a href="#" onclick="opentab('tools/monitoring.html');">
+	    <i class="fa fa-bar-chart"></i>
+	    Monitoring Graphs
+	</a></li>
+        <li class="pure-menu-heading">Fathom</li>
+        <li class="pure-menu-selected" id="fathomon">
+	  <a href="#" onclick="emit('fathom');">
+	    <i class="fa fa-check"></i>
+	    Monitoring Enabled
+	  </a>
+	</li>
+        <li class="pure-menu pure-menu-hidden" id="fathomoff">
+	  <a href="#" onclick="emit('fathom');">
+	    <i class="fa fa-close"></i>
+	    Monitoring Disabled
+	  </a>
+	</li>
+        <li><a href="#" onclick="emit('about');">
+	    <i class="fa fa-info"></i>
+	    About
+	</a></li>
+      </ul>
+    </div>
+    <script src="panelhelp.js"></script>
+  </body>
+</html>

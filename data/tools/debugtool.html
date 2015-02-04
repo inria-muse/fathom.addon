@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Debug My Connection</title>
+
+  <link rel="icon" type="../image/png" id="favicon" href="icons/icon-32.png"/>
+  
+  <link href="../stylesheets/pure-min.css" type="text/css" rel="stylesheet">
+  <link href="../stylesheets/grids-responsive-min.css" type="text/css" rel="stylesheet">
+  <link href="../stylesheets/font-awesome.min.css" type="text/css" rel="stylesheet">
+  <link href="../stylesheets/fathom.css" type="text/css" rel="stylesheet">
+  </head>
+  
+  <body>
+    <div id="container">
+      <div class="header">
+        <h1><i class="fa fa-wrench"></i>&nbsp;Debug My Connection</h1>
+        <h2>Sit back while the tests are running</h2>
+      </div>
+
+      <!-- placeholder for results -->
+      <div id="results" class="content"></div>
+
+      <div class="center">
+	<button class="pure-button pure-button-primary" 
+		onclick="location.reload();">
+	  <i class="fa fa-refresh"></i> Run Again
+	</button>
+      </div>
+    </div>
+
+    <!-- The main template -->
+    <script id="template" type="x-tmpl-mustache">
+      {{#testsuites}}
+      <h2 class="content-subhead">{{name}}</h2>
+      {{#tests}}
+      <div id="test{{id}}"></div>
+      {{/tests}}
+      {{/testsuites}}
+    </script>
+
+    <!-- Template for tests tag -->
+    <script id="testtemplate" type="x-tmpl-mustache">
+      <div class="test {{status}}" >
+	<b>{{name}}</b> <i>{{desc}}</i>
+	{{#isrunning}}
+	<div class="spinner floatright">
+	  <div class="rect1"></div>
+	  <div class="rect2"></div>
+	  <div class="rect3"></div>
+	  <div class="rect4"></div>
+	  <div class="rect5"></div>
+	</div>
+	{{/isrunning}}
+      </div>
+    </script>
+    
+    <!-- UI library scripts -->
+    <script src="../scripts/ext/jquery.min.js"></script>
+    <script src="../scripts/ext/underscore-min.js"></script>
+    <script src="../scripts/ext/backbone-min.js"></script>
+    <script src="../scripts/ext/mustache.js"></script>
+    <!-- the tool script -->
+    <script src="./debugtool.js"></script>
+  </body>
+</html>

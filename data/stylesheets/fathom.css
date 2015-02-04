@@ -1,0 +1,347 @@
+/* Overrides and extra defs on top of pure-min.css. */
+
+/* Dialogs */
+.splash-container {
+    border-bottom: 2px solid #848282;
+    border-right: 2px solid #848282;
+    border-top: 1px solid #D9D9D8;
+    border-left: 1px solid #D9D9D8;
+    background: #FFF;
+    z-index: 1;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    padding: 0;
+    position: fixed !important;
+}
+
+.splash {
+    /* absolute center .splash within .splash-container */
+    width: 100%;
+    height: 100%;
+    margin: auto;
+    position: absolute;
+    top: 0px; left: 5px; bottom: 0; right: 5px;
+    text-align: center;
+}
+
+.splash-head {
+    font-size: 20px;
+    color: #0A0545;
+    font-weight: 200;
+    padding: 5px;
+    line-height: 1em;
+    text-align: left;
+    text-transform: uppercase;
+}
+
+.splash-head img {
+    padding-right: 3px;
+}
+
+.splash-subhead {
+    color: #0A0545;
+    letter-spacing: 0.05em;
+    opacity: 0.8;
+    text-align: center;
+    text-transform: uppercase;
+    padding: 5px;
+}
+
+.splash-text {
+    color: #0A0545;
+    opacity: 0.8;
+    text-align: center;
+    padding: 5px;
+}
+
+.splash-text-left {
+    color: #0A0545;
+    opacity: 0.8;
+    text-align: left;
+    padding: 5px;
+}
+
+.splash-button {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    padding-bottom: 5px;
+}
+
+.highlight {
+    background-color: #E6E6EC;
+    border: 2px solid;
+    border-radius: 5px;
+    border-color: #0A0545;
+    padding: 5px;
+}
+
+.pure-button {
+    background-color: #0A0545;
+    color: white;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.pure-button-active {
+    background-color: #FFB515;
+}
+
+.button-xsmall {
+    font-size: 70%;
+}
+
+.button-small {
+    font-size: 85%;
+}
+
+.button-large {
+    font-size: 110%;
+}
+
+.button-xlarge {
+    font-size: 125%;
+}
+
+/* Main menu */
+.pure-menu .pure-menu-heading {
+    color: #0A0545;
+}
+
+.pure-menu i {
+    color: #FFB515;
+}
+
+/* Tool pages */
+#container {
+    position: relative;
+    padding-left: 0;
+    padding-bottom: 60px;
+}
+
+.content {
+    margin: 0 auto;
+    padding: 0 2em;
+    max-width: 800px;
+    margin-bottom: 20px;
+    line-height: 1.6em;
+}
+
+.center {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.right {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.small {
+    font-size: 75%;
+}
+
+a, a:visited { color: #0A0545; text-decoration: underline; outline: 0; }
+p a, p a:visited { line-height: inherit; }
+
+.header {
+     margin: 0;
+     color: #0A0545;
+     text-align: center;
+     padding: 2.5em 2em 0;
+     border-bottom: 1px solid #eee;
+ }
+.header h1 {
+    margin: 0.2em 0;
+    font-size: 3em;
+    font-weight: 300;
+}
+
+.header h2 {
+    font-weight: 300;
+    color: #888;
+    padding: 0;
+    margin-top: 0;
+}
+
+.content-subhead {
+    margin: 30px 0 10px 0;
+    font-weight: 300;
+    color: #888;
+}
+
+.test {
+    margin-bottom: 3px;
+    padding-left: 4px;
+    color: #777;
+}
+
+.test-not-running {
+    border-left: 4px solid grey;
+    background-color: #f0f0f0;
+}
+
+.test-running {
+    border-left: 4px solid #0A0545;
+    background-color: #f0f0f0;
+}
+
+.test-skip {
+    border-left: 4px solid rgb(243,123,29);
+    background-color: #f0f0f0;
+}
+
+.test-success {
+    border-left: 4px solid rgb(94,185,94);
+    background-color: rgba(94,185,94,0.25);
+}
+
+.test-errors {
+    border-left: 4px solid rgb(243,123,29);
+    background-color: rgba(243,123,29,0.25);
+}
+
+.test-failure {
+    border-left: 4px solid rgb(221,81,76);
+    background-color: rgba(221,81,76,0.25);
+}
+
+/* CSS Spinner */
+
+.floatright {
+    float: right;
+}
+
+.spinner {
+    width: 40px;
+    height: 15px;
+    display: inline-block;
+    margin: 3px 3px 0 0;
+}
+
+.spinner > div {
+  background-color: #FFB515;
+  height: 100%;
+  width: 4px;
+  animation: stretchdelay 1.2s infinite ease-in-out;
+  display: inline-block;
+}
+
+.spinner .rect2 {
+  animation-delay: -1.1s;
+}
+
+.spinner .rect3 {
+  animation-delay: -1.0s;
+}
+
+.spinner .rect4 {
+  animation-delay: -0.9s;
+}
+
+.spinner .rect5 {
+  animation-delay: -0.8s;
+}
+
+@keyframes stretchdelay {
+  0%, 40%, 100% { 
+    transform: scaleY(0.4);
+  }  20% { 
+    transform: scaleY(1.0);
+  }
+}
+
+div .infofloat {
+    margin: 0;
+    padding: 5px;
+    color: #000;
+    font: 12px sans-serif;
+    border-radius: 2px;       
+    pointer-events: none;         
+}
+
+svg.net-graph .canvas {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    fill: none;
+    pointer-events: all;
+    stroke: #000;
+    stroke-width: 1.5px;
+}
+
+svg.net-graph .edge {
+    stroke: #98abc5;
+    stroke-width: 2.5px;
+}
+
+svg.net-graph .wifi-edge {
+    stroke: #98abc5;
+    stroke-width: 2.5px;
+    stroke-dasharray: 3,3;
+}
+
+svg.net-graph .label {
+  pointer-events: none;
+  font: 16px sans-serif; 
+  fill: #000;
+}
+
+/* unknown */
+svg.net-graph .node {
+    fill: #ffffff;
+    stroke: #000;
+    stroke-width: 0.5px;
+}
+
+/* localhost */
+svg.net-graph .localhost-node {
+    fill: #ff8c00;
+    stroke: #000;
+    stroke-width: 0.5px;
+}
+
+/* other host */
+svg.net-graph .peer-node {
+    fill: #8a89a6;
+    stroke: #000;
+    stroke-width: 0.5px;
+}
+
+/* other host, rpc available */
+svg.net-graph .rpc-peer-node {
+    fill: #a05d56;
+    stroke: #000;
+    stroke-width: 0.5px;
+}
+
+/* gateway */
+svg.net-graph .gw-node {
+    fill: #7b6888;
+    stroke: #000;
+    stroke-width: 0.5px;
+}
+
+/* gateway, rpc */
+svg.net-graph .rpc-gw-node {
+    fill: #6b486b;
+    stroke: #000;
+    stroke-width: 0.5px;
+}
+
+/* ap */
+svg.net-graph .ap-node {
+    fill: #7b6888;
+    stroke: #000;
+    stroke-width: 0.5px;
+}
+
+/* internet nodes */
+svg.net-graph .i-node {
+    fill: #d0743c;
+    stroke: #000;
+    stroke-width: 0.5px;
+}

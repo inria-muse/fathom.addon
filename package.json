@@ -1,0 +1,91 @@
+{
+    "name": "fathom",
+    "title": "Fathom",
+    "id": "jid1-o49GgyEaRRmXPA",
+    "description": "A Browser-based Network Measurement Platform",
+    "author": "MUSE Inria Paris-Rocquencourt <muse.fathom@inria.fr> (https://team.inria.fr/muse/)",
+    "license": "MIT",
+    "version": "2.0.0",
+    "contributors": "Anna-Kaisa Pietilainen, Stéphane Archer, Renata Teixeira, Christian Kreibich, Mohan Dhawan, Justin Samuel, Nick Weaver, Mark Allman, Vern Paxson",
+    "homepage": "https://muse.inria.fr/fathom",
+    "icon": "data/icons/icon-80.png",
+    "icon64": "data/icons/icon-64.png",
+    "permissions": {
+        "private-browsing": false	
+    },
+    "dependencies": ["underscore","ipaddr","ieee754","base64-js","buffer","buffercursor","subprocess","addon-sdk"],
+    "preferences": [
+	{
+            "name": "enablefathomapi",
+            "type": "bool",
+            "title": "Enable Fathom for Regular Web Pages",
+            "description" : "Enable Fathom APIs for any regular web page. Fathom will always ask your approval before a page can access any of the Fathom features. If you disable Fathom, web pages will not know that Fathom is installed. The built-in Fathom tools remain always available.",
+            "value": true
+	},
+	{
+            "name": "debugtoolupload",
+            "type": "radio",
+            "title": "Share 'Debug My Connection' Tool Reports",
+            "description" : "Allow uploading of 'Debug My Connection' tool reports to our secure servers for network research. No data is shared with third parties.",
+            "value": "askme",
+            "options": [
+		{
+		    "value": "askme",
+		    "label": "Ask Me"
+		},
+		{
+		    "value": "always",
+		    "label": "Always"
+		},
+		{
+		    "value": "never",
+		    "label": "Never"
+		}
+            ]
+	},
+	{
+            "name": "homenetupload",
+            "type": "radio",
+            "title": "Share 'Homenet Discovery' Tool Reports",
+            "description" : "Allow uploading of 'Homenet Discovery' tool reports to our secure servers for network research. No data is shared with third parties.",
+            "value": "askme",
+            "options": [
+		{
+		    "value": "askme",
+		    "label": "Ask Me"
+		},
+		{
+		    "value": "always",
+		    "label": "Always"
+		},
+		{
+		    "value": "never",
+		    "label": "Never"
+		}
+            ]
+	},
+	{
+            "type": "bool",
+            "name": "enablebaseline",
+            "value": true,
+            "title": "Enable Background Performance Monitoring"
+	},
+	{
+            "name": "baselineupload",
+            "type": "radio",
+            "title": "Share Background Monitoring Performance Reports",
+            "description" : "Allow uploading of background monitoring reports to our secure servers for network research. No data is shared with third parties.",
+            "value": "always",
+            "options": [
+		{
+		    "value": "always",
+		    "label": "Always"
+		},
+		{
+		    "value": "never",
+		    "label": "Never"
+		}
+            ]
+	}
+    ]
+}

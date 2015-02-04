@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Monitoring Graphs</title>
+
+    <link rel="icon" type="image/png" id="favicon" href="../icons/icon-16.png"/>
+  
+    <link href="../stylesheets/pure-min.css" type="text/css" rel="stylesheet">
+    <link href="../stylesheets/grids-responsive-min.css" type="text/css" rel="stylesheet">
+    <link href="../stylesheets/font-awesome.min.css" type="text/css" rel="stylesheet">
+    <link href="../stylesheets/metricsgraphics.css" type="text/css" rel="stylesheet">
+    <link href="../stylesheets/fathom.css" type="text/css" rel="stylesheet">
+  </head>
+  
+  <body>
+    <div id="container">
+      <div id="main">
+	<div class="header">
+          <h1><i class="fa fa-bar-chart"></i>&nbsp;Monitoring Graphs</h1>
+          <h2>On this page you can explore the background monitoring statistics</h2>
+	</div>
+      </div>
+
+      <div class="center">
+	<a id="lastday" class="pure-button pure-button-active" href="#">Last 24h</a>
+	<a id="lastweek" class="pure-button" href="#">Last 7 days</a>
+	<a id="lastmonth" class="pure-button" href="#">Last month</a>
+	<a id="lastyear" class="pure-button" href="#">Last year</a>
+
+	<p/>
+
+	<div id="waitspin" class="spinner">
+	  <div class="rect1"></div>
+	  <div class="rect2"></div>
+	  <div class="rect3"></div>
+	  <div class="rect4"></div>
+	  <div class="rect5"></div>
+	</div>
+      </div>
+
+      <div class="content">
+	<h2 class="content-subhead">Network Environments</h2>
+	<div id="legend-env"></div>
+	<div id="chart-env"></div>
+
+	<h2 class="content-subhead">CPU Utilization</h2>
+	<div id="legend-cpu"></div>
+	<div id="chart-cpu"></div>
+
+	<h2 class="content-subhead">CPU Load</h2>
+	<div id="legend-load"></div>
+	<div id="chart-load"></div>
+
+	<h2 class="content-subhead">Tasks</h2>
+	<div id="legend-tasks"></div>
+	<div id="chart-tasks"></div>
+
+	<h2 class="content-subhead">Memory Utilization</h2>
+	<div id="legend-mem"></div>
+	<div id="chart-mem"></div>
+
+	<h2 class="content-subhead">Wifi Signal</h2>
+	<div id="legend-wifi"></div>
+	<div id="chart-wifi"></div>
+
+	<h2 class="content-subhead">Network Traffic</h2>
+	<div id="legend-traffic"></div>
+	<div id="chart-traffic"></div>
+
+	<h2 class="content-subhead">Network Delays</h2>
+	<div id="legend-rtt"></div>
+	<div id="chart-rtt"></div>
+
+      </div>
+    </div>
+    
+    <!-- UI library scripts -->
+    <script src="../scripts/ext/jquery.min.js"></script>
+    <script src="../scripts/ext/underscore-min.js"></script>
+    <script src="../scripts/ext/d3.v3.min.js"></script>
+    <script src="../scripts/ext/metricsgraphics.min.js"></script>
+    <script src="./monitoring.js"></script>
+  </body>
+</html>

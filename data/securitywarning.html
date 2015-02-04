@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="stylesheets/pure-min.css" type="text/css" rel="stylesheet">
+    <link href="stylesheets/font-awesome.min.css" type="text/css" rel="stylesheet">
+    <link href="stylesheets/fathom.css" type="text/css" rel="stylesheet">
+  </head>
+
+  <body style="overflow:hidden;">
+
+    <div class="splash-container">
+      <div id="container" class="splash">
+
+        <h1 class="splash-head">
+	  <img src="icons/icon-32.png" alt="fathomlogo" />&nbsp;Fathom
+	</h1>
+
+	<p class="splash-subhead">
+	  <i class="fa fa-warning fa-lg"></i>&nbsp;&nbsp;This Web Page is Requesting Special Privileges
+	</p>
+
+	<p id="rendertarget" class="splash-text-left">
+	  <!-- The manifest content is rendered here -->
+	</p>
+	  
+	<p id="buttons" class="splash-button">
+	  <button onclick="emit(true);" class="pure-button">Allow</button>
+	  <button onclick="emit(false);" class="pure-button">Deny</button>
+	</p>
+      </div>
+    </div>
+
+    <script id="rendertemplate" type="x-tmpl-mustache">
+      The page wants to use following functions:
+      <ul>
+	{{#api}}
+	<li><strong>{{orig}}:</strong> {{desc}}</li>
+	{{/api}}
+      </ul>
+      
+      The page wants to communicate with following destinations:
+      <ul>
+	{{#dst}}
+	<li>{{desc}}</li>
+	{{/dst}}
+      </ul>
+    </script>
+    
+    <script src="extscripts/jquery.min.js"></script>
+    <script src="extscripts/mustache.js"></script>
+    <script src="panelhelp.js"></script>
+  </body>
+</html>

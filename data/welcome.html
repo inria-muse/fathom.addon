@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html> 
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Welcome to Fathom</title>
+  <link rel="icon" type="image/png" id="favicon" href="icons/icon-16.png"/>  
+  <link href="stylesheets/pure-min.css" type="text/css" rel="stylesheet">
+  <link href="stylesheets/grids-responsive-min.css" type="text/css" rel="stylesheet">
+  <link href="stylesheets/font-awesome.min.css" type="text/css" rel="stylesheet">
+  <link href="stylesheets/fathom.css" type="text/css" rel="stylesheet">
+  </head>
+  
+  <body>
+    <div id="container">
+
+      <div id="main">
+	<div class="header">
+          <h1><img src="icons/icon-64.png"/> Thanks for Installing Fathom!</h1>
+          <h2>Review the settings and instructions below to get started</h2>
+	</div>
+      </div>
+
+      <div class="content">
+	<h2 class="content-subhead">Introduction</h2>
+	
+	<p>
+	  The Fathom project explores the browser as a platform for network measurement and troubleshooting. Fathom is a joint project between <a href="https://team.inria.fr/muse/">MUSE team</a> at Inria Paris-Rocquencourt and <a href="https://www.icsi.berkeley.edu/icsi/">International Computer Science Institute (ICSI)</a> at Berkeley (CA, US).
+	</p>
+
+	<h2 class="content-subhead">Tools</h2>
+
+	<p>
+	  You can access several network troubleshooting and monitoring tools by clicking on the Fathom icon <img src="icons/icon-16.png" /> on the toolbar (or via the Firefox menu on Android).
+	</p>
+
+	  <ul>
+	    <li><b>Debug My Connection</b>: test your network configuration and connectivity if you are having problems with your network.</li>
+	    <li><b>Home Network Discovery</b>: discover devices and network connectivity in your home network.</li>
+	    <li><b>Monitoring Graphs</b>: system and network performance measurements over time (see next section for details on background monitoring).</li>
+	  </ul>
+
+	<h2 class="content-subhead">Background Monitoring</h2>
+
+	<p>
+	  Fathom collects periodically basic performance metrics about your system (CPU, load, memory) and network connectivity (signal quality on Wifi, cross-traffic and network delays). You can visualize the monitoring data via the <b>Monitoring Graphs</b> tool. In addition, we use this monitoring data to improve the diagnosis of the <b>Debug My Connection</b> tool. 
+	</p>
+	<p>
+	  You can always disable the background monitoring via the Fathom menu. Optionally, you can share the monitoring data with us for research purposes (see next section on our data collection policy). 
+	</p>
+
+	<div class="highlight">
+	<b>Enable background monitoring ?</b>
+	<form>
+	  <label for="enablebaseline" class="pure-checkbox">
+            <input id="enablebaseline" type="checkbox" checked>&nbsp;&nbsp;Do periodic background performance monitoring.
+          </label>
+	</form>
+
+	<b>Share background monitoring data ?</b>
+	<form>
+	  <label for="baselineupload" class="pure-checkbox">
+            <input id="baselineupload" type="checkbox" checked>&nbsp;&nbsp;Allow Fathom to share background monitoring data.
+          </label>
+	</form>
+
+	<i class="small">You can change these settings at anytime via the addon preferences (go to Menu -> Addons -> Fathom).</i>
+	</div>
+
+	<h2 class="content-subhead">Fathom for Web Pages</h2>
+
+	<p>
+	  Fathom provides network performance monitoring and measurement functionality for any web page via javascript. Each page using Fathom must provide a description of the required functionality and network destinations it will communicate with. Fathom will prompt for your approval of the requested features before the page is allowed to access them.
+	</p>
+
+	<div class="highlight">
+	<b>Enable Fathom for any web page ?</b>
+	<form>
+	  <label for="enablefathomapi" class="pure-checkbox">
+            <input id="enablefathomapi" type="checkbox" checked>&nbsp;&nbsp;Allow web pages to request access to Fathom.
+          </label>
+	</form>
+
+	<i class="small">You can change this setting at anytime via the addon preferences (go to Menu -> Addons -> Fathom).</i>
+	</div>
+
+	<h2 class="content-subhead">Data Collection</h2>
+
+	<p>
+	  The Fathom project is a research project and we hope to collect data on real home networks configuration, performance characteristics and typical problems as part of the work. The extension will ask you for your permission to upload the results of the various network measurements to our secure server when you first use each tool. You can change the settings at anytime via the addon preferences (go to Menu -> Addons -> Fathom).
+	</p>
+
+	<h3>What data is collected ?</h3>
+
+	TODO
+
+	<h3>Privacy policy</h3>
+
+	TODO: cnil mention ?
+
+	<h2 class="content-subhead">Contacts</h2>
+
+	<p>
+	  If you have any questions or suggestions about Fathom, do not hesitate to <a href="mailto:muse.fathom@inria.fr">contact us</a>!
+	</p>
+	<p>
+	<i class="small">&copy; 2014-2015 Inria Paris-Rocquencourt, ICSI</i>
+	</p>
+      </div>
+    </div>
+  </body>
+</html>
