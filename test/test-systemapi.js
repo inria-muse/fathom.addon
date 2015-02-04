@@ -55,7 +55,7 @@ exports["testpingttl"] = function(assert, done) {
 		  res.result.time_exceeded_from);
 	done();
     }, { method : 'doPing', params: [config.MSERVER_FR, 
-				     { count : 1, ttl : 1, timeout : 1 }]});
+				     { count : 1, ttl : 2, timeout : 1}]});
 };
 
 exports["testtraceroute"] = function(assert, done) {

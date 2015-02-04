@@ -1,10 +1,12 @@
+const os = require('sdk/system').platform;
+console.log(os);
 
 exports['test1'] = function(assert, done) {
     const subprocess = require("subprocess");
     subprocess.registerDebugHandler(console.log);
     subprocess.registerLogHandler(console.log);
     var p = subprocess.call({
-	command:     '/bin/echo',
+	command:     (os === 'winnt' ? 'echo' : '/bin/echo'),
       
 	arguments:   ['foo'],
       
@@ -30,7 +32,7 @@ exports['test2'] = function(assert, done) {
     subprocess.registerDebugHandler(console.log);
     subprocess.registerLogHandler(console.log);
     var p = subprocess.call({
-	command:     '/usr/bin/which',
+	command:     (os === 'winnt' ? 'C:\\Windows\\System32\\where.exe' : '/usr/bin/which'),
       
 	arguments:   ['ping'],
       
@@ -55,7 +57,8 @@ exports['test2'] = function(assert, done) {
 
 exports['test3'] = function(assert, done) {
     const child_process = require("sdk/system/child_process");
-    var p = child_process.spawn('/bin/echo',['foo']);
+	const prog = (os === 'winnt' ? 'echo' : '/bin/echo');
+    var p = child_process.spawn(prog,['foo']);
     p.stdout.on('data', function(data) {
         assert.ok((data.trim() === "foo"), "sdk can read from stdout");
     });
@@ -70,7 +73,8 @@ exports['test3'] = function(assert, done) {
 
 exports['test4'] = function(assert, done) {
     const child_process = require("sdk/system/child_process");
-    var p = child_process.spawn('/usr/bin/which',['ping']);
+	var prog = (os === 'winnt' ? 'C:\\Windows\\System32\\where.exe' : '/usr/bin/which');
+    var p = child_process.spawn(prog,['ping']);
 
     p.stdout.on('data', function(data) {
         assert.ok((data.indexOf("ping")>0), "sdk found ping");
