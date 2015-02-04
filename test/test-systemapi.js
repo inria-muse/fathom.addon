@@ -104,6 +104,14 @@ exports["testgetarp"] = function(assert, done) {
     }, { method : 'getArpCache'});
 };
 
+exports["testnslookup"] = function(assert, done) {
+    systemapi.exec(function(res, doneflag) {
+	console.log(res);
+	assert.ok(!res.error, "getArp no error");
+	done();
+    }, { method : 'nslookup', params : ['muse.inria.fr']});
+};
+
 exports["testgetroute"] = function(assert, done) {
     systemapi.exec(function(res, doneflag) {
 	console.log(res);
