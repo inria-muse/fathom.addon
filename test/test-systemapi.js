@@ -90,6 +90,7 @@ exports["testgetos"] = function(assert, done) {
 
 exports["testgethostname"] = function(assert, done) {
     systemapi.exec(function(res, doneflag) {
+	console.log(res);
 	assert.ok(!res.error && res.result, "getHostname: " + res.result);
 	done();
     }, { method : 'getHostname'});

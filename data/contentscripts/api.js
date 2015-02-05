@@ -221,13 +221,24 @@ sys.getLoad = function(callback) {
 
 /**
  * @description This function retrieves the client's current memory 
- * load via "proc".
+ * load via "proc" (non-WIN).
  *
  * @param {function} callback - The callback Fathom invokes once the
  * call completes. On error contains "error" member.
  */
 sys.getMemInfo = function(callback) {
     makereq(callback, "system", "getMemInfo");
+};
+
+
+/**
+ * @description This function retrieves system info (WIN only).
+ *
+ * @param {function} callback - The callback Fathom invokes once the
+ * call completes. On error contains "error" member.
+ */
+sys.getSysInfo = function(callback) {
+    makereq(callback, "system", "getSysInfo");
 };
 
 /**
