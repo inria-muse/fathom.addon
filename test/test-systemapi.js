@@ -55,7 +55,7 @@ exports["testpingttl"] = function(assert, done) {
 		  res.result.time_exceeded_from);
 	done();
     }, { method : 'doPing', params: [config.MSERVER_FR, 
-				     { count : 1, ttl : 2, timeout : 1}]});
+				     { count : 1, ttl : 1, timeout : 1}]});
 };
 
 exports["testtraceroute"] = function(assert, done) {
@@ -107,7 +107,7 @@ exports["testgetarp"] = function(assert, done) {
 exports["testnslookup"] = function(assert, done) {
     systemapi.exec(function(res, doneflag) {
 	console.log(res);
-	assert.ok(!res.error, "getArp no error");
+	assert.ok(!res.error, "nslookup no error");
 	done();
     }, { method : 'nslookup', params : ['muse.inria.fr']});
 };
@@ -181,7 +181,7 @@ exports["testgetwifi"] = function(assert, done) {
 exports["testmem"] = function(assert, done) {
     systemapi.exec(function(res, doneflag) {
 	console.log(res);
-	if (system.platform !== 'darwin') {
+	if (system.platform !== 'darwin' && system.platform !== 'winnt') {
 	    assert.ok(!res.error && res.result.memfree > 0, "getMemInfo");
 	} else {
 	    assert.ok(res.error, "getMemInfo");
@@ -190,14 +190,27 @@ exports["testmem"] = function(assert, done) {
     }, { method : 'getMemInfo'});
 };
 
+exports["testsysinfo"] = function(assert, done) {
+    systemapi.exec(function(res, doneflag) {
+	console.log(res);
+	if (system.platform === 'winnt') {
+	    assert.ok(!res.error && res.result.memfree > 0, "getSysInfo");
+	} else {
+		// not available
+	    assert.ok(res.error, "getSysInfo not available");
+	}
+	done();
+    }, { method : 'getSysInfo'});
+};
+
 exports["testload"] = function(assert, done) {
     systemapi.exec(function(res, doneflag) {
 	console.log(res);
 	assert.ok(!res.error, "getLoad no error");
-	assert.ok(res.result.tasks.total > 0, "getLoad found tasks");
-	assert.ok(res.result.loadavg.onemin > 0, "getLoad found loadavg");
-	assert.ok(res.result.cpu.user > 0, "getLoad found cpu");
-	assert.ok(res.result.memory.total > 0, "getLoad found memory");
+	if (system.platform !== 'winnt') assert.ok(res.result.tasks.total > 0, "getLoad found tasks");
+	if (system.platform !== 'winnt') assert.ok(res.result.loadavg.onemin > 0, "getLoad found loadavg");
+	if (system.platform !== 'winnt') assert.ok(res.result.cpu.user > 0, "getLoad found cpu");
+	if (system.platform !== 'winnt') assert.ok(res.result.memory.total > 0, "getLoad found memory");
 	done();
     }, { method : 'getLoad'});
 };
