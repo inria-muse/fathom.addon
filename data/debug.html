@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html> 
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fathom Internals</title>
+  <link rel="icon" type="image/png" id="favicon" href="icons/icon-16.png"/>  
+  <link href="stylesheets/pure-min.css" type="text/css" rel="stylesheet">
+  <link href="stylesheets/grids-responsive-min.css" type="text/css" rel="stylesheet">
+  <link href="stylesheets/font-awesome.min.css" type="text/css" rel="stylesheet">
+  <link href="stylesheets/fathom.css" type="text/css" rel="stylesheet">
+  </head>  
+  <body>    
+    <div id="container">
+
+      <div id="main">
+	<div class="header">
+          <h1>Fathom Internals</h1>
+          <h2>Debug Information about Fathom Extension</h2>
+	</div>
+      </div>
+
+      <div class="content">
+	<div id="rendertarget"></div>
+      </div>
+
+    </div>
+
+    <script id="rendertemplate" type="x-tmpl-mustache">
+      {{#components}}
+      <h2>{{name}}</h2>
+      <table class="pure-table">
+	<thead>
+          <tr>
+            <th>Key</th>
+            <th>Value</th>
+          </tr>
+	</thead>
+	<tbody>
+	  {{#data}}
+          <tr>
+            <td>{{key}}</td>
+            <td>{{value}}</td>
+          </tr>
+	  {{/data}}
+	</tbody>
+      </table>
+      {{/components}}
+    </script>
+
+    <script src="extscripts/jquery.min.js"></script>
+    <script src="extscripts/underscore-min.js"></script>
+    <script src="extscripts/mustache.js"></script>
+    <script src="debug.js"></script>
+  </body>
+</html>

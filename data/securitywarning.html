@@ -33,14 +33,17 @@
     </div>
 
     <script id="rendertemplate" type="x-tmpl-mustache">
-      The page wants to use following functions:
+      <strong>{{appname}}</strong><br/>
+      <i>{{appdesc}}</i><br/>
+
+      The script wants to use following functions:
       <ul>
 	{{#api}}
 	<li><strong>{{orig}}:</strong> {{desc}}</li>
 	{{/api}}
       </ul>
       
-      The page wants to communicate with following destinations:
+      The script wants to communicate with following destinations:
       <ul>
 	{{#dst}}
 	<li>{{desc}}</li>

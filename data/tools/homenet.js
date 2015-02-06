@@ -337,7 +337,7 @@ window.onload = function() {
 	    } else {
 		// all done
 		var elapsed = (window.performance.now() - startts); // ms
-		fathom.uploaddata('homenet', { 
+		fathom.uploaddata({ 
 		    ts : ts.getTime(),
 		    timezoneoffset : ts.getTimezoneOffset(),
 		    elapsed : elapsed,

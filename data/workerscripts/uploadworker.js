@@ -56,7 +56,7 @@ onmessage = function(event) {
 		var bcount = byteCount(msgdata);
 		postMessage(JSON.stringify({
 		    elapsed : elapsed,
-		    datalen : bcount,
+		    bytes : bcount,
 		    rate : (elapsed > 0 ?
 			    (bcount * 8.0) / (elapsed/1000.0) : // bits / s
 			    undefined)

@@ -38,7 +38,7 @@ Fathom comes with a set of built-in tools for network monitoring and troubleshoo
 
 ## Use Fathom on Web Pages
 
-Fathom provides a set of network measurement oriented javascript APIs for regular web pages, read more from [our project dev site](https://muse.inria.fr/fathom/dev).
+Fathom provides a set of network measurement oriented javascript APIs for regular web pages, read more from [our project dev web site](https://muse.inria.fr/fathom/dev).
 
 ### Contributors
 

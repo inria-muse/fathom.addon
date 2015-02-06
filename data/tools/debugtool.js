@@ -763,7 +763,7 @@ window.onload = function() {
 	var startts = window.performance.now();
 	testsuites.exec(function(obj) {
 	    var elapsed = (window.performance.now() - startts); // ms
-	    fathom.uploaddata('debugtool', { 
+	    fathom.uploaddata({ 
 		ts : ts.getTime(),
 		timezoneoffset : ts.getTimezoneOffset(),
 		elapsed : elapsed,

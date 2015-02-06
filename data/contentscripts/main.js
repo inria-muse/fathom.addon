@@ -18,56 +18,34 @@
  * This script is attached via page-mod to pages accessed using 
  * http(s)://, file:// and resource:// protocols.
  *
+ * Alternatively the addon pages can include this file directly via
+ * a script tag (and the content is loaded as 'trusted').
+ *
  * @author Anna-Kaisa Pietilainen <anna-kaisa.pietilainen@inria.fr> 
  */
 
-var error = function(message, e) {
-    console.error(message + (e ? "\n"+e : ""));
-    console.trace();
-};
-
-var debug = function(message, obj) {
-    console.log(message +(obj ? "\n"+JSON.stringify(obj,null,2) : ""));
-};
-
-// TODO: remove the 'trusted script' option ?
-// this script can be loaded as 'trusted' script (directly in
-// addon html pages <script> tags) or attached as content script
-var trusted = (typeof addon !== "undefined");
-
-// addon or regular web page ?
-var isaddon = (trusted || 
-	       (typeof self !== "undefined" && self.options.isaddon));
-
-// user pref
-var enableapi = (trusted || 
-		 (typeof self !== "undefined" && self.options.enableapi));
-
-debug("loading fathom " + 
-     ", trusted=" + trusted + 
-     ", isaddon=" + isaddon + 
-     ", enableapi=" + enableapi);
-
-if (enableapi) {
+if (typeof addon !== "undefined" || 
+    (typeof self !== "undefined" && self.options.enableapi)) 
+{
     // The global Fathom object clone in page script context or 
     // the actual object if trusted (this script is loaded in page context)
     var fathom = undefined; 
 
     // HACKish... make this func global so the api.js can call it.
-    // Only required to support trusted addon script to directly 
-    // include fathom api on the page (instead as content script)
     var makereq = function() {};
 
-    // init rest in a func closure to keep things hidden
+    // hide everything else in this closure
     (function() {
+	// TODO: remove the 'trusted script' option ?
+	var trusted = (typeof addon !== "undefined");
+
+	// addon or regular web page ?
+	var isaddon = (trusted || 
+		       (typeof self !== "undefined" && self.options.isaddon));
+
 	var dummyfathom = {
 	    about : "Fathom - Browser-based Network Measurements",
-	    copyright : "Inria & ICSI, 2012-2015",	
-	};
-
-	var FathomException = function(message) {
-	    this.message = message;
-	    this.name = "FathomException";
+	    copyright : "Inria & ICSI, 2014-2015",	
 	};
 
 	/* On-going requests and corresponding callbacks. */
@@ -86,14 +64,13 @@ if (enableapi) {
 	    req.module = module;     // fathom.module or init/close
 	    req.method = method;     // fathom.module.method
 	    req.params = params;     // method params
-	    req.multiresp = (multiresponse !== undefined ? multiresponse : false);
+	    req.multiresp = (multiresponse !== undefined ? 
+			     multiresponse : false);
 	    req.id = nextreqid;      // unique request id
 	    
-	    if (callback) {
-		requests[req.id] = { 
-		    cb : callback,
-		    req : req,
-		};
+	    requests[req.id] = { 
+		cb : callback,
+		req : req
 	    };
 	    
 	    // send msg to the addon
@@ -111,8 +88,6 @@ if (enableapi) {
 		|| !res.id 
 		|| !requests[res.id]) 
 	    {
-		// should not really happen ...
-		error("invalid message from the addon",res);
 		return;
 	    }
 	    
@@ -234,8 +209,7 @@ if (enableapi) {
 	var handleinit = function(cb) {
 	    return function(res) {
 		if (res.error) {
-		    // some failure (user did not accept the manifest etc)
-		    throw new FathomException(res.error);
+		    cb(res);
 		} else {
 		    // security check ok, attach validated API methods and 
 		    // return control to the page script
@@ -247,17 +221,21 @@ if (enableapi) {
 
 	if (!trusted) {
 	    if (!isaddon) {
+		// init for regular web pages
 		dummyfathom.init = function(callback, manifest) {
 		    if (!manifest || 
-			(manifest.api===undefined && 
+			(manifest.appname===undefined || 
+			 manifest.appdesc===undefined || 
+			 manifest.api===undefined || 
 			 manifest.destinations===undefined)) 
 		    {
-			throw new FathomException(
-			    "missing or invalid manifest");
+			callback({error : "missing or invalid manifest"});
+			return;
 		    }
+
 		    if (nextreqid>1) {
 			// re-calling init, cleanup previous state
-			makereq(undefined, 'close');
+			makereq(undefined, 'internal', 'close', undefined);
 			// reset exposed api
 			fathom = cloneInto(dummyfathom, unsafeWindow,
 					   { cloneFunctions: true });
@@ -269,12 +247,14 @@ if (enableapi) {
 		    // used in manifest destination checks
 		    manifest.location = window.location;
 		    manifest.isaddon = false;
-		    makereq(handleinit(callback), 'init', undefined, manifest);
+		    makereq(handleinit(callback), 'internal', 'init', manifest);
 		};
 	    } else {	
 		// simplified init for addon pages
 		dummyfathom.init = function(callback) {
 		    var manifest = {
+			appname : 'fathomtool',
+			appdesc : 'built-in tool',
 			api : [],
 			destinations : [],
 			location : window.location,
@@ -283,20 +263,22 @@ if (enableapi) {
 		    for (var api in fathomapi) {
 			manifest.api.push(api+".*");
 		    }
-		    makereq(handleinit(callback), 'init', undefined, manifest);
+		    makereq(handleinit(callback), 'internal', 'init', manifest);
 		};
 
-		// upload method for addon pages
-		dummyfathom.uploaddata = function(src, data) {
-		    self.port.emit("uploaddata", { 
-			'datasource' : src, 
-			'data' : data
-		    });
+		// expose the internal API directly to the addon pages
+		dummyfathom.internal = function(callback, method, params) {
+		    makereq(callback, 'internal', method, params);
 		}
+
+		// shortcut for uploads
+		dummyfathom.uploaddata = function(src, data) {
+		    makereq(undefined, 'internal', 'upload', data);
+		};
 	    }
 
 	    dummyfathom.close = function() {
-		makereq(undefined, 'close');
+		makereq(undefined, 'internal', 'close', undefined);
 	    };
 
 	    // create initial Fathom object and expose it to page script(s)
@@ -308,6 +290,8 @@ if (enableapi) {
 	    // simplified init for trusted addon pages
 	    dummyfathom.init = function(callback) {
 		var manifest = {
+		    appname : 'fathomtool',
+		    appdesc : 'built-in tool',
 		    api : [],
 		    destinations : [],
 		    location : window.location,
@@ -316,23 +300,25 @@ if (enableapi) {
 		for (var api in fathomapi) {
 		    manifest.api.push(api+".*");
 		}
-		makereq(handleinit(callback), 'init', undefined, manifest);
+		makereq(handleinit(callback), 'internal', 'init', manifest);
 	    };
 
-	    // upload method for addon pages
-	    dummyfathom.uploaddata = function(src, data) {
-		addon.port.emit("uploaddata", { 
-		    'datasource' : src, 
-		    'data' : data
-		});
-	    }
+	    // expose the internal API directly to the addon pages
+	    dummyfathom.internal = function(callback, method, params) {
+		makereq(callback, 'internal', method, params);
+	    };
+
+	    // shortcut for uploads
+	    dummyfathom.uploaddata = function(data) {
+		makereq(undefined, 'internal', 'upload', data);
+	    };
 
 	    dummyfathom.close = function() {
-		makereq(undefined, 'close');
+		makereq(undefined, 'internal', 'close', undefined);
 	    };
 
 	    // expose directly via the window
 	    window.fathom = fathom = dummyfathom;
 	}
     }()); // init closure
-} // else Fathom for any page is disabled, do nothing
+} // disabled
