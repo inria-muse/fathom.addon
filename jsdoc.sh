@@ -4,3 +4,4 @@
 DOC=doc
 rm -rf $DOC
 jsdoc -d $DOC data/contentscripts/api.js
+cp -ru $DOC ../fathom.web/api
