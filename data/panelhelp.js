@@ -103,12 +103,12 @@ addon.port.on("render", function(values) {
 	e.innerHTML = rendered;
 
 	// request resize the panel to fit the rendered content
-	var es = getElemSize(e);
-	var s = getSize();
-	addon.port.emit('resize', {
-	    width : Math.max(es[0],s[0]),
-	    height : Math.max(es[1],s[1])
-	});
+	//var es = getElemSize(e);
+	//var s = getSize();
+	//addon.port.emit('resize', {
+	//    width : Math.max(es[0],s[0]),
+	//    height : Math.max(es[1],s[1])
+	//});
     } else {
 	console.error("Did you forgot to include mustache.js?!");
     }

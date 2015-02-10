@@ -1,7 +1,7 @@
 var _ = require('underscore');
 var sec = require("./security");
 
-exports["test1 parseManifest errors"] = function(assert) {
+exports["testerrors"] = function(assert) {
     var m = {
 	'api' : [
 	    'foo.*',
@@ -9,7 +9,7 @@ exports["test1 parseManifest errors"] = function(assert) {
 	'destinations' : []
     };
     var r = sec.parseManifest(m);
-    assert.ok((r.error !== undefined && r.error.indexOf('No such api')>=0),
+    assert.ok((r.error !== undefined && r.error.type == "invalidmanifest"),
 	      "parseManifest detects invalid api");
 
     m = {
@@ -17,7 +17,7 @@ exports["test1 parseManifest errors"] = function(assert) {
 	'destinations' : ['foo://bar']
     };
     r = sec.parseManifest(m);
-    assert.ok((r.error !== undefined && r.error.indexOf('invalid proto')>=0),
+    assert.ok((r.error !== undefined && r.error.type == "invalidmanifest"),
 	      "parseManifest detects invalid destination protocol");
 
     m = {
@@ -25,7 +25,7 @@ exports["test1 parseManifest errors"] = function(assert) {
 	'destinations' : ['bar:asd']
     };
     r = sec.parseManifest(m);
-    assert.ok((r.error !== undefined && r.error.indexOf('invalid port')>=0),
+    assert.ok((r.error !== undefined && r.error.type == "invalidmanifest"),
 	      "parseManifest detects non-numerical destination port");
 
     m = {
@@ -33,11 +33,12 @@ exports["test1 parseManifest errors"] = function(assert) {
 	'destinations' : ['bar:100000']
     };
     r = sec.parseManifest(m);
-    assert.ok((r.error !== undefined && r.error.indexOf('invalid port')>=0),
+    assert.ok((r.error !== undefined && r.error.type == "invalidmanifest"),
 	      "parseManifest detects invalid destination port");
 };
 
-exports["test2 parseManifest apis"] = function(assert) {
+
+exports["testapiparsing"] = function(assert) {
     var m = {
 	'api' : [
 	    'socket.*',
@@ -73,7 +74,7 @@ exports["test2 parseManifest apis"] = function(assert) {
 	      "parseManifest parses 2nd level methods correctly");
 };
 
-exports["test3 parseManifest destinations"] = function(assert) {
+exports["testdstparsing"] = function(assert) {
     m = {
 	'destinations' : [
 	    'udp://192.168.1.1:53',
@@ -81,6 +82,7 @@ exports["test3 parseManifest destinations"] = function(assert) {
 	    '192.168.1.1:5353',
 	    '*://192.168.1.1:*',
 	    '192.168.1.2',
+	    'www.google.com',
 	]
     };
     r = sec.parseManifest(m);
@@ -103,9 +105,14 @@ exports["test3 parseManifest destinations"] = function(assert) {
     assert.ok((r.error === undefined && r.allowdst['*'] && 
 	       r.allowdst['*']['192.168.1.2']['*']),
 	     "parseManifest parses "+m.destinations[4]+" correctly");
+
+    assert.ok((r.error === undefined && r.allowdst['*'] && 
+	       r.allowdst['*']['www.google.com']['*']),
+	     "parseManifest parses "+m.destinations[5]+" correctly");
+
 };
 
-exports["test4 checkDstPermission"] = function(assert) {
+exports["testcheckdst"] = function(assert) {
     var m = {
 	'destinations' : [
 	    'udp://192.168.1.1:53',

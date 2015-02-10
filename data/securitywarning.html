@@ -18,7 +18,7 @@
 	</h1>
 
 	<p class="splash-subhead">
-	  <i class="fa fa-warning fa-lg"></i>&nbsp;&nbsp;This Web Page is Requesting Special Privileges
+	  <i class="fa fa-warning fa-lg"></i>&nbsp;&nbsp;Web Page is Requesting Fathom Privileges
 	</p>
 
 	<p id="rendertarget" class="splash-text-left">
@@ -33,17 +33,17 @@
     </div>
 
     <script id="rendertemplate" type="x-tmpl-mustache">
-      <strong>{{appname}}</strong><br/>
-      <i>{{appdesc}}</i><br/>
+      <strong>Page:</strong>{{origin}}<br/>
+      {{#description}}<i>{{description}}</i><br/>{{/description}}
 
-      The script wants to use following functions:
+      The page requests access to following functions:
       <ul>
 	{{#api}}
 	<li><strong>{{orig}}:</strong> {{desc}}</li>
 	{{/api}}
       </ul>
       
-      The script wants to communicate with following destinations:
+      The page will communicate with the following destinations:
       <ul>
 	{{#dst}}
 	<li>{{desc}}</li>

@@ -1108,9 +1108,9 @@ var proto = fathomapi.proto = {};
 /**
  * @description HTTP protocol implementation using fathom sockets.
  * 
- * NOTE use browser xmlhttprequest API if you can, this implementation 
- * provides a really basic support for HTTP for testing/measurement 
- * purposes only.
+ * NOTE, you should use the built-in browser xmlhttprequest API 
+ * for fetching HTTP resources, this implementation provides just a basic 
+ * support of HTTP for testing/measurement purposes only.
  * 
  * @exports fathom/proto/http
  */
@@ -1143,7 +1143,8 @@ http.create = function(callback, ip, port) {
  * It can null in case of GET.
  */
 http.send = function(callback, httpid, method, path, headers, data) {
-    makereq(callback, "proto.http", "send", [httpid, method, path, headers, data]);
+    makereq(callback, "proto.http", "send", 
+	    [httpid, method, path, headers, data]);
 };
 	    
 /**
@@ -1170,6 +1171,10 @@ http.close = function(callback, httpid) {
 
 /**
  * @description DNS protocol implementation using fathom sockets.
+ *
+ * NOTE, for regular IP lookups the tools.lookup* methods are preferred. 
+ * This implementation is basic and should be used for troubleshooting 
+ * only.
  *
  * @exports fathom/proto/dns
  */
@@ -1371,6 +1376,7 @@ var tools = fathomapi.tools = {};
 /**
  * @description ping (udp/tcp/http) client/server implementation in
  * using nspr API directly
+ *
  * @exports fathom/tools/ping
  */
 var ping = tools.ping = {};
@@ -1384,7 +1390,7 @@ var ping = tools.ping = {};
  * the arguments (naming and values) that you can give to commandline
  * ping. At minimum { client : <ip> } else runs as server.
  */
-tools.ping.start = function(callback, args) {
+ping.start = function(callback, args) {
     makereq(callback, "tools", "ping.start", [args], true);
 };
 
@@ -1392,7 +1398,7 @@ tools.ping.start = function(callback, args) {
  * @description stop running ping server.
  * @param {number} id The id returned by the start call.
  */
-tools.ping.stop = function(callback, id) {
+ping.stop = function(callback, id) {
     makereq(callback, "tools", "ping.stop", [id]);
 };
 
@@ -1404,7 +1410,7 @@ tools.ping.stop = function(callback, id) {
 var iperf = tools.iperf = {};
 
 /**
- * @description Start iperf.
+ * @description Start iperf (args.c -> client or args.s -> server).
  *
  * @param {function} func The callback function to invoke when
  * results are available.
@@ -1412,7 +1418,7 @@ var iperf = tools.iperf = {};
  * the arguments (naming and values) that you can give to commandline
  * iperf.
  */
-tools.iperf.start = function(callback, args) {
+iperf.start = function(callback, args) {
     makereq(callback, "tools", "iperf.start", [args], true);
 };
 
@@ -1420,8 +1426,21 @@ tools.iperf.start = function(callback, args) {
  * @description stop running iperf server.
  * @param {number} id The id returned by the start call.
  */
-tools.iperf.stop = function(callback, id) {
+iperf.stop = function(callback, id) {
     makereq(callback, "tools", "iperf.stop", [id]);
+};
+
+/**
+ * @description  This function gets a certificate chain information for 
+ * the specified uri.
+ *
+ * @param {function} callback The return callback. Returns the response or 
+ * an object with error field in case of failure. 
+ * @param {string} uri The complete uri for which the certificate should be
+ * resolved.
+ */ 	
+tools.getCertificateChain = function(callback, uri) {
+    makereq(callback, "tools", "getCertChain", [uri]);
 };
 
 /**
@@ -1449,19 +1468,6 @@ tools.lookupUrl = function(callback, url) {
 tools.lookupHostname = function(callback, hostname) {
     makereq(callback, "tools", "lookupHostname", [hostname]);
 };
-	    
-/**
- * @description  This function gets a certificate chain information for 
- * the specified uri.
- *
- * @param {function} callback The return callback. Returns the response or 
- * an object with error field in case of failure. 
- * @param {string} uri The complete uri for which the certificate should be
- * resolved.
- */ 	
-tools.getCertificateChain = function(callback, uri) {
-    makereq(callback, "tools", "getCertChain", [uri]);
-};
 
 /**
  * @description device manufacturer lookup based on the MAC address. 
@@ -1481,27 +1487,37 @@ tools.lookupIP = function(callback) {
 /**
  * @description Get this node description (as send out in response to
  *              Fathom discovery queries). Static node info + current
-                active interfaces + network env.
+ *              active interfaces + network env.
+ *
+ *              Available only for addon pages.
  */
 tools.getDesc = function(callback) {
     makereq(callback, "tools", "getDesc", []);
 };
+tools.getDesc.addononly = true;
 
 /**
  * @description Get this node current network environment.
+ *
+ *              Available only for addon pages.
  */
 tools.getNetworkEnv = function(callback) {
     makereq(callback, "tools", "getNetworkEnv", []);
 };
+tools.getNetworkEnv.addononly = true;
 
 /**
  * @description Do full network neighbour search (uses any available
  *              means to discover devices in the local network).
+ *
+ *              Available only for addon pages.
+ *
  * @param {number} timeout Time to wait devices (in seconds).
  */
 tools.discovery = function(callback, timeout) {
     makereq(callback, "tools", "discovery", [timeout]);
 };
+tools.discovery.addononly = true;
 
 /**
  * @description Fathom remote API implementation. Includes discovery and
@@ -1512,9 +1528,11 @@ tools.discovery = function(callback, timeout) {
  *              the manifest, they are allowed implicitely when requesting
  *              the tools.remoteapi.* functionality.
  *
+ *              These methods are available only for addon pages.
+ *
  * @exports fathom/tools/remoteapi
  */
-tools.remoteapi = {};
+tools.remoteapi = { addononly : true };
 
 /**
  * @description Start remote API servers (sets the browser visible to other 
@@ -1522,16 +1540,18 @@ tools.remoteapi = {};
  *
  *              Does nothing if API is already enabled.
  */
-tools.remoteapi.start = function(callback) {
+remoteapi.start = function(callback) {
     makereq(callback, "tools", "remoteapi.start", []);
 };
+remoteapi.start.addononly = true;
 
 /**
  * @description Stop remote API servers (unless somebody else is using it).
  */
-tools.remoteapi.stop = function(callback) {
+remoteapi.stop = function(callback) {
     makereq(callback, "tools", "remoteapi.stop", []);
 };
+remoteapi.stop.addononly = true;
 
 /**
  * @description Discover other nodes running Fathom (i.e. nodes that have 
@@ -1540,9 +1560,10 @@ tools.remoteapi.stop = function(callback) {
  * @param {Function} callback Result callback.
  * @param {int} timeout Timeout (seconds).
  */
-tools.remoteapi.discovery = function(callback, timeout) {
+remoteapi.discovery = function(callback, timeout) {
     makereq(callback, "tools", "remoteapi.discovery", [timeout]);
 };
+remoteapi.discovery.addononly = true;
 
 /**
  * @description Make remote API requests to other nodes running Fathom.
@@ -1553,9 +1574,10 @@ tools.remoteapi.discovery = function(callback, timeout) {
  *                          available subject to the page manifest).
  * @param {Array} params    The parameters for the API call.
  */
-tools.remoteapi.makereq = function(callback, node, method, params) {
+remoteapi.makereq = function(callback, node, method, params) {
     makereq(callback, "tools", "remoteapi.makereq", [node,method,params]);
 };
+remoteapi.makereq.addononly = true;
 
 //--------------------- FATHOM.BASELINE --------------------------
 

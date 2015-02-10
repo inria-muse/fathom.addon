@@ -136,27 +136,42 @@ if (typeof addon !== "undefined" ||
 		} else {
 		    // export by cloning
 		    if (submodule) {
+			// create module object
 			if (!fathom[module])
 			    fathom[module] = createObjectIn(
 				fathom, 
 				{defineAs: module});
 
 			if (func && func !== '*') {
+			    // create submodule object
 			    if (!fathom[module][submodule])
 				fathom[module][submodule] = createObjectIn(
 				    fathom[module], 
 				    {defineAs: submodule});
 
-			    exportFunction(fathomapi[module][submodule][func], 
-					   fathom[module][submodule], 
-					   {defineAs: func});
+			    // make sure not to expose addononly functions
+			    // for regular pages
+			    if (isaddon || 
+				(!fathomapi[module][submodule][func].addononly)) 
+			    {
+				exportFunction(fathomapi[module][submodule][func], 
+					       fathom[module][submodule], 
+					       {defineAs: func});
+			    }
 
 			} else {
-			    fathom[module][submodule] = cloneInto(
-				fathomapi[module][submodule], 
-				fathom[module],
-				{ cloneFunctions: true });	
+			    // make sure not to expose addononly functions
+			    // for regular pages
+			    if (isaddon || 
+				(!fathomapi[module][submodule].addononly)) 
+			    {
+				fathom[module][submodule] = cloneInto(
+				    fathomapi[module][submodule], 
+				    fathom[module],
+				    { cloneFunctions: true });	
+			    }
 			}
+
 		    } else {
 			if (func && func !== '*') {
 			    if (!fathom[module])
@@ -164,15 +179,27 @@ if (typeof addon !== "undefined" ||
 				    fathom, 
 				    {defineAs: module});
 
-			    exportFunction(fathomapi[module][func], 
-					   fathom[module], 
-					   {defineAs: func});
+			    // make sure not to expose addononly functions
+			    // for regular pages
+			    if (isaddon || 
+				(!fathomapi[module][func].addononly)) 
+			    {
+				exportFunction(fathomapi[module][func], 
+					       fathom[module], 
+					       {defineAs: func});
+			    }
 
 			} else {
-			    fathom[module] = cloneInto(
-				fathomapi[module], 
-				fathom,
-				{ cloneFunctions: true });	
+			    // make sure not to expose addononly functions
+			    // for regular pages
+			    if (isaddon || 
+				(!fathomapi[module].addononly)) 
+			    {
+				fathom[module] = cloneInto(
+				    fathomapi[module], 
+				    fathom,
+				    { cloneFunctions: true });	
+			    }
 			}
 		    }
 		}
@@ -224,9 +251,7 @@ if (typeof addon !== "undefined" ||
 		// init for regular web pages
 		dummyfathom.init = function(callback, manifest) {
 		    if (!manifest || 
-			(manifest.appname===undefined || 
-			 manifest.appdesc===undefined || 
-			 manifest.api===undefined || 
+			(manifest.api===undefined || 
 			 manifest.destinations===undefined)) 
 		    {
 			callback({error : "missing or invalid manifest"});
@@ -253,8 +278,7 @@ if (typeof addon !== "undefined" ||
 		// simplified init for addon pages
 		dummyfathom.init = function(callback) {
 		    var manifest = {
-			appname : 'fathomtool',
-			appdesc : 'built-in tool',
+			description : "Fathom Tools",
 			api : [],
 			destinations : [],
 			location : window.location,
@@ -290,8 +314,7 @@ if (typeof addon !== "undefined" ||
 	    // simplified init for trusted addon pages
 	    dummyfathom.init = function(callback) {
 		var manifest = {
-		    appname : 'fathomtool',
-		    appdesc : 'built-in tool',
+		    description : 'Fathom Tools',
 		    api : [],
 		    destinations : [],
 		    location : window.location,
