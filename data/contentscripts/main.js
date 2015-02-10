@@ -112,6 +112,7 @@ if (typeof addon !== "undefined" ||
 
 	/* Expose selected modules & methods to the page scripts. */
 	var exportapi = function(methods) {
+
 	    var _export = function(module, submodule, func) {
 		if (trusted) {
 		    // export directly to trusted pages
@@ -143,33 +144,21 @@ if (typeof addon !== "undefined" ||
 				{defineAs: module});
 
 			if (func && func !== '*') {
-			    // create submodule object
+			    // create submodule object			    
 			    if (!fathom[module][submodule])
 				fathom[module][submodule] = createObjectIn(
 				    fathom[module], 
 				    {defineAs: submodule});
-
-			    // make sure not to expose addononly functions
-			    // for regular pages
-			    if (isaddon || 
-				(!fathomapi[module][submodule][func].addononly)) 
-			    {
-				exportFunction(fathomapi[module][submodule][func], 
-					       fathom[module][submodule], 
-					       {defineAs: func});
-			    }
+			    
+			    exportFunction(fathomapi[module][submodule][func], 
+					   fathom[module][submodule], 
+					   {defineAs: func});
 
 			} else {
-			    // make sure not to expose addononly functions
-			    // for regular pages
-			    if (isaddon || 
-				(!fathomapi[module][submodule].addononly)) 
-			    {
-				fathom[module][submodule] = cloneInto(
-				    fathomapi[module][submodule], 
-				    fathom[module],
-				    { cloneFunctions: true });	
-			    }
+			    fathom[module][submodule] = cloneInto(
+				fathomapi[module][submodule], 
+				fathom[module],
+				{ cloneFunctions: true });	
 			}
 
 		    } else {
@@ -179,54 +168,56 @@ if (typeof addon !== "undefined" ||
 				    fathom, 
 				    {defineAs: module});
 
-			    // make sure not to expose addononly functions
-			    // for regular pages
-			    if (isaddon || 
-				(!fathomapi[module][func].addononly)) 
-			    {
-				exportFunction(fathomapi[module][func], 
-					       fathom[module], 
-					       {defineAs: func});
-			    }
+			    exportFunction(fathomapi[module][func], 
+					   fathom[module], 
+					   {defineAs: func});
 
 			} else {
-			    // make sure not to expose addononly functions
-			    // for regular pages
-			    if (isaddon || 
-				(!fathomapi[module].addononly)) 
-			    {
-				fathom[module] = cloneInto(
-				    fathomapi[module], 
-				    fathom,
-				    { cloneFunctions: true });	
-			    }
+			    fathom[module] = cloneInto(
+				fathomapi[module], 
+				fathom,
+				{ cloneFunctions: true });	
 			}
 		    }
 		}
 	    }; // export
 
-	    for (var module in methods) {
-		for (var submodule in methods[module]) {
-		    if (submodule === '*') {
-			// module.* => export all funcs
-			_export(module, undefined, undefined);
-			break;
-		    }
+	    for (var module in fathomapi) {
+		if (!methods[module])
+		    continue; // not requested
 
-		    if (typeof fathomapi[module][submodule] === 'function') {
-			// module.function => selected func
+		// check functions and submodules
+		for (var submodule in fathomapi[module]) {
+		    if (typeof fathomapi[module][submodule] === 'function' && 
+			(methods[module]['*'] || methods[module][submodule]) &&
+			(isaddon || !fathomapi[module][submodule].addononly)) 
+		    {
+			// module.[*|function] => selected func
 			_export(module, undefined, submodule);
 			continue;
 		    }
 
-		    // else check submodule
+		    if (typeof fathomapi[module][submodule] === 'object' && 
+			(methods[module]['*'] || 
+			 methods[module][submodule]['*']) && 
+			(isaddon || !fathomapi[module][submodule].addononly)) 
+		    {
+			// requested module.[*|submodule.*] => export all funcs
+			_export(module, submodule, undefined);
+			continue;
+		    }
+
+		    // else check submodule functions
 		    for (var func in fathomapi[module][submodule]) {
-			if (func === '*') {
-			    // module.submodule.* => export all
-			    _export(module, submodule, undefined);
-			} else {		    
-			    // module.submodule.func => selected func
+			if (typeof fathomapi[module][submodule][func] === 'function' && 
+			    (methods[module]['*'] || 
+			     methods[module][submodule][func]) &&
+			    (isaddon || 
+			     !fathomapi[module][submodule][func].addononly)) 
+			{
+			    // module.submodule.function => selected func
 			    _export(module, submodule, func);
+			    continue;
 			}
 		    }
 		}

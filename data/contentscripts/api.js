@@ -1472,17 +1472,21 @@ tools.lookupHostname = function(callback, hostname) {
 /**
  * @description device manufacturer lookup based on the MAC address. 
  * @param {string} mac The mac addres.
+ * @access private
  */
 tools.lookupMAC = function(callback, mac) {
     makereq(callback, "tools", "lookupMAC", [mac]);
 };
+tools.lookupMAC.addononly = true;
 
 /**
  * @description get my current public IP.
+ * @access private
  */
 tools.lookupIP = function(callback) {
     makereq(callback, "tools", "lookupIP", []);
 };
+tools.lookupIP.addononly = true;
 
 /**
  * @description Get this node description (as send out in response to
@@ -1527,7 +1531,7 @@ tools.discovery.addononly = true;
  * @access private
  * @exports fathom/tools/remoteapi
  */
-tools.remoteapi = { addononly : true };
+var remoteapi = tools.remoteapi = { addononly : true };
 
 /**
  * @description Start remote API servers (sets the browser visible to other 
