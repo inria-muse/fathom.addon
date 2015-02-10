@@ -1488,8 +1488,7 @@ tools.lookupIP = function(callback) {
  * @description Get this node description (as send out in response to
  *              Fathom discovery queries). Static node info + current
  *              active interfaces + network env.
- *
- *              Available only for addon pages.
+ * @access private
  */
 tools.getDesc = function(callback) {
     makereq(callback, "tools", "getDesc", []);
@@ -1498,8 +1497,7 @@ tools.getDesc.addononly = true;
 
 /**
  * @description Get this node current network environment.
- *
- *              Available only for addon pages.
+ * @access private
  */
 tools.getNetworkEnv = function(callback) {
     makereq(callback, "tools", "getNetworkEnv", []);
@@ -1509,9 +1507,7 @@ tools.getNetworkEnv.addononly = true;
 /**
  * @description Do full network neighbour search (uses any available
  *              means to discover devices in the local network).
- *
- *              Available only for addon pages.
- *
+ * @access private
  * @param {number} timeout Time to wait devices (in seconds).
  */
 tools.discovery = function(callback, timeout) {
@@ -1528,8 +1524,7 @@ tools.discovery.addononly = true;
  *              the manifest, they are allowed implicitely when requesting
  *              the tools.remoteapi.* functionality.
  *
- *              These methods are available only for addon pages.
- *
+ * @access private
  * @exports fathom/tools/remoteapi
  */
 tools.remoteapi = { addononly : true };
@@ -1539,6 +1534,7 @@ tools.remoteapi = { addononly : true };
  *              Fathoms and serves incoming RPC calls).
  *
  *              Does nothing if API is already enabled.
+ * @access private
  */
 remoteapi.start = function(callback) {
     makereq(callback, "tools", "remoteapi.start", []);
@@ -1547,6 +1543,7 @@ remoteapi.start.addononly = true;
 
 /**
  * @description Stop remote API servers (unless somebody else is using it).
+ * @access private
  */
 remoteapi.stop = function(callback) {
     makereq(callback, "tools", "remoteapi.stop", []);
@@ -1557,6 +1554,7 @@ remoteapi.stop.addononly = true;
  * @description Discover other nodes running Fathom (i.e. nodes that have 
  *              called remoteapi.start).
  *
+ * @access private
  * @param {Function} callback Result callback.
  * @param {int} timeout Timeout (seconds).
  */
@@ -1568,6 +1566,7 @@ remoteapi.discovery.addononly = true;
 /**
  * @description Make remote API requests to other nodes running Fathom.
  *
+ * @access private
  * @param {Function} callback Result callback.
  * @param {Object} node     The target Fathom node as returned by the discovery.
  * @param {string} method   The Fathom API method to call (all API methods
