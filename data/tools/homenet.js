@@ -28,6 +28,10 @@ var NetGraph = function(elem, clickevents, width) {
     };
 
     // SVG canvas
+    d3.select(elem)
+ 	.attr("width", width)
+        .style("position", "relative")
+
     var svg = d3.select(elem).append("svg:svg")
     	.attr("class", "net-graph")
  	.attr("width", width)
@@ -47,10 +51,13 @@ var NetGraph = function(elem, clickevents, width) {
 
     // info float
     var infobox = d3.select(elem)
-	.style("position", "relative")
 	.append("div")
         .attr("class", "infofloat")
-        .style("opacity", 0);
+	.style("position", "absolute")
+        .style('top', '10px')
+        .style('left', '50%')
+        .style('margin-left', (-width/2+10)+'px')
+        .style("opacity", 0); // hidden
 
     var tick = function() {
         link.attr("x1", function(d) { return d.source.x; })
@@ -102,22 +109,22 @@ var NetGraph = function(elem, clickevents, width) {
     var clickednode = undefined;
     var nodemouseclick = function(n) {
 	if (clickednode === undefined) {
+	    clickednode = d3.select(this);
 	    infobox.html(formatInfoStr(n));
 	    infobox.transition()
-		.duration(100)
+		.duration(300)
 		.style("opacity", .9);
 
-	    clickednode = d3.select(this);
 	    clickednode.select("circle").transition()
-		.duration(100)
+		.duration(300)
 		.attr("r", defaultr+defaultr/3);
 	} else {
 	    infobox.transition()
-		.duration(100)
+		.duration(300)
 		.style("opacity", 0)
 	    
 	    clickednode.select("circle").transition()
-		.duration(100)
+		.duration(300)
 		.attr("r", defaultr);
 	    clickednode = undefined;
 	}
@@ -329,6 +336,9 @@ window.onload = function() {
 	// FIXME: mobile flag + adjust width ?
 	var g = new NetGraph('#canvas', false, 640);
 
+	// start the remote API for discovering other Fathoms
+	fathom.tools.remoteapi.start(function() {});
+
 	fathom.tools.discovery(function(node) {
 	    if (node.type) {
 		results.push(node);
@@ -342,7 +352,7 @@ window.onload = function() {
 		    timezoneoffset : ts.getTimezoneOffset(),
 		    elapsed : elapsed,
 		    results : _.map(results,function(o) {
-			// remove UI related keys from the data
+			// remove UI related keys from the uploaded data
 			return _.omit(o,
 				      "id",
 				      "cssstyle",
@@ -355,6 +365,9 @@ window.onload = function() {
 				      "fixed");
 		    })
 		});
+
+		// stop using the extension
+		fathom.tools.remoteapi.stop(function() {});
 		fathom.close();
 	    }
 	}); // disc	

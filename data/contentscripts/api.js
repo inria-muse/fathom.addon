@@ -1391,7 +1391,7 @@ var ping = tools.ping = {};
  * ping. At minimum { client : <ip> } else runs as server.
  */
 ping.start = function(callback, args) {
-    makereq(callback, "tools", "ping.start", [args], true);
+    makereq(callback, "tools.ping", "start", [args], true);
 };
 
 /**
@@ -1399,7 +1399,7 @@ ping.start = function(callback, args) {
  * @param {number} id The id returned by the start call.
  */
 ping.stop = function(callback, id) {
-    makereq(callback, "tools", "ping.stop", [id]);
+    makereq(callback, "tools.ping", "stop", [id]);
 };
 
 /**
@@ -1419,7 +1419,7 @@ var iperf = tools.iperf = {};
  * iperf.
  */
 iperf.start = function(callback, args) {
-    makereq(callback, "tools", "iperf.start", [args], true);
+    makereq(callback, "tools.iperf", "start", [args], true);
 };
 
 /**
@@ -1427,7 +1427,7 @@ iperf.start = function(callback, args) {
  * @param {number} id The id returned by the start call.
  */
 iperf.stop = function(callback, id) {
-    makereq(callback, "tools", "iperf.stop", [id]);
+    makereq(callback, "tools.iperf", "stop", [id]);
 };
 
 /**
@@ -1541,7 +1541,7 @@ var remoteapi = tools.remoteapi = { addononly : true };
  * @access private
  */
 remoteapi.start = function(callback) {
-    makereq(callback, "tools", "remoteapi.start", []);
+    makereq(callback, "tools.remoteapi", "start", []);
 };
 remoteapi.start.addononly = true;
 
@@ -1550,7 +1550,7 @@ remoteapi.start.addononly = true;
  * @access private
  */
 remoteapi.stop = function(callback) {
-    makereq(callback, "tools", "remoteapi.stop", []);
+    makereq(callback, "tools.remoteapi", "stop", []);
 };
 remoteapi.stop.addononly = true;
 
@@ -1563,7 +1563,7 @@ remoteapi.stop.addononly = true;
  * @param {int} timeout Timeout (seconds).
  */
 remoteapi.discovery = function(callback, timeout) {
-    makereq(callback, "tools", "remoteapi.discovery", [timeout]);
+    makereq(callback, "tools.remoteapi", "discovery", [timeout]);
 };
 remoteapi.discovery.addononly = true;
 
@@ -1578,7 +1578,7 @@ remoteapi.discovery.addononly = true;
  * @param {Array} params    The parameters for the API call.
  */
 remoteapi.makereq = function(callback, node, method, params) {
-    makereq(callback, "tools", "remoteapi.makereq", [node,method,params]);
+    makereq(callback, "tools.remoteapi", "makereq", [node,method,params]);
 };
 remoteapi.makereq.addononly = true;
 
