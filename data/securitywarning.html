@@ -33,13 +33,17 @@
     </div>
 
     <script id="rendertemplate" type="x-tmpl-mustache">
-      <strong>Page:&nbsp;</strong>{{origin}}<br/><br/>
-      {{#description}}<i>{{description}}</i><br/><br/>{{/description}}
+      <strong>{{origin}}</strong>
+      {{#description}}
+      <blockquote>
+	Description: <i>{{description}}</i>
+      </blockquote>
+      {{/description}}
 
       The page requests access to following functions:
       <ul>
 	{{#api}}
-	<li><strong>{{orig}}:</strong> {{desc}}</li>
+	<li><strong>{{orig}}:</strong>&nbsp;{{desc}}</li>
 	{{/api}}
       </ul>
       
