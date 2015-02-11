@@ -83,14 +83,6 @@ exports["testgetdesc"] = function(assert, done) {
 	 params : []});
 };
 
-exports["testnetwork"] = function(assert, done) {
-    tools.exec(function(res) {
-	console.log(JSON.stringify(res));
-	assert.ok(!res.error, "no error");
-	done();	
-    }, { method : 'getNetworkEnv'});
-};
-
 exports["testdisclocal"] = function(assert, done) {
     tools.exec(function(res,dflag) {
 	console.log(res);

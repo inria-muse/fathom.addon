@@ -1500,15 +1500,6 @@ tools.getDesc = function(callback) {
 tools.getDesc.addononly = true;
 
 /**
- * @description Get this node current network environment.
- * @access private
- */
-tools.getNetworkEnv = function(callback) {
-    makereq(callback, "tools", "getNetworkEnv", []);
-};
-tools.getNetworkEnv.addononly = true;
-
-/**
  * @description Do full network neighbour search (uses any available
  *              means to discover devices in the local network).
  * @access private

@@ -1,4 +1,26 @@
 var baseline = require("./baselineapi");
+var timers = require("sdk/timers");
+
+exports["testnetwork"] = function(assert, done) {
+    baseline.getnetworkenv(function(res) {
+	console.log(JSON.stringify(res));
+	assert.ok(!res.error, "no error");
+	done();	
+    });
+};
+
+exports["testnetworkfull"] = function(assert, done) {
+    baseline.start();
+    // delay so that the DB connection is up
+    timers.setTimeout(function() {
+	baseline.getnetworkenv(function(res) {
+	    console.log(JSON.stringify(res));
+	    assert.ok(!res.error, "no error");
+	    baseline.stop();
+	    done();	
+	});
+    },15);
+};
 
 exports["testmeasurements"] = function(assert, done) {
     baseline.domeasurements(function(res) {
