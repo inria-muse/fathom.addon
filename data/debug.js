@@ -13,6 +13,11 @@
  * @author Anna-Kaisa Pietilainen <anna-kaisa.pietilainen@inria.fr> 
  */
 window.onload = function() {
+    // force upload now
+    $("#upload").click(function() {
+	window.fathom.internal(function() {}, 'uploadnow');
+    });
+
     window.fathom.internal(function(stats) {
 	var robj = {
 	    components : _.map(_.keys(stats), function(k) {

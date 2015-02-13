@@ -21,14 +21,21 @@
       </div>
 
       <div class="content">
-	<div id="rendertarget"></div>
+	<div class="center">
+	  <p>
+	  <button id="upload" class="pure-button pure-button-primary">
+	    Upload Now
+	  </button>
+	  </p>
+	  <div id="rendertarget"></div>
+	</div> <!-- center -->
       </div>
 
     </div>
 
     <script id="rendertemplate" type="x-tmpl-mustache">
       {{#components}}
-      <h2>{{name}}</h2>
+      <h2>Module: {{name}}</h2>
       <table class="pure-table">
 	<thead>
           <tr>
