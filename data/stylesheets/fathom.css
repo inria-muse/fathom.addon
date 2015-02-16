@@ -127,22 +127,24 @@
     padding: 0 2em;
     max-width: 800px;
     margin-bottom: 20px;
+    margin-top: 20px;
     line-height: 1.6em;
 }
 
 .center {
-    margin-top: 20px;
-    margin-bottom: 20px;
     text-align: center;
 }
 
 .right {
-    margin-top: 20px;
     text-align: right;
 }
 
 .small {
     font-size: 75%;
+}
+
+.upper {
+    text-transform: uppercase;
 }
 
 a, a:visited { color: #0A0545; text-decoration: underline; outline: 0; }
@@ -223,7 +225,7 @@ blockquote {
 }
 
 .spinner {
-    width: 40px;
+    color: #0A0545;
     height: 15px;
     display: inline-block;
     margin: 3px 3px 0 0;
@@ -267,7 +269,8 @@ div .infofloat {
     color: #000;
     font: 12px sans-serif;
     border-radius: 2px;       
-    pointer-events: none;         
+    pointer-events: none;
+    text-align: left;
 }
 
 svg.net-graph .canvas {
@@ -278,12 +281,12 @@ svg.net-graph .canvas {
 }
 
 svg.net-graph .edge {
-    stroke: #98abc5;
+    stroke: #0A0545;
     stroke-width: 2.5px;
 }
 
 svg.net-graph .wifi-edge {
-    stroke: #98abc5;
+    stroke: #0A0545;
     stroke-width: 2.5px;
     stroke-dasharray: 3,3;
 }
@@ -297,55 +300,41 @@ svg.net-graph .label {
 /* unknown */
 svg.net-graph .node {
     fill: #ffffff;
-    stroke: #000;
+    stroke: #0A0545;
     stroke-width: 0.5px;
 }
 
 /* localhost */
 svg.net-graph .localhost-node {
     fill: #ff8c00;
-    stroke: #000;
-    stroke-width: 0.5px;
 }
 
 /* other host */
 svg.net-graph .peer-node {
     fill: #8a89a6;
-    stroke: #000;
-    stroke-width: 0.5px;
 }
 
 /* other host, rpc available */
 svg.net-graph .rpc-peer-node {
     fill: #a05d56;
-    stroke: #000;
-    stroke-width: 0.5px;
 }
 
 /* gateway */
 svg.net-graph .gw-node {
     fill: #7b6888;
-    stroke: #000;
-    stroke-width: 0.5px;
 }
 
 /* gateway, rpc */
 svg.net-graph .rpc-gw-node {
     fill: #6b486b;
-    stroke: #000;
-    stroke-width: 0.5px;
 }
 
 /* ap */
 svg.net-graph .ap-node {
     fill: #7b6888;
-    stroke: #000;
-    stroke-width: 0.5px;
 }
 
 /* internet nodes */
 svg.net-graph .i-node {
     fill: #d0743c;
-    stroke: #000;
-    stroke-width: 0.5px;
 }

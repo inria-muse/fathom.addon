@@ -19,18 +19,30 @@
     <div id="container">
       <div class="header">
         <h1><i class="fa fa-home"></i>&nbsp;Homenet Discovery</h1>
-        <h2>Sit back while we are checking your network</h2>
+        <h2>Find out about devices connected to your local network</h2>
       </div>
-    </div>
 
-    <!-- the canvas -->
-    <div class="center">
-      <div id="canvas"></div>
-      <button class="pure-button pure-button-primary" 
-	      onclick="location.reload();">
-	<i class="fa fa-refresh"></i> Run Again
-      </button>
-    </div> <!-- center -->
+      <!-- the canvas -->
+      <div class="content">
+	<div class="center">
+	  <div id="waitspin" class="spinner">
+	    Looking for devices&nbsp; 
+	    <div class="rect1"></div>
+	    <div class="rect2"></div>
+	    <div class="rect3"></div>
+	    <div class="rect4"></div>
+	    <div class="rect5"></div>
+	  </div>
+	  
+	  <div id="canvas"></div>
+	  
+	  <button class="pure-button pure-button-primary" 
+		  onclick="location.reload();">
+	    <i class="fa fa-refresh"></i> Run Again
+	  </button>
+	</div> <!-- center -->
+      </div> <!-- content -->
+    </div> <!-- container -->
     
     <!-- UI library scripts -->
     <script src="../extscripts/jquery.min.js"></script>

@@ -287,7 +287,7 @@ if (typeof addon !== "undefined" ||
 		}
 
 		// shortcut for uploads
-		dummyfathom.uploaddata = function(src, data) {
+		dummyfathom.uploaddata = function(data) {
 		    makereq(undefined, 'internal', 'upload', data);
 		};
 	    }

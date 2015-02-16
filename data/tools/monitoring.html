@@ -17,34 +17,45 @@
   
   <body>
     <div id="container">
-      <div id="main">
-	<div class="header">
-          <h1><i class="fa fa-bar-chart"></i>&nbsp;Monitoring Graphs</h1>
-          <h2>On this page you can explore the background monitoring statistics</h2>
-	</div>
-      </div>
-
-      <div class="center">
-	<a id="lastday" class="pure-button pure-button-active" href="#">Last 24h</a>
-	<a id="lastweek" class="pure-button" href="#">Last 7 days</a>
-	<a id="lastmonth" class="pure-button" href="#">Last month</a>
-	<a id="lastyear" class="pure-button" href="#">Last year</a>
-
-	<p/>
-
-	<div id="waitspin" class="spinner">
-	  <div class="rect1"></div>
-	  <div class="rect2"></div>
-	  <div class="rect3"></div>
-	  <div class="rect4"></div>
-	  <div class="rect5"></div>
-	</div>
+      <div class="header">
+        <h1><i class="fa fa-bar-chart"></i>&nbsp;Monitoring Graphs</h1>
+        <h2>Explore performance monitoring statistics over time</h2>
       </div>
 
       <div class="content">
+
+	<div class="center">
+	  <a id="lastday" class="pure-button pure-button-active" href="#">Last 24h</a>
+	  <a id="lastweek" class="pure-button" href="#">Last 7 days</a>
+	  <a id="lastmonth" class="pure-button" href="#">Last month</a>
+	  <a id="lastyear" class="pure-button" href="#">Last year</a>
+
+	  <p/>
+
+	  <div id="waitspin" class="spinner">
+	    <div class="rect1"></div>
+	    <div class="rect2"></div>
+	    <div class="rect3"></div>
+	    <div class="rect4"></div>
+	    <div class="rect5"></div>
+	  </div>
+	</div> <!-- center -->
+
 	<h2 class="content-subhead">Network Environments</h2>
 	<div id="legend-env"></div>
 	<div id="chart-env"></div>
+
+	<h2 class="content-subhead">Network Traffic</h2>
+	<div id="legend-traffic"></div>
+	<div id="chart-traffic"></div>
+
+	<h2 class="content-subhead">Network Delays</h2>
+	<div id="legend-rtt"></div>
+	<div id="chart-rtt"></div>
+
+	<h2 class="content-subhead">Wifi Signal</h2>
+	<div id="legend-wifi"></div>
+	<div id="chart-wifi"></div>
 
 	<h2 class="content-subhead">CPU Utilization</h2>
 	<div id="legend-cpu"></div>
@@ -61,18 +72,6 @@
 	<h2 class="content-subhead">Memory Utilization</h2>
 	<div id="legend-mem"></div>
 	<div id="chart-mem"></div>
-
-	<h2 class="content-subhead">Wifi Signal</h2>
-	<div id="legend-wifi"></div>
-	<div id="chart-wifi"></div>
-
-	<h2 class="content-subhead">Network Traffic</h2>
-	<div id="legend-traffic"></div>
-	<div id="chart-traffic"></div>
-
-	<h2 class="content-subhead">Network Delays</h2>
-	<div id="legend-rtt"></div>
-	<div id="chart-rtt"></div>
 
       </div>
     </div>

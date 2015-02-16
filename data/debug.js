@@ -13,9 +13,14 @@
  * @author Anna-Kaisa Pietilainen <anna-kaisa.pietilainen@inria.fr> 
  */
 window.onload = function() {
-    // force upload now
     $("#upload").click(function() {
-	window.fathom.internal(function() {}, 'uploadnow');
+	window.fathom.internal(function() {}, 'forceupload');
+	location.reload();
+    });
+
+    $("#purge").click(function() {
+	window.fathom.internal(function() {}, 'purgeupload');
+	location.reload();
     });
 
     window.fathom.internal(function(stats) {

@@ -20,10 +20,27 @@ var NetGraph = function(elem, clickevents, width) {
     var nodeid = this.nodeid = 0;
 
     var formatInfoStr = function(n) {
-	var res = "<h5>"+n.name+"</h5>"+
-	    "<p><ul>"+
-	    "<li>IP "+n.address+"</li>"+
-	    "</ul></p>";
+	var res = "<h5 class=\"upper\">"+n.name+"</h5><p><ul>";
+	switch (n.type) {
+	case 'local':    
+	    res += "<li>Hostname: "+n.raw['local'].hostname+"</li>";
+	    res += "<li>IP: "+n.address+"</li>";
+	    break;
+	case 'peer':    
+	    res += "<li>IP: "+n.address+"</li>";
+	    break;
+	case 'gw':
+	    res += "<li>IP: "+n.address+"</li>";
+	    break;
+	case 'internet':
+	    res += "<li>Public IP: "+n.address+"</li>";
+	    res += "<li>ISP: "+n.raw['internet'].isp+"</li>";
+	    res += "<li>Location: "+n.raw['internet'].city+
+		", "+n.raw['internet'].country+"</li>";
+	    break;
+	}
+
+	res += "</ul></p>";
 	return res;
     };
 
@@ -166,7 +183,7 @@ var NetGraph = function(elem, clickevents, width) {
 	});
 
 	node.attr("class", function(n) {
-	    return n.cssstyle;
+	    return "node " + n.cssstyle;
 	});
 
 	force.start();
@@ -179,9 +196,11 @@ var NetGraph = function(elem, clickevents, width) {
 NetGraph.prototype.addNode = function(newnode) {
     var that = this;
 
+    console.log(newnode);
+
     // check if we already know this node ?
     var node = _.find(that.nodes, function(n) {
-	return (n.address == newnode.address);
+	return (n.address === newnode.address);
     });
 
     if (!node) {
@@ -197,17 +216,20 @@ NetGraph.prototype.addNode = function(newnode) {
 	    node.cssstyle = 'i-node';
 	    that.internet = node;
 	    break;
+
 	case 'local':
 	    node.cssstyle = 'localhost-node';
 	    that.localnode = node;
 	    break;
+
 	case 'peer':
 	    node.cssstyle = (node.rpc ? 'rpc-' : '') + 'peer-node';
 	    break;
+
 	case 'gw':
 	    node.cssstyle = (node.rpc ? 'rpc-' : '') + 'gw-node';
-	    break;
-	    
+	    break;	    
+
 	}
 	that.nodes.push(node);
 
@@ -215,22 +237,29 @@ NetGraph.prototype.addNode = function(newnode) {
 	switch (newnode.type) {
 	case 'local':
 	    // override previous (mdns/upnp/fathom) info with local
-	    var tmpnode = node;
-	    node = newnode;
+	    node.type = 'local';
+	    node.name = newnode.name;
+	    node.rpc = newnode.rpc;
+	    node.reachable = newnode.reachable;
 	    node.cssstyle = 'localhost-node';
-	    node.raw = _.extend(node.raw, tmpnode.raw);
+	    node.raw = _.extend(node.raw, newnode.raw);
 	    that.localnode = node;
 	    break;
+
 	case 'peer':
-	    // keep old values unless missing
-	    node.name = node.name || newnode.name;
-	    node.rpc = node.rpc || newnode.rpc;
-	    node.reachable = node.reachable || newnode.reachable;
+	    if (node.type !== 'local') {
+		// update missing values
+		node.name = node.name || newnode.name;
+		node.rpc = node.rpc || newnode.rpc;
+		node.reachable = node.reachable || newnode.reachable;
+		node.cssstyle = (node.rpc ? 'rpc-' : '') + 'peer-node';
+	    }
 	    node.raw = _.extend(node.raw, newnode.raw);
-	    node.cssstyle = (node.rpc ? 'rpc-' : '') + 'peer-node';
 	    break;
+
 	case 'gw':
 	    node.type = newnode.type; // peer turns into gw
+
 	    // for others keep old values unless missing
 	    node.name = node.name || newnode.name;
 	    node.rpc = node.rpc || newnode.rpc;
@@ -238,9 +267,9 @@ NetGraph.prototype.addNode = function(newnode) {
 	    node.raw = _.extend(node.raw, newnode.raw);
 	    node.cssstyle = (node.rpc ? 'rpc-' : '') + 'gw-node';
 	    break;
+
 	case 'internet':
 	    // should not happen (we only get single update for i-node)
-	    that.internet = node;
 	    break;
 	}
     }
@@ -248,7 +277,7 @@ NetGraph.prototype.addNode = function(newnode) {
     // links
     switch (node.type) {
     case 'peer':
-	// connect peer to gw
+	// connect peer to each gw
 	_.each(that.nodes, function(n) {
 	    // FIXME: check that the IP subnets match
 	    if ((n.type === 'gw') &&
@@ -260,7 +289,7 @@ NetGraph.prototype.addNode = function(newnode) {
 	break;
 
     case 'gw':
-	// connect gw to peer(s)
+	// connect gw to each peer
 	_.each(that.nodes, function(n) {
 	    // FIXME: check that the IP subnets match
 	    if ((n.type === 'peer') &&
@@ -278,16 +307,14 @@ NetGraph.prototype.addNode = function(newnode) {
 	break;
     }
 
-    // check default gw when local or gw updates take place
-    if (node.type !== 'peer' &&
-	node.type !== 'internet' &&
-	that.localnode) 
-    {
+    // check for default gateway link
+    if (that.localnode && !that.defaultgw) {
 	var gwip = that.localnode.raw['local'].networkenv.gateway_ip;
 	var gw = _.find(that.nodes, function(n) {
 	    return (n.type === 'gw' &&
 		    n.address === gwip);
 	});
+
 	if (gw) {
 	    that.defaultgw = gw;
 	    if (gw.reachable && !that.hasEdge(that.localnode,gw))
@@ -295,9 +322,8 @@ NetGraph.prototype.addNode = function(newnode) {
 	}
     }
 
-    // check internet conn updates
-    if (node.type !== 'peer' &&
-	that.defaultgw && that.defaultgw.reachable && 
+    // check for internet link
+    if (that.defaultgw && that.defaultgw.reachable && 
 	that.internet && that.internet.reachable && 
 	!that.hasEdge(that.internet,that.defaultgw)) 
     {
@@ -327,11 +353,11 @@ window.onload = function() {
 	throw "Fathom not found";
 
     $('#canvas').empty();
+    $('#waitspin').show();
 
     fathom.init(function() {
 	var ts = new Date(); // starttime
 	var startts = window.performance.now();
-	var results = [];
 
 	// FIXME: mobile flag + adjust width ?
 	var g = new NetGraph('#canvas', false, 640);
@@ -341,17 +367,28 @@ window.onload = function() {
 
 	fathom.tools.discovery(function(node) {
 	    if (node.type) {
-		results.push(node);
 		g.addNode(node);
 		g.redraw();
 	    } else {
 		// all done
 		var elapsed = (window.performance.now() - startts); // ms
+		$('#waitspin').hide();
+
+		// contains lots of duplicate info, strip down before upload
+		if (g.localnode && g.localnode.raw['fathom']) {
+		    g.localnode.raw['fathom'] = {
+			"address" : g.localnode.raw['fathom'].address,
+			"descriptor" : {
+			    "fathom_node_id" : g.localnode.raw['fathom'].descriptor.fathom_node_id
+			}
+		    };
+		}
+
 		fathom.uploaddata({ 
 		    ts : ts.getTime(),
 		    timezoneoffset : ts.getTimezoneOffset(),
 		    elapsed : elapsed,
-		    results : _.map(results,function(o) {
+		    results : _.map(g.nodes, function(o) {
 			// remove UI related keys from the uploaded data
 			return _.omit(o,
 				      "id",
