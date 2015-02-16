@@ -20,7 +20,26 @@ var NetGraph = function(elem, clickevents, width) {
     var nodeid = this.nodeid = 0;
 
     var formatInfoStr = function(n) {
-	var res = "<h5 class=\"upper\">"+n.name+"</h5><p><ul>";
+        var name = n.name || 'Network Device';
+        if (!name && n.raw['upnp']) {
+	    if (n.raw['upnp'].iswin)
+		name = "Windows Device";
+	    else if (n.raw['upnp'].islinux)
+		name = "Linux Device";
+	    else if (n.raw['upnp'].isdarwin)
+		name = "Mac Device";
+        }
+        
+        if (!name && n.raw['mdns']) {
+	    if (n.raw['mdns'].iswin)
+		name = "Windows Device";
+	    else if (n.raw['mdns'].islinux)
+		name = "Linux Device";
+	    else if (n.raw['mdns'].isdarwin)
+		name = "Mac Device";
+        }
+
+        var res = "<h5 class=\"upper\">"+name+"</h5><p><ul>";
 	switch (n.type) {
 	case 'local':    
 	    res += "<li>Hostname: "+n.raw['local'].hostname+"</li>";
@@ -252,15 +271,15 @@ NetGraph.prototype.addNode = function(newnode) {
 		node.name = node.name || newnode.name;
 		node.rpc = node.rpc || newnode.rpc;
 		node.reachable = node.reachable || newnode.reachable;
-		node.cssstyle = (node.rpc ? 'rpc-' : '') + 'peer-node';
+	        if (node.type !== 'gw') {
+		    node.cssstyle = (node.rpc ? 'rpc-' : '') + 'peer-node';
+                }
 	    }
 	    node.raw = _.extend(node.raw, newnode.raw);
 	    break;
 
 	case 'gw':
 	    node.type = newnode.type; // peer turns into gw
-
-	    // for others keep old values unless missing
 	    node.name = node.name || newnode.name;
 	    node.rpc = node.rpc || newnode.rpc;
 	    node.reachable = node.reachable || newnode.reachable;

@@ -113,7 +113,7 @@ exports["testdiscroute"] = function(assert, done) {
 	else
 	    done();
     }, { method : 'discovery',
-	 params : [5,['route']]});
+	 params : [5,['route']]}, {neighbors : {}});
 };
 
 exports["testdiscmdns"] = function(assert, done) {
@@ -124,7 +124,7 @@ exports["testdiscmdns"] = function(assert, done) {
 	else
 	    done();
     }, { method : 'discovery',
-	 params : [5,['mdns']]});
+	 params : [5,['mdns']]}, {neighbors : {}});
 };
 
 exports["testdiscupnp"] = function(assert, done) {
@@ -135,7 +135,7 @@ exports["testdiscupnp"] = function(assert, done) {
 	else
 	    done();
     }, { method : 'discovery',
-	 params : [5,['upnp']]});
+	 params : [5,['upnp']]}, {neighbors : {}});
 };
 
 exports["testdiscall"] = function(assert, done) {
@@ -146,7 +146,7 @@ exports["testdiscall"] = function(assert, done) {
 	else
 	    done();
     }, { method : 'discovery',
-	 params : [10]});
+	 params : [10, undefined]}, {neighbors : {}});
 };
 
 exports["teststartstop"] = function(assert, done) {
