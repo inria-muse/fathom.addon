@@ -127,6 +127,17 @@ exports["testdiscmdns"] = function(assert, done) {
 	 params : [5,['mdns']]}, {neighbors : {}});
 };
 
+exports["testdiscping"] = function(assert, done) {
+    tools.exec(function(res,dflag) {
+	console.log(res);
+	if (!dflag)
+	    assert.ok(res.raw['ping'], "correct raw results");	
+	else
+	    done();
+    }, { method : 'discovery',
+	 params : [5,['ping']]}, {neighbors : {}});
+};
+
 exports["testdiscupnp"] = function(assert, done) {
     tools.exec(function(res,dflag) {
 	console.log(res);

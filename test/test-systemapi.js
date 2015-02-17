@@ -32,7 +32,8 @@ exports["testpingbcast"] = function(assert, done) {
 	if (doneflag)
 	    done();
     }, { method : 'doPing', 
-	 params: ['192.168.1.255', { count : 1, interval : 5, bcast : true }]});
+	 params: ['10.254.2.255',{ count : 2, interval : 1, bcast : true }]});
+    //'192.168.1.255',
 };
 
 

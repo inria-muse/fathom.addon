@@ -199,7 +199,7 @@ blockquote {
 }
 
 .test-skip {
-    border-left: 4px solid rgb(243,123,29);
+    border-left: 4px solid grey;
     background-color: #f0f0f0;
 }
 

@@ -336,7 +336,8 @@ NetGraph.prototype.addNode = function(newnode) {
 
 	if (gw) {
 	    that.defaultgw = gw;
-	    if (gw.reachable && !that.hasEdge(that.localnode,gw))
+            // link to gw if reachable (from some discovery proto) or in the routing table
+	    if ((gw.reachable || gw.raw['route']) && !that.hasEdge(that.localnode,gw))
 		that.addEdge(that.localnode,gw);
 	}
     }

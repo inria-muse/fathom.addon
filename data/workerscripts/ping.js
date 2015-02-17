@@ -20,9 +20,9 @@ tools.ping = (function() {
     var settings = {
         id : -1,
         client : undefined,   // if defined, run ping cli to this address, else server
+        port : undefined,     // destination port
         proto : 'udp',        // one of UDP, TCP, HTTP
-        port : 5790,          // destination port
-        count : 5,            // number of packets
+        count : 3,            // number of packets
         interval : 1.0,       // interval between packets (s)
         timeout : 10.0,       // time to wait for answer (s)
         srciface : undefined, // src IP
