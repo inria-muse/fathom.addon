@@ -343,8 +343,10 @@ NetGraph.prototype.addNode = function(newnode) {
     }
 
     // check for internet link
-    if (that.defaultgw && (gw.reachable || gw.raw['route']) && 
-	that.internet && that.internet.reachable && 
+    if (that.defaultgw && 
+	(that.defaultgw.reachable || that.defaultgw.raw['route']) && 
+	that.internet && 
+	that.internet.reachable && 
 	!that.hasEdge(that.internet,that.defaultgw)) 
     {
 	that.addEdge(that.internet,that.defaultgw);
