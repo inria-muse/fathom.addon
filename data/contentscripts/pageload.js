@@ -17,11 +17,10 @@ if (typeof self !== "undefined" && self.options.enableperf) {
     setTimeout(function() {
 	self.port.emit('perf', { 
 	    performance: window.performance,
+	    https : (window.location.protocol === 'https:'),
+	    http : (window.location.protocol === 'http:'),
 	    location: {
-		host : window.location.host,
-		href : window.location.href,
-		origin : window.location.origin,
-		protocol : window.location.protocol,
+		host : window.location.host
 	    }
 	});
     }, 250);

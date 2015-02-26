@@ -92,14 +92,14 @@
             "type": "bool",
             "name": "enablepageload",
             "value": true,
-            "title": "Enable Background Performance Monitoring of Pageload Times",
-	    "description" : "Allow Fathom to monitor the page-load times of web pages."
+            "title": "Enable Background Performance Monitoring of Page Load Times",
+	    "description" : "Allow Fathom to monitor the page load times of visited web pages."
 	},
 	{
             "name": "pageloadupload",
             "type": "radio",
-            "title": "Share Pageload Performance Reports",
-            "description" : "Allow uploading of pageload performance reports to our secure servers for network research. No data is shared with third parties.",
+            "title": "Share Page Load Performance Reports",
+            "description" : "Allow uploading of page load performance reports to our secure servers for network research. No data is shared with third parties.",
             "value": "always",
             "options": [
 		{
@@ -111,6 +111,13 @@
 		    "label": "Never"
 		}
             ]
-	}
+	},
+        {
+            "type": "control",
+            "label": "Show",
+            "name": "whitelist",
+            "title": "Page Load Monitoring Whitelist",
+            "description" : "The identity of visited web pages is anonymized when uploading the page load performance reports excluding a small set of popular hosts (e.g. google.com). You can review and edit the whitelisted hosts here."
+        }
     ]
 }

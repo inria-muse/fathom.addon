@@ -224,6 +224,35 @@ blockquote {
     float: right;
 }
 
+fieldset.whitelistgroup  { 
+  margin: 0; 
+  margin-bottom: 20px; 
+  padding: 5px; 
+}
+
+fieldset.whitelistgroup legend { 
+  margin: 0; 
+  padding: 0; 
+  font-weight: bold; 
+  margin-left: 20px; 
+  font-size: 100%; 
+  color: black; 
+}
+
+ul.whitelist { 
+  margin: 0; 
+  padding: 0; 
+  margin-left: 20px; 
+  list-style: none; 
+}
+
+ul.whitelist li {
+  text-align: left;
+  float: left;
+  min-width: 150px;
+  display:inline-block;
+}
+
 .spinner {
     color: #0A0545;
     height: 15px;
