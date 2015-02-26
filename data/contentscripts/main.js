@@ -24,6 +24,7 @@
  * @author Anna-Kaisa Pietilainen <anna-kaisa.pietilainen@inria.fr> 
  */
 
+// fathom API stuff
 if (typeof addon !== "undefined" || 
     (typeof self !== "undefined" && self.options.enableapi)) 
 {
@@ -36,6 +37,9 @@ if (typeof addon !== "undefined" ||
 
     // hide everything else in this closure
     (function() {
+	const REQ = "req";
+	const RES = "res";
+
 	// TODO: remove the 'trusted script' option ?
 	var trusted = (typeof addon !== "undefined");
 
@@ -54,14 +58,10 @@ if (typeof addon !== "undefined" ||
 	/* Running request id. */
 	var nextreqid = 1;
 
-	// Message constants
-	const REQ = "req";
-	const RES = "res";
-
 	/* Make request to the addon. */
 	makereq = function(callback, module, method, params, multiresponse) {
 	    var req = {};
-	    req.module = module;     // fathom.module or init/close
+	    req.module = module;   
 	    req.method = method;     // fathom.module.method
 	    req.params = params;     // method params
 	    req.multiresp = (multiresponse !== undefined ? 

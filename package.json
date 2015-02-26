@@ -68,13 +68,38 @@
             "type": "bool",
             "name": "enablebaseline",
             "value": true,
-            "title": "Enable Background Performance Monitoring"
+            "title": "Enable Background Performance Monitoring of Your System and Network Connection",
+	    "description" : "Allow Fathom to collect system and network peformance metrics periodically on the background."
 	},
 	{
             "name": "baselineupload",
             "type": "radio",
             "title": "Share Background Monitoring Performance Reports",
             "description" : "Allow uploading of background monitoring reports to our secure servers for network research. No data is shared with third parties.",
+            "value": "always",
+            "options": [
+		{
+		    "value": "always",
+		    "label": "Always"
+		},
+		{
+		    "value": "never",
+		    "label": "Never"
+		}
+            ]
+	},
+	{
+            "type": "bool",
+            "name": "enablepageload",
+            "value": true,
+            "title": "Enable Background Performance Monitoring of Pageload Times",
+	    "description" : "Allow Fathom to monitor the page-load times of web pages."
+	},
+	{
+            "name": "pageloadupload",
+            "type": "radio",
+            "title": "Share Pageload Performance Reports",
+            "description" : "Allow uploading of pageload performance reports to our secure servers for network research. No data is shared with third parties.",
             "value": "always",
             "options": [
 		{
