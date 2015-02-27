@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html> 
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Raw Data</title>
+  <link rel="icon" type="image/png" id="favicon" href="icons/icon-16.png"/>  
+  <link href="stylesheets/pure-min.css" type="text/css" rel="stylesheet">
+  <link href="stylesheets/grids-responsive-min.css" type="text/css" rel="stylesheet">
+  <link href="stylesheets/font-awesome.min.css" type="text/css" rel="stylesheet">
+  <link href="stylesheets/fathom.css" type="text/css" rel="stylesheet">
+  </head>  
+  <body>    
+    <div id="container">
+      <div class="header">
+        <h1><i class="fa fa-code"></i>&nbsp;Raw Data</h1>
+        <h2>This data is used for network research and never shared with 3rd parties!</h2>
+      </div>
+
+      <div id="json" class="content"></div>
+    </div>
+    <script>
+      window.onload = function() {
+        document.getElementById('json').innerHTML = 
+          '<pre>'+ 
+        	JSON.stringify(window.json,null,4)+
+          '</pre>'
+      };
+    </script>
+  </body>
+</html>
