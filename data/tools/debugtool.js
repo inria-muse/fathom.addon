@@ -755,6 +755,16 @@ window.onload = function() {
     if (!fathom)
 	throw "Fathom not found";
 
+    var utemplate = document.getElementById('uploadtemplate').innerHTML;
+    Mustache.parse(utemplate);
+    fathom.internal(function(pref) {
+	var rendered = Mustache.render(
+	    utemplate, 
+	    {upload : (pref === 'always'), ready : false });
+	var e = document.getElementById('upload');
+	e.innerHTML = rendered;
+    }, 'getuserpref', 'debugtoolupload');
+
     fathom.init(function() {
 	var testsuites = create_testsuite(getQuery()); 
 	var mainview = new ResultView({model:testsuites});
@@ -763,13 +773,33 @@ window.onload = function() {
 	var startts = window.performance.now();
 	testsuites.exec(function(obj) {
 	    var elapsed = (window.performance.now() - startts); // ms
-	    fathom.uploaddata({ 
+
+	    // get raw data
+	    var json = testsuites.toUploadJSON();
+
+	    // queue for upload
+	    fathom.internal(function(userok) {
+		// update the upload block
+		var rendered = Mustache.render(
+		    utemplate, 
+		    {upload : userok, ready : true});
+		var e = document.getElementById('upload');
+		e.innerHTML = rendered;
+
+		// enable the data link
+		$("#showdata").click(function() {
+		    var win = window.open("../rawdata.html");
+		    win.json = json;
+		});
+
+		fathom.close();
+
+	    }, 'upload', { 
 		ts : ts.getTime(),
 		timezoneoffset : ts.getTimezoneOffset(),
 		elapsed : elapsed,
-		results : testsuites.toUploadJSON()
+		results : json
 	    });
-	    fathom.close();
 	});
     });
 };

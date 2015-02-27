@@ -377,6 +377,16 @@ window.onload = function() {
     $('#canvas').empty();
     $('#waitspin').show();
 
+    var utemplate = document.getElementById('uploadtemplate').innerHTML;
+    Mustache.parse(utemplate);
+    fathom.internal(function(pref) {
+	var rendered = Mustache.render(
+	    utemplate, 
+	    {upload : (pref === 'always'), ready : false });
+	var e = document.getElementById('upload');
+	e.innerHTML = rendered;
+    }, 'getuserpref', 'homenetupload');
+
     fathom.init(function() {
 	var ts = new Date(); // starttime
 	var startts = window.performance.now();
@@ -406,28 +416,47 @@ window.onload = function() {
 		    };
 		}
 
-		fathom.uploaddata({ 
+		// get raw data
+		var json = _.map(g.nodes, function(o) {
+		    // remove UI related keys from the uploaded data
+		    return _.omit(o,
+				  "id",
+				  "cssstyle",
+				  "index",
+				  "weight",
+				  "x",
+				  "y",
+				  "px",
+				  "py",
+				  "fixed");
+		})
+		
+		// queue for upload
+		fathom.internal(function(userok) {
+		    // update the upload block
+		    var rendered = Mustache.render(
+			utemplate, 
+			{upload : userok, ready : true});
+		    var e = document.getElementById('upload');
+		    e.innerHTML = rendered;
+
+		    // enable the data link
+		    $("#showdata").click(function() {
+			var win = window.open("../rawdata.html");
+			win.json = json;
+		    });
+
+
+		    // stop using the extension
+		    fathom.tools.remoteapi.stop(function() {});
+		    fathom.close();
+		    
+		}, 'upload', { 
 		    ts : ts.getTime(),
 		    timezoneoffset : ts.getTimezoneOffset(),
 		    elapsed : elapsed,
-		    results : _.map(g.nodes, function(o) {
-			// remove UI related keys from the uploaded data
-			return _.omit(o,
-				      "id",
-				      "cssstyle",
-				      "index",
-				      "weight",
-				      "x",
-				      "y",
-				      "px",
-				      "py",
-				      "fixed");
-		    })
+		    results : json
 		});
-
-		// stop using the extension
-		fathom.tools.remoteapi.stop(function() {});
-		fathom.close();
 	    }
 	}); // disc	
     }); // init

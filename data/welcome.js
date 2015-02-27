@@ -14,16 +14,26 @@
 window.onload = function() {
     $("#baselineupload").change(function() {
 	var obj = {baselineupload:$("#baselineupload").is(":checked")};
-	window.fathom.internal(undefined, 'userpref', obj);
+	window.fathom.internal(undefined, 'setuserpref', obj);
     });
     
     $("#enablebaseline").change(function() {
 	var obj = {enablebaseline:$("#enablebaseline").is(":checked")};
-	window.fathom.internal(undefined, 'userpref', obj);
+	window.fathom.internal(undefined, 'setuserpref', obj);
+    });
+
+    $("#pageloadupload").change(function() {
+	var obj = {baselineupload:$("#pageloadupload").is(":checked")};
+	window.fathom.internal(undefined, 'setuserpref', obj);
+    });
+    
+    $("#enablepageload").change(function() {
+	var obj = {enablebaseline:$("#enablepageload").is(":checked")};
+	window.fathom.internal(undefined, 'setuserpref', obj);
     });
     
     $("#enablefathomapi").change(function() {
 	var obj = {enablefathomapi:$("#enablefathomapi").is(":checked")};
-	window.fathom.internal(undefined, 'userpref', obj);
+	window.fathom.internal(undefined, 'setuserpref', obj);
     });
 };

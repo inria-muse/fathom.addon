@@ -5,7 +5,7 @@
     "description": "A Browser-based Network Measurement Platform",
     "author": "MUSE Inria Paris-Rocquencourt <muse.fathom@inria.fr> (https://team.inria.fr/muse/)",
     "license": "MIT",
-    "version": "2.0.10",
+    "version": "2.0.11",
     "contributors": "Anna-Kaisa Pietilainen, Stéphane Archer, Renata Teixeira, Christian Kreibich, Mohan Dhawan, Justin Samuel, Nick Weaver, Mark Allman, Vern Paxson",
     "homepage": "https://muse.inria.fr/fathom",
     "icon": "data/icons/icon-80.png",
@@ -116,8 +116,8 @@
             "type": "control",
             "label": "Show",
             "name": "whitelist",
-            "title": "Page Load Monitoring Whitelist",
-            "description" : "The identity of visited web pages is anonymized when uploading the page load performance reports excluding a small set of popular hosts (e.g. google.com). You can review and edit the whitelisted hosts here."
+            "title": "Whitelisted Domains",
+            "description" : "The identity of visited web pages is anonymized when uploading the page load performance reports excluding a small set of popular domains (e.g. google.com). You can review and edit the whitelisted domains here."
         }
     ]
 }

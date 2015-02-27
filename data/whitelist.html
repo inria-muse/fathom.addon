@@ -3,7 +3,7 @@
   <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Page Load Monitoring Whitelist</title>
+  <title>Whitelisted Domains</title>
   <link rel="icon" type="image/png" id="favicon" href="icons/icon-16.png"/>  
   <link href="stylesheets/pure-min.css" type="text/css" rel="stylesheet">
   <link href="stylesheets/grids-responsive-min.css" type="text/css" rel="stylesheet">
@@ -15,8 +15,8 @@
 
       <div id="main">
 	<div class="header">
-          <h1><i class="fa fa-bookmark"></i>&nbsp;Page Load Monitoring Whitelist</h1>
-          <h2>Manage the list of hosts that we can monitor in clear</h2>
+          <h1><i class="fa fa-bookmark"></i>&nbsp;Whitelisted Domains</h1>
+          <h2>Manage the list of public domains for page load monitoring</h2>
 	</div>
       </div>
 
@@ -25,17 +25,22 @@
         <h2 class="content-subhead">What is This ?</h2>
 
         <p>
-        Fathom monitors on the background the page load performance of websites you
-        visit (excluding anything you do in the private browsing mode).
-        If allowed, we upload the performance data to our secure servers for network
-        research purposes. By default, we anonymize the identity of the accessed pages. This means that we cannot know which pages you visit or if you and any other
-        user have visited the same pages.
+        Fathom monitors on the background the page load performance of 
+	websites you visit (excluding always anything you do in the private 
+	browsing mode). If allowed, we upload the performance data to 
+	our secure servers for network research purposes. By default, 
+	we anonymize the identity of the accessed domains. This means 
+	that we cannot know which pages or domains you visit or if you 
+	and any other Fathom user have visited the same domains.
         </p>
         
         <p>
-        However, to be able to correlate the network performance across users, we DO NOT
-        anonymize the identify of a small set of popular hosts and pages listed below.
-        You can remove any items that you do not wish us to know about by unchecking the names. The changes will only affect future visits.
+        However, to be able to correlate the network performance across 
+	users, we DO NOT anonymize the identify of a small set of popular 
+	domains listed below. You can remove any domains that you feel 
+	unconfortable about sharing with us by unchecking the names below 
+	(don't forget to save changes). The changes will only affect 
+	future data collection.
         </p>
         
         <div class="center">

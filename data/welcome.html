@@ -34,36 +34,56 @@
 	</p>
 
 	  <ul>
-	    <li><b>Debug My Connection</b>: test your network configuration and connectivity if you are having problems with your network.</li>
-	    <li><b>Home Network Discovery</b>: discover devices and network connectivity in your home network.</li>
-	    <li><b>Monitoring Graphs</b>: system and network performance measurements over time (see next section for details on background monitoring).</li>
+	    <li><b><i class="fa fa-wrench"></i> Debug My Connection</b>: test your network configuration and connectivity if you are having problems with your network.</li>
+	    <li><b> <i class="fa fa-home"></i> Home Network Discovery</b>: discover devices and network connectivity in your home network.</li>
+	    <li><b><i class="fa fa-bar-chart"></i> Monitoring Graphs</b>: system and network performance over time (see next section for details on background monitoring).</li>
 	  </ul>
 
 	<h2 class="content-subhead">Background Monitoring</h2>
 
 	<p>
-	  Fathom collects periodically basic performance metrics about your system (CPU, load, memory) and network connectivity (signal quality on Wifi, cross-traffic and network delays). You can visualize the monitoring data via the <b>Monitoring Graphs</b> tool. In addition, we use this monitoring data to improve the diagnosis of the <b>Debug My Connection</b> tool. 
+	  Fathom collects two types of background monitoring data:
+	  <ol>
+	    <li>Performance metrics about your system (CPU, load, memory) and network connectivity (signal quality on Wifi, cross-traffic and network delays). These metrics are recorded periodically.</li>
+	    <li>Page load performance when browsing the web (time to fetch the content and render the page).</li> 
+	  </ol>
+	  The monitoring is light-weight and should not impact your network browsing. 
+	  </p>
+	<p>
+	  You can visualize the collected performance data via the <b>Monitoring Graphs</b> tool to identify problems and to compare your current performance with the past and in different network environments (if your device connects to multiple networks). In addition, we are currently working on to use this monitoring data to improve the diagnosis of the <b>Debug My Connection</b> tool (e.g. we plan to pin-point large deviations from the baseline automatically to help to solve problems). 
 	</p>
 	<p>
-	  You can always disable the background monitoring via the Fathom menu. Optionally, you can share the monitoring data with us for research purposes (see next section on our data collection policy). 
+	  You can always disable background monitoring via the Fathom menu. Optionally, you can share the monitoring data with us for research purposes (see next section on our data collection policy). 
 	</p>
 
 	<div class="highlight">
-	<b>Enable background monitoring ?</b>
-	<form>
-	  <label for="enablebaseline" class="pure-checkbox">
-            <input id="enablebaseline" type="checkbox" checked>&nbsp;&nbsp;Do periodic background performance monitoring.
-          </label>
-	</form>
 
-	<b>Share background monitoring data ?</b>
-	<form>
-	  <label for="baselineupload" class="pure-checkbox">
-            <input id="baselineupload" type="checkbox" checked>&nbsp;&nbsp;Allow Fathom to share background monitoring data.
+	  <b>Enable background monitoring ?</b>
+	  <form>
+	  <label for="enablebaseline" class="pure-checkbox">
+            <input id="enablebaseline" type="checkbox" checked>&nbsp;&nbsp;Allow periodic system and network performance monitoring.
           </label>
-	</form>
+	  </form>
+	  <form>
+	  <label for="enablepageload" class="pure-checkbox">
+            <input id="enablepageload" type="checkbox" checked>&nbsp;&nbsp;Allow page load performance monitoring.
+          </label>
+	  </form>
+
+	  <b>Share background monitoring data ?</b>
+	  <form>
+	  <label for="baselineupload" class="pure-checkbox">
+            <input id="baselineupload" type="checkbox" checked>&nbsp;&nbsp;Allow Fathom to share background system and network monitoring data.
+          </label>
+	  </form>
+	  <form>
+	  <label for="pageloadupload" class="pure-checkbox">
+            <input id="pageloadupload" type="checkbox" checked>&nbsp;&nbsp;Allow Fathom to share anonymized page load monitoring data (see <a href="whitelist.html" target="_blank">Whitelisted Domains</a> for execptions).
+          </label>
+	  </form>
 
 	<i class="small">You can change these settings at anytime via the addon preferences (go to Menu -> Addons -> Fathom).</i>
+
 	</div>
 
 	<h2 class="content-subhead">Fathom for Web Pages</h2>

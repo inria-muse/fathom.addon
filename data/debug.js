@@ -14,12 +14,16 @@
  */
 window.onload = function() {
     $("#upload").click(function() {
-	window.fathom.internal(function() {}, 'forceupload');
+	window.fathom.internal(function() {
+	    alert("Done!");
+	}, 'forceupload');
 	location.reload();
     });
 
     $("#purge").click(function() {
-	window.fathom.internal(function() {}, 'purgeupload');
+	window.fathom.internal(function() {
+	    alert("Done!");
+	}, 'purgeupload');
 	location.reload();
     });
 

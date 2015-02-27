@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html>
-  
+<html> 
   <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -42,12 +41,24 @@
 	  </button>
 	</div> <!-- center -->
       </div> <!-- content -->
+
+      <div id="upload" class="content"></div>
+
     </div> <!-- container -->
     
+    <!-- Template for data upload disclaimer -->
+    <script id="uploadtemplate" type="x-tmpl-mustache">
+      <blockquote>
+	You have {{#upload}}<span class="allow">allowed</span>{{/upload}}{{^upload}}<span class="disallow">disallowed</span>{{/upload}} the sharing of the results from this tool. {{#ready}}<a id="showdata">See the data!</a>{{/ready}}</br>
+	<i class="small">You can change this setting at anytime via the addon preferences (go to Menu -> Addons -> Fathom).</i>
+      </blockquote>
+    </script>
+
     <!-- UI library scripts -->
     <script src="../extscripts/jquery.min.js"></script>
     <script src="../extscripts/underscore-min.js"></script>
     <script src="../extscripts/d3.v3.min.js"></script>
+    <script src="../extscripts/mustache.js"></script>
     <!-- main test script -->
     <script src="./homenet.js"></script>
   </body>

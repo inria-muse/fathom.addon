@@ -150,9 +150,16 @@
 a, a:visited { color: #0A0545; text-decoration: underline; outline: 0; }
 p a, p a:visited { line-height: inherit; }
 
+b { color: #0A0545; }
+
+.testname {
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
 blockquote {
     border-left: 2px solid #0A0545;
-    padding-left: 2px;
+    padding-left: 4px;
     background-color: white;
 }
 
@@ -180,6 +187,13 @@ blockquote {
     margin: 30px 0 10px 0;
     font-weight: 300;
     color: #888;
+}
+
+.allow {
+    background-color: rgba(94,185,94,0.25);
+}
+.disallow {
+    background-color: rgba(221,81,76,0.25);
 }
 
 .test {

@@ -21,7 +21,10 @@ window.onload = function() {
                 disabled : !($this.is(":checked"))
             });
         });
-        window.fathom.internal(undefined, 'setwhitelist', whitelist);
+
+        window.fathom.internal(function(done) {
+	    alert("Changes saved!");
+	}, 'setwhitelist', whitelist);
     });
     
     window.fathom.internal(function(res) {

@@ -31,6 +31,8 @@
 	  <i class="fa fa-refresh"></i> Run Again
 	</button>
       </div>
+
+      <div id="upload" class="content"></div>
     </div>
 
     <!-- The main template -->
@@ -45,8 +47,8 @@
 
     <!-- Template for tests tag -->
     <script id="testtemplate" type="x-tmpl-mustache">
-      <div class="test {{status}}" >
-	<b>{{name}}</b> <i>{{desc}}</i>
+      <div class="test {{status}}">
+	<span class="testname">{{name}}</span> <i>{{desc}}</i>
 	{{#isrunning}}
 	<div class="spinner floatright">
 	  <div class="rect1"></div>
@@ -57,6 +59,14 @@
 	</div>
 	{{/isrunning}}
       </div>
+    </script>
+
+    <!-- Template for data upload disclaimer -->
+    <script id="uploadtemplate" type="x-tmpl-mustache">
+      <blockquote>
+	You have {{#upload}}<span class="allow">allowed</span>{{/upload}}{{^upload}}<span class="disallow">disallowed</span>{{/upload}} the sharing of the results from this tool. {{#ready}}<a id="showdata">See the data!</a>{{/ready}}</br>
+	<i class="small">You can change this setting at anytime via the addon preferences (go to Menu -> Addons -> Fathom).</i>
+	</blockquote>
     </script>
     
     <!-- UI library scripts -->
