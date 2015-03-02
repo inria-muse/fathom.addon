@@ -1,7 +1,7 @@
 var baseline = require("./baselineapi");
 var timers = require("sdk/timers");
 
-exports["testnetwork"] = function(assert, done) {
+exports["testnetworkbasic"] = function(assert, done) {
     baseline.getnetworkenv(function(res) {
 	console.log(JSON.stringify(res));
 	assert.ok(!res.error, "no error");
@@ -30,46 +30,62 @@ exports["testmeasurements"] = function(assert, done) {
     });
 };
 
-exports["testexecday"] = function(assert, done) {
-    baseline.exec(function(res) {
-	assert.ok(!res.error, "no error");
-	assert.ok(res.data.length>0, "got data " + res.data.length);
-	if (res.data.length>0)
-	    console.log(res.data[0]);
-	done();	
-    }, { method : 'get', params : ['cpu','day']});
+exports["testexecday1"] = function(assert, done) {
+    baseline.start();
+    timers.setTimeout(function() {
+	baseline.exec(function(res) {
+	    assert.ok(!res.error, "no error");
+	    assert.ok(res.data.length>0, "got data " + res.data.length);
+	    if (res.data.length>0)
+		console.log(res.data[0]);
+	    baseline.stop();
+	    done();	
+	}, { method : 'get', params : ['cpu','day']});
+    }, 15);
 };
 
 
 exports["testexecday2"] = function(assert, done) {
+    baseline.start();
+    timers.setTimeout(function() {
     baseline.exec(function(res) {
 	assert.ok(!res.error, "no error");
 	assert.ok(res.data.length>0, "got data " + res.data.length);
 	if (res.data.length>0)
 	    console.log(res.data[0]);
+	baseline.stop();
 	done();	
     }, { method : 'get', params : [['cpu','load'],'day']});
+    }, 15);
 };
 
 
 exports["testexecweek"] = function(assert, done) {
+    baseline.start();
+    timers.setTimeout(function() {
     baseline.exec(function(res) {
 	assert.ok(!res.error, "no error");
 	assert.ok(res.data.length>0, "got data " + res.data.length);
 	if (res.data.length>0)
 	    console.log(res.data[0]);
+	baseline.stop();
 	done();	
     }, { method : 'get', params : ['cpu','week']});
+    }, 15);
 };
 
 exports["testexecenv"] = function(assert, done) {
+    baseline.start();
+    timers.setTimeout(function() {
     baseline.exec(function(res) {
 	assert.ok(!res.error, "no error");
 	assert.ok(res.data.length>0, "got data " + res.data.length);
 	if (res.data.length>0)
 	    console.log(res.data[0]);
+	baseline.stop();
 	done();	
     }, { method : 'get', params : ['env', 'day']});
+    }, 15);
 };
 
 require("sdk/test").run(exports);

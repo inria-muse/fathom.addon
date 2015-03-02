@@ -1589,15 +1589,13 @@ var base = fathomapi.baseline = {};
  * To fetch a single metric, you can use the helper methods.
  *
  * @param {string} range One of 'day' (default), 'week', 'month', 'year'.
- * @param {Array}  what  List of 'cpu', 'load', 'tasks', 'mem', 'traffic',
- *                       'wifi' and 'rtt'. Undefined or empty list
- *                       defaults to all metrics (execpt 'env' which has
- *                       to be requested separately always -- see getEnv).
+ * @param {Array}  what  List of metrics. Valid metrics are 'cpu', 'load', 
+ *                       'tasks', 'mem', 'traffic', 'wifi' and 'rtt'. 
+ *                       Undefined defaults to all metrics.
  */
 base.get = function(callback, range, what) {
     if (!range) range = 'day';
-    if (!what || what.length == 0) 
-	what = ['cpu','load','tasks','mem','traffic','wifi','rtt'];
+    if (!what) what = ['cpu','load','tasks','mem','traffic','wifi','rtt'];
     makereq(callback, "baseline", "get", [what,range]);    
 };
 

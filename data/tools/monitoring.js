@@ -106,9 +106,6 @@ var drawemptychart = function(metric) {
 var drawchart = function(metric, range, data) {
     var xrange = getxrange(range);
 
-    if (metric == 'traffic')
-	console.log(data)
-
     var lines = _.map(_.keys(data), function(k) { 
 	return linelabels[metric][k];
     });
@@ -198,7 +195,6 @@ var loadgraphs = function(range) {
 
     var error = function(err) {
 	$('#waitspin').hide();
-	console.error("failed to get baseline measurements");
 	console.error(err);
 	fathom.close();
 	return;
@@ -206,7 +202,10 @@ var loadgraphs = function(range) {
 
     fathom.init(function() {
 	fathom.baseline.getEnv(function(res) {
-	    if (res.error) return error(res.error);
+	    if (res.error) 
+		return error(res.error);
+	    if (!res.data || res.data.length <= 0) 
+		return error('no baseline env data');
 
 	    drawenvchart(range, 
 			 _.map(res.data, function(d) { 
@@ -217,10 +216,13 @@ var loadgraphs = function(range) {
 			 }));
 
 	    fathom.baseline.get(function(res) {
+		if (res.error) 
+		    return error(res.error);
+		if (!res.data || res.data.length <= 0) 
+		    return error('no baseline measurement data');
+
 		$('#waitspin').hide();
 		fathom.close();
-
-		if (res.error) return error(res.error);
 
 		_.each(_.keys(linelabels), function(metric) {
 		    var flatres = [];
@@ -292,7 +294,6 @@ $(window).load(function() {
     });
 
     // default view last 24h
-    console.log('load default day');
     loadgraphs('day');
 });
 
