@@ -24,36 +24,21 @@ var getSize = function() {
     var body = document.body;
     var html = document.documentElement;
 
-    console.log('h',body.scrollHeight, 
-		body.offsetHeight,
-		html.clientHeight, 
-		html.scrollHeight, 
-		html.offsetHeight, 
-		window.innerHeight);
-    console.log('w',body.scrollWidth, 
-		body.offsetWidth, 
-		html.clientWidth, 
-		html.scrollWidth, 
-		html.offsetWidth, 
-		window.innerWidth);
-    
     var h = Math.max( body.scrollHeight, 
 		      html.scrollHeight, 
-		      body.offsetHeight);//,
-		      //html.clientHeight);//, 
-		      // html.scrollHeight,
-		      //html.offsetHeight, 
-		      //window.innerHeight);
+		      body.offsetHeight,
+		      html.clientHeight, 
+		      html.scrollHeight,
+		      html.offsetHeight, 
+		      window.innerHeight);
 
     var w = Math.max( body.scrollWidth, 
 		      html.scrollWidth,
-		      body.offsetWidth);//, 
-		      //html.clientWidth);//, 
-		      //html.scrollWidth, 
-		      //html.offsetWidth, 
-		      //window.innerWidth);
-
-    console.log('size [' + w + 'x' + h + ']');
+		      body.offsetWidth, 
+		      html.clientWidth, 
+		      html.scrollWidth, 
+		      html.offsetWidth, 
+		      window.innerWidth);
     return [w,h];
 }
 
@@ -63,8 +48,6 @@ var getElemSize = function(e) {
 		      e.offsetHeight );
     var w = Math.max( e.clientWidth, 
 		      e.offsetWidth );
-
-    console.log('elem [' + w + 'x' + h + ']');
     return [w,h];
 }
 
@@ -103,12 +86,11 @@ addon.port.on("render", function(values) {
 	e.innerHTML = rendered;
 
 	// request resize the panel to fit the rendered content
-	//var es = getElemSize(e);
-	//var s = getSize();
-	//addon.port.emit('resize', {
-	//    width : Math.max(es[0],s[0]),
-	//    height : Math.max(es[1],s[1])
-	//});
+	var s = getSize();
+	addon.port.emit('resize', {
+	    width : s[0],
+	    height : s[1]
+	});
     } else {
 	console.error("Did you forgot to include mustache.js?!");
     }
@@ -116,18 +98,18 @@ addon.port.on("render", function(values) {
 
 /** Request the panel to be closed. */
 function closeme() {
-    addon.port.emit('action', 'close');
-};
-
-/** Send msg to the addon and close the dialog unless asked not to. */
-function emit(msg, noclose) {
-    addon.port.emit('action', msg);
-    if (!noclose) closeme();
+    addon.port.emit('close');
 };
 
 /** Open url in new tab/window and close the dialog unless asked not to. */
 function opentab(url, noclose) {
     window.open(url,'_blank');
+    if (!noclose) closeme();
+};
+
+/** Send msg to the addon and close the dialog unless asked not to. */
+function emit(msg, noclose) {
+    addon.port.emit('action', msg);
     if (!noclose) closeme();
 };
 

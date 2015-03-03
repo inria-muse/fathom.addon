@@ -33,7 +33,8 @@
       </div>
 
       <div id="upload" class="content"></div>
-    </div>
+
+    </div> <!-- container -->
 
     <!-- The main template -->
     <script id="template" type="x-tmpl-mustache">
@@ -64,8 +65,8 @@
     <!-- Template for data upload disclaimer -->
     <script id="uploadtemplate" type="x-tmpl-mustache">
       <blockquote>
-	You have {{#upload}}<span class="allow">allowed</span>{{/upload}}{{^upload}}<span class="disallow">disallowed</span>{{/upload}} the sharing of the results from this tool. {{#ready}}<a id="showdata">See the data!</a>{{/ready}}</br>
-	<i class="small">You can change this setting at anytime via the addon preferences (go to Menu -> Addons -> Fathom).</i>
+	<i class="small">
+	You have {{#upload}}<span class="allow">allowed</span>{{/upload}}{{^upload}}<span class="disallow">disallowed</span>{{/upload}} the sharing of the results from this tool. {{#ready}}<a href="#void" id="showdata">See the data!</a>{{/ready}}</i>
 	</blockquote>
     </script>
     

@@ -4,8 +4,8 @@ var dialogs = require('./ui/dialogs');
 exports["testSecDialog"] = function(assert, done) {
     var sec = require("./security");
     var m = {
-	'appname' : 'test',
-	'appdesc' : 'testing security dialog',
+	'location' : { href : 'http://foo.bar' },
+	'description' : 'testing security dialog',
 	'api' : ["socket.*", "proto.*", "tools.*", "system.*"],
 	'destinations' : [
 	    'udp://192.168.1.1:53',

@@ -19,10 +19,33 @@ var NetGraph = function(elem, clickevents, width) {
     var height = this.height = width/1.61;
     var nodeid = this.nodeid = 0;
 
-    var formatInfoStr = function(n) {
-        var name = n.name || 'Network Device';
-        if (!name && n.raw['upnp']) {
-	    if (n.raw['upnp'].iswin)
+    // The node label
+    var getName = function(n) {
+	if (n.type === 'local') {
+	    return 'Your Device';
+
+	} else if (n.type === 'internet') {
+	    return 'Internet';
+
+	} else if (n.type === 'gw') {
+	    if (n.raw['upnp'] && 
+		n.raw['upnp'].xml && 
+		n.raw['upnp'].xml.friendlyName)
+		return n.raw['upnp'].xml.friendlyName;
+	    else if (n.raw['mdns'] && 
+		     n.raw['mdns'].hostname)
+		return 'Gateway ' + n.raw['mdns'].hostname.replace('.local','');
+	    else
+		return 'Gateway';
+	}
+	 
+	// else some other device
+        var name = 'Network Device';
+
+        if (n.raw['upnp']) {
+	    if (n.raw['upnp'].xml && n.raw['upnp'].xml.friendlyName)
+		name = n.raw['upnp'].xml.friendlyName;
+	    else if (n.raw['upnp'].iswin)
 		name = "Windows Device";
 	    else if (n.raw['upnp'].islinux)
 		name = "Linux Device";
@@ -31,7 +54,9 @@ var NetGraph = function(elem, clickevents, width) {
         }
         
         if (!name && n.raw['mdns']) {
-	    if (n.raw['mdns'].iswin)
+	    if (n.raw['mdns'].hostname)
+		name = n.raw['mdns'].hostname.replace('.local','');
+	    else if (n.raw['mdns'].iswin)
 		name = "Windows Device";
 	    else if (n.raw['mdns'].islinux)
 		name = "Linux Device";
@@ -39,7 +64,11 @@ var NetGraph = function(elem, clickevents, width) {
 		name = "Mac Device";
         }
 
-        var res = "<h5 class=\"upper\">"+name+"</h5><p><ul>";
+	return name;
+    };
+
+    var formatInfoStr = function(n) {
+        var res = "<h5 class=\"upper\">"+getName(n)+"</h5><p><ul>";
 	switch (n.type) {
 	case 'local':    
 	    res += "<li>Hostname: "+n.raw['local'].hostname+"</li>";
@@ -119,7 +148,8 @@ var NetGraph = function(elem, clickevents, width) {
     var node = ng.selectAll(".circle"); // circle group
     var link = eg.selectAll(".line");   // edge group
 
-    var defaultr = 0.04 * width;
+    // node radius
+    var defaultr = 0.03 * width;
 
     var nodemouseover = function(n) {
 	infobox.html(formatInfoStr(n));
@@ -197,12 +227,24 @@ var NetGraph = function(elem, clickevents, width) {
             .attr("dy", ".15em");
 
 	// enter + update
-        node.selectAll("text").text(function(n) {
-	    return n.name;
-	});
+        node.selectAll("text").text(getName);
 
 	node.attr("class", function(n) {
-	    return "node " + n.cssstyle;
+	    switch (n.type) {
+	    case 'internet':
+		return 'node i-node';
+		break;
+	    case 'local':
+		return 'node localhost-node';
+		break;
+	    case 'peer':
+		return 'node ' + ((n.rpc ? 'rpc-' : '') + 'peer-node');
+		break;
+	    case 'gw':
+		return 'node ' + ((n.rpc ? 'rpc-' : '') + 'gw-node');
+		break;	    
+	    }
+	    return 'node';
 	});
 
 	force.start();
@@ -223,7 +265,7 @@ NetGraph.prototype.addNode = function(newnode) {
     });
 
     if (!node) {
-	// new node
+	// new node !
 	node = newnode;
 	node.id = that.nodeid++;
 	switch (node.type) {
@@ -232,21 +274,17 @@ NetGraph.prototype.addNode = function(newnode) {
 	    node.x = that.width*0.5;
 	    node.y = that.height*0.1;
 	    node.fixed = true;
-	    node.cssstyle = 'i-node';
 	    that.internet = node;
 	    break;
 
 	case 'local':
-	    node.cssstyle = 'localhost-node';
 	    that.localnode = node;
 	    break;
 
 	case 'peer':
-	    node.cssstyle = (node.rpc ? 'rpc-' : '') + 'peer-node';
 	    break;
 
 	case 'gw':
-	    node.cssstyle = (node.rpc ? 'rpc-' : '') + 'gw-node';
 	    break;	    
 
 	}
@@ -257,38 +295,27 @@ NetGraph.prototype.addNode = function(newnode) {
 	case 'local':
 	    // override previous (mdns/upnp/fathom) info with local
 	    node.type = 'local';
-	    node.name = newnode.name;
 	    node.rpc = newnode.rpc;
 	    node.reachable = newnode.reachable;
-	    node.cssstyle = 'localhost-node';
 	    node.raw = _.extend(node.raw, newnode.raw);
 	    that.localnode = node;
 	    break;
 
-	case 'peer':
-	    if (node.type !== 'local') {
-		// update missing values
-		node.name = node.name || newnode.name;
-		node.rpc = node.rpc || newnode.rpc;
-		node.reachable = node.reachable || newnode.reachable;
-	        if (node.type !== 'gw') {
-		    node.cssstyle = (node.rpc ? 'rpc-' : '') + 'peer-node';
-                }
-	    }
-	    node.raw = _.extend(node.raw, newnode.raw);
-	    break;
-
 	case 'gw':
 	    node.type = newnode.type; // peer turns into gw
-	    node.name = node.name || newnode.name;
 	    node.rpc = node.rpc || newnode.rpc;
 	    node.reachable = node.reachable || newnode.reachable;
 	    node.raw = _.extend(node.raw, newnode.raw);
-	    node.cssstyle = (node.rpc ? 'rpc-' : '') + 'gw-node';
+	    break;
+
+	case 'peer':
+	    // don't override previous type (local or gw)
+	    node.rpc = node.rpc || newnode.rpc;
+	    node.reachable = node.reachable || newnode.reachable;
+	    node.raw = _.extend(node.raw, newnode.raw);
 	    break;
 
 	case 'internet':
-	    // should not happen (we only get single update for i-node)
 	    break;
 	}
     }
@@ -392,7 +419,7 @@ window.onload = function() {
 	var startts = window.performance.now();
 
 	// FIXME: mobile flag + adjust width ?
-	var g = new NetGraph('#canvas', false, 640);
+	var g = new NetGraph('#canvas', false, 600);
 
 	// start the remote API for discovering other Fathoms
 	fathom.tools.remoteapi.start(function() {});
@@ -418,10 +445,9 @@ window.onload = function() {
 
 		// get raw data
 		var json = _.map(g.nodes, function(o) {
-		    // remove UI related keys from the uploaded data
+		    // remove UI related keys from the json data
 		    return _.omit(o,
 				  "id",
-				  "cssstyle",
 				  "index",
 				  "weight",
 				  "x",

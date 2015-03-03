@@ -47,21 +47,21 @@
     opacity: 0.8;
     text-align: center;
     text-transform: uppercase;
-    padding: 5px;
+    padding: 3px;
 }
 
 .splash-text {
     color: #0A0545;
     opacity: 0.8;
     text-align: center;
-    padding: 5px;
+    padding: 3px;
 }
 
 .splash-text-left {
     color: #0A0545;
     opacity: 0.8;
     text-align: left;
-    padding: 5px;
+    padding: 3px;
 }
 
 .splash-button {
