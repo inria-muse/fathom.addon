@@ -1,42 +1,3 @@
-/* Color scheme from violet to yellow:
-
-          #0a0545
- 	  #160E43
- 	  #221740
- 	  #2F1F3E
- 	  #3B283B
- 	  #473139
- 	  #543A37
- 	  #604334
- 	  #6C4B32
- 	  #78542F
- 	  #845D2D
- 	  #91662B
- 	  #9D6F28
- 	  #A97726
- 	  #B68023
- 	  #C28921
- 	  #CE921F
- 	  #DA9B1C
- 	  #E6A31A
- 	  #F3AC17
-	  #FFB515
- */
-
-/* Color scheme violets
- 	#0a0545
-	#221E58
-	#3B376A
-	#54507D
-	#6C698F
-	#8482A2
-	#9D9BB5
-	#B6B4C7
-	#CECDDA
-	#E6E6EC
-	#FFFFFF
-*/
-
 .mg-active-datapoint {
     fill: #0a0545;
     font-size: 0.9rem;
@@ -65,7 +26,7 @@
 }
 
 .mg-barplot rect.mg-bar {
-    shape-rendering: crispEdges;
+    shape-rendering: auto;
     fill: #221E58;
 }
 
@@ -84,9 +45,9 @@
 
 .mg-baselines line {
     opacity: 1;
-    shape-rendering: crispEdges;
+    shape-rendering: auto;
     stroke: #909090;
-    stroke-width: 0.5;
+    stroke-width: 1px;
 }
 
 .mg-baselines text {
@@ -182,13 +143,13 @@
 .mg-histogram .axis line {
     fill: none;
     opacity: 0.7;
-    shape-rendering: crispEdges;
+    shape-rendering: auto;
     stroke: #ccc;
 }
 
 .mg-histogram .mg-bar rect {
     fill: #221E58;
-    shape-rendering: crispEdges;
+    shape-rendering: auto;
 }
 
 .mg-histogram .mg-bar rect.active {
@@ -197,7 +158,7 @@
 
 .mg-least-squares-line {
     stroke: red;
-    stroke-width: 1;
+    stroke-width: 1px;
 }
 
 .mg-lowess-line {
@@ -206,64 +167,75 @@
 }
 
 .mg-line1-color {
-    stroke: #221E58;
+    stroke: #8a89a6;
 }
-
 .mg-hover-line1-color {
-    fill: #221E58;
+    fill: #8a89a6;
+}
+.mg-line1-legend-color {
+    color: #8a89a6;
 }
 
 .mg-line2-color {
-    stroke: #54507D;
+    stroke: #6b486b;
 }
-
 .mg-hover-line2-color {
-    fill: #54507D;
+    fill: #6b486b;
+}
+.mg-line2-legend-color {
+    color: #6b486b;
 }
 
 .mg-line3-color {
-    stroke: #8482A2;
+    stroke: #d0743c;
 }
-
 .mg-hover-line3-color {
-    fill: #8482A2;
+    fill: #d0743c;
+}
+.mg-line3-legend-color {
+    color: #d0743c;
 }
 
 .mg-line4-color {
-    stroke: #B6B4C7;
+    stroke: #98abc5;
 }
-
 .mg-hover-line4-color {
-    fill: #B6B4C7;
+    fill: #98abc5;
+}
+.mg-line4-legend-color {
+    color: #98abc5;
 }
 
 .mg-line5-color {
-    stroke: #E6E6EC;
+    stroke: #7b6888;
 }
-
 .mg-hover-line5-color {
-    fill: #E6E6EC;
+    fill: #7b6888;
 }
-
-.mg-line1-legend-color {
-    color: #221E58;
-}
-
-.mg-line2-legend-color {
-    color: #54507D;
-}
-
-.mg-line3-legend-color {
-    color: #8482A2;
-}
-
-.mg-line4-legend-color {
-    color: #B6B4C7;
-}
-
 .mg-line5-legend-color {
-    color: #E6E6EC;
+    color: #7b6888;
 }
+
+.mg-line6-color {
+    stroke: #a05d56;
+}
+.mg-hover-line6-color {
+    fill: #a05d56;
+}
+.mg-line6-legend-color {
+    color: #a05d56;
+}
+
+.mg-line7-color {
+    stroke: #ff8c00;
+}
+.mg-hover-line7-color {
+    fill: #ff8c00;
+}
+.mg-line7-legend-color {
+    color: #ff8c00;
+}
+
 
 .mg-main-area-solid svg .mg-main-area {
     fill: #ccccff;
@@ -271,10 +243,10 @@
 }
 
 .mg-markers line {
-    opacity: 1;
-    shape-rendering: crispEdges;
+    opacity: 0.9;    
+    shape-rendering: auto;
     stroke: #909090;
-    stroke-width: 0.5;
+    stroke-width: 1px;
 }
 
 .mg-markers text {
@@ -289,11 +261,11 @@
 }
 
 .mg-missing-background {
-    stroke-width:2;
-    stroke-opacity:0.05;
-    stroke-dasharray:10,5;
-    fill:none;
-    stroke:blue;
+    stroke: blue;
+    fill: none;
+    stroke-dasharray: 10,5;
+    stroke-opacity: 0.05;
+    stroke-width: 2;
 }
 
 .mg-missing .mg-main-line {
@@ -352,9 +324,9 @@ circle.mg-points-mono {
 .mg-x-axis line,
 .mg-y-axis line {
     opacity: 1;
-    shape-rendering: crispEdges;
+    shape-rendering: auto;
     stroke: #ccc;
-    stroke-width: 1;
+    stroke-width: 1px;
 }
 
 .mg-x-axis text,
@@ -392,9 +364,9 @@ circle.mg-points-mono {
 
 .mg-year-marker line {
     opacity: 1;
-    shape-rendering: crispEdges;
+    shape-rendering: auto;
     stroke: #ccc;
-    stroke-width: 1;
+    stroke-width: 1px;
 }
 
 .mg-year-marker-small text {

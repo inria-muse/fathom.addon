@@ -325,12 +325,12 @@ svg.net-graph .canvas {
 
 svg.net-graph .edge {
     stroke: #0A0545;
-    stroke-width: 2.5px;
+    stroke-width: 2.0px;
 }
 
 svg.net-graph .wifi-edge {
     stroke: #0A0545;
-    stroke-width: 2.5px;
+    stroke-width: 2.0px;
     stroke-dasharray: 3,3;
 }
 
@@ -340,9 +340,9 @@ svg.net-graph .label {
   fill: #000;
 }
 
-/* unknown */
+/* node base */
 svg.net-graph .node {
-    fill: #ffffff;
+    fill: #98abc5;
     stroke: #0A0545;
     stroke-width: 0.5px;
 }
@@ -359,22 +359,17 @@ svg.net-graph .peer-node {
 
 /* other host, rpc available */
 svg.net-graph .rpc-peer-node {
-    fill: #a05d56;
+    fill: #7b6888;
 }
 
 /* gateway */
 svg.net-graph .gw-node {
-    fill: #7b6888;
+    fill: #6b486b;
 }
 
 /* gateway, rpc */
 svg.net-graph .rpc-gw-node {
-    fill: #6b486b;
-}
-
-/* ap */
-svg.net-graph .ap-node {
-    fill: #7b6888;
+    fill: #a05d56;
 }
 
 /* internet nodes */

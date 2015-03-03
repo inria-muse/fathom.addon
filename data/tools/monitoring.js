@@ -65,27 +65,32 @@ const linelabels = {
 var getxrange = function(range) {
     var max_x = new Date();
     var min_x = undefined;
+    var iv = undefined;
     switch (range) {
     case "day":
 	// beg of next hour
 	max_x.setHours(max_x.getHours()+1,0);
 	// -24h - 1sec ago
 	min_x = new Date(max_x.getTime() - 24*60*60*1000 - 1000);  
+	iv = 120;
 	break;
     case "week":
 	max_x.setDate(max_x.getDate()+1);
 	min_x = new Date(max_x.getTime() - 7*24*60*60*1000 - 1000);
+	iv = 600;
 	break;
     case "month":
 	max_x.setDate(max_x.getDate()+7);
 	min_x = new Date(max_x.getTime() - 30*24*60*60*1000 - 1000);  
+	iv = 3600;
 	break;
     case "year":
 	max_x.setMonth(max_x.getMonth()+1);
 	min_x = new Date(max_x.getTime() - 365*24*60*60*1000 - 1000);  
+	iv = 6*3600;
 	break;
     }
-    return [min_x,max_x];
+    return [min_x,max_x,iv];
 };
 
 /** metricsgraphics implementation */
@@ -112,11 +117,36 @@ var drawchart = function(metric, range, data) {
 
     // array of array per line
     var linedata = _.map(_.keys(data), function(k) {
-	return _.filter(data[k], function(d) {
+	var tmp = _.filter(data[k], function(d) {
 	    // filter away non range values
 	    return (d['date']>=xrange[0] && d['date']<=xrange[1]);
 	});
+	// add zeroes to hide gaps
+	var res = [];
+	var prev = undefined;
+	var lim = 2*xrange[2]*1000; // twice the measurement iv (ms)
+	_.each(tmp, function(v) {
+	    if (prev && (v['date'].getTime()-prev['date'].getTime()) > lim) {
+		// gap
+		res.push({ 
+		    date : new Date(prev['date'].getTime()+1000*xrange[2]/2),
+		    value : null,
+		    missing : true,
+		    metric : prev['metric']});
+		res.push({ 
+		    date : new Date(v['date'].getTime()-1000*xrange[2]/2),
+		    value : null,
+		    missing : true,
+		    metric : prev['metric']});
+	    }
+	    res.push(v);
+	    prev = v;
+	});
+	return res;
     });
+
+    if (linedata.length <= 0 || linedata[0].length <= 0)
+	return;
 
     MG.data_graphic({
 	width: 640,
@@ -131,8 +161,8 @@ var drawchart = function(metric, range, data) {
 	y_autoscale: (metric !== 'rtt'),
 	min_x: xrange[0],
 	max_x: xrange[1],
-	missing_is_undefined: true,
-	missing_is_zero: false,
+	interpolate : 'linear',
+	missing_is_undefined : true,
 	x_accessor: 'date',
 	y_accessor: 'value',
 	format: (metric === 'cpu' ? 'percentage' : 'count'),
@@ -153,6 +183,9 @@ var drawenvchart = function(range, data) {
     var datainrange = _.filter(data, function(d) {
 	return (d['date']>=xrange[0] && d['date']<=xrange[1]);
     });
+    if (datainrange.length <= 0)
+	return;
+
     var envs =  _.uniq(_.pluck(datainrange,'env'));
 
     MG.data_graphic({
