@@ -170,7 +170,7 @@ var drawchart = function(metric, range, data) {
 	area: false,
 	y_label: ylabels[metric],
 	y_extended_ticks: true,
-	show_years : (range==='year'),
+	show_secondary_x_label : (range==='year'),
 	legend : lines,
 	legend_target : '#legend-'+metric,
 	aggregate_rollover: true
@@ -181,36 +181,123 @@ var drawchart = function(metric, range, data) {
 var drawenvchart = function(range, data) {
     var xrange = getxrange(range);
     var datainrange = _.filter(data, function(d) {
-	return (d['date']>=xrange[0] && d['date']<=xrange[1]);
+	var ts = new Date(d.ts);
+	return (ts>=xrange[0] && ts<=xrange[1]);
     });
     if (datainrange.length <= 0)
 	return;
 
-    var envs =  _.uniq(_.pluck(datainrange,'env'));
+    var idx = 0;
+    var envs = {};
+
+    // add #num suffix to make labels unique
+    var uniqlabel = function(label) {
+	var t = _.find(envs, function(v) {
+	    return (v.l === label || v.l === label+' [1]');
+	});
+
+	if (t) {
+	    // two or more networks with the same label
+	    if (!t.lidx) {
+		t.lidx = 1
+		t.l += ' ['+t.lidx+']'; // 1st
+	    }
+	    t.lidx += 1;
+	    label += '['+t.lidx+']';
+	} // else first with this label
+	return label;
+    };
+
+    var ddata = _.map(data, function(d) { 
+	if (!envs[d.env_id]) {
+	    idx += 1;
+	    var e = { 
+		id : idx, 
+		l : 'Environment' + idx // name must be unique!
+	    };
+
+	    if (d.userlabel) {
+		// user has given a label (unique by design)
+		e.l = d.userlabel; 
+	    } else if (d.ssid) {
+		e.l = uniqlabel(d.ssid);
+	    } else if (d.isp) {
+		e.l = uniqlabel(d.isp);
+	    }
+	    envs[d.env_id] = e;
+	}
+
+	// for the graphic
+	d.date = new Date(d.ts);
+	d.y = envs[d.env_id].id;
+	d.env = envs[d.env_id].l;
+	return d;
+    });
 
     MG.data_graphic({
 	data: datainrange,
 	chart_type: 'point',
 	width: 640,
-	height: 120*_.size(envs),
+	height: 25*_.size(envs)+50,
 	left: 50,
 	right: 20,
 	top: 30,
 	target: '#chart-env',
-	missing_is_zero: false,
-	show_rollover_text: false,
 	min_y: 1,
 	max_y: _.size(envs),
 	min_x: xrange[0],
 	max_x: xrange[1],
-	color_range : ['#221E58','#E6E6EC'],
+	color_range : ["#8a89a6", "#6b486b", "#d0743c", "#98abc5", "#7b6888", "#a05d56", "#ff8c00"],
 	x_accessor: 'date',
 	y_accessor: 'y',
 	color_accessor:'env',
 	color_type:'category',
-	show_years : (range==='year'),
-	legend : envs,
-	legend_target : '#legend-env'
+	show_secondary_x_label : (range==='year'),
+	legend : _.uniq(_.pluck(envs, 'l')),
+	legend_target : '#legend-env',
+	show_rollover_text: false,
+	mouseover: function(d, i) {
+	    // custom format the rollover text, describe env
+	    d = d.point;
+	    
+	    var text = d3.select('#chart-env svg .mg-active-datapoint');
+	    text.text('');
+
+	    text.append('tspan').text(d.env);
+
+	    var lc = 1;
+	    if (d.ssid) {
+		text.append('tspan')
+		.attr({
+                    x: 0,
+                    y: (lc * 1.1) + 'em'
+                })
+		.text("WiFi: " + d.ssid);
+		lc +=1;
+	    }
+	    text.append('tspan')
+		.attr({
+                    x: 0,
+                    y: (lc * 1.1) + 'em'
+                })
+		.text("Gateway: " + d.gateway_ip);
+	    lc +=1;
+
+	    text.append('tspan')
+		.attr({
+                    x: 0,
+                    y: (lc * 1.1) + 'em'
+                })
+		.text("ISP: " + d.isp);
+	    lc +=1;
+
+	    text.append('tspan')		
+		.attr({
+                    x: 0,
+                    y: (lc * 1.1) + 'em'
+                })
+		.text("Location: " + d.city + ", " + d.country);
+	}
     });
 };
 
@@ -240,13 +327,7 @@ var loadgraphs = function(range) {
 	    if (!res.data || res.data.length <= 0) 
 		return error('no baseline env data');
 
-	    drawenvchart(range, 
-			 _.map(res.data, function(d) { 
-			     d.date = new Date(d.ts);
-			     d.y = d.env_id;
-			     d['env'] = 'Environment' + d.env_id;
-			     return d;
-			 }));
+	    drawenvchart(range, res.data);
 
 	    fathom.baseline.get(function(res) {
 		if (res.error) 
