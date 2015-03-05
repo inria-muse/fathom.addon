@@ -64,9 +64,7 @@ exports["testpingttl3"] = function(assert, done) {
 	console.log("test doPing with ttl",res);
 	assert.ok(!res.error, "doPing no error");
 	assert.ok(res.result.count === 1, "doPing count == 1");
-	assert.ok(res.result.time_exceeded_from, 
-		  "doPing got time exceeded from " + 
-		  res.result.time_exceeded_from);
+	assert.ok(res.result.lost === 1, "lost at ttl 3");
 	done();
     }, { method : 'doPing', params: [config.MSERVER_FR, 
 				     { count : 1, ttl : 3, timeout : 1}]});
