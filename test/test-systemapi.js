@@ -32,8 +32,7 @@ exports["testpingbcast"] = function(assert, done) {
 	if (doneflag)
 	    done();
     }, { method : 'doPing', 
-	 params: ['10.254.2.255',{ count : 2, interval : 1, bcast : true }]});
-    //'192.168.1.255',
+	 params: ['192.168.1.255',{ count : 2, interval : 1, bcast : true }]});
 };
 
 
@@ -57,6 +56,20 @@ exports["testpingttl"] = function(assert, done) {
 	done();
     }, { method : 'doPing', params: [config.MSERVER_FR, 
 				     { count : 1, ttl : 1, timeout : 1}]});
+};
+
+
+exports["testpingttl3"] = function(assert, done) {
+    systemapi.exec(function(res, doneflag) {
+	console.log("test doPing with ttl",res);
+	assert.ok(!res.error, "doPing no error");
+	assert.ok(res.result.count === 1, "doPing count == 1");
+	assert.ok(res.result.time_exceeded_from, 
+		  "doPing got time exceeded from " + 
+		  res.result.time_exceeded_from);
+	done();
+    }, { method : 'doPing', params: [config.MSERVER_FR, 
+				     { count : 1, ttl : 3, timeout : 1}]});
 };
 
 exports["testtraceroute"] = function(assert, done) {
