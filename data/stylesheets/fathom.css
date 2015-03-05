@@ -115,6 +115,14 @@
     color: #FFB515;
 }
 
+.pure-menu-fathom {
+    display: inline-block;
+}
+
+.hidden {
+    display: none;
+}
+
 /* Tool pages */
 #container {
     position: relative;

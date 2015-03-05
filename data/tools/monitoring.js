@@ -237,11 +237,11 @@ var drawenvchart = function(range, data) {
     MG.data_graphic({
 	data: datainrange,
 	chart_type: 'point',
-	width: 640,
-	height: 25*_.size(envs)+50,
-	left: 50,
+	width: $('#chart-env').width(),
+	height: 25*_.size(envs)+100,
+	left: 20,
 	right: 20,
-	top: 30,
+	top: 50,
 	target: '#chart-env',
 	min_y: 1,
 	max_y: _.size(envs),
@@ -253,50 +253,61 @@ var drawenvchart = function(range, data) {
 	color_accessor:'env',
 	color_type:'category',
 	show_secondary_x_label : (range==='year'),
-	legend : _.uniq(_.pluck(envs, 'l')),
-	legend_target : '#legend-env',
+//	legend : _.uniq(_.pluck(envs, 'l')),
+//	legend_target : '#legend-env',
 	show_rollover_text: false,
-	mouseover: function(d, i) {
-	    // custom format the rollover text, describe env
-	    d = d.point;
-	    
-	    var text = d3.select('#chart-env svg .mg-active-datapoint');
-	    text.text('');
+//	rollover_no_y: true,
+	mouseclick: function(d, i) {
+	    if (i>0) {
+		$('#info-env-default').hide();
+		$('#info-env').show();
+		$('#info-env').html(
+		    '<div id="userlabel-text"><strong id="userlabel-s">'+d.point.env+'</strong>&nbsp;'+
+			'<a href="#void" id="userlabel-edit"><i class="fa fa-edit"></i></a></div>'+
+			'<div id="userlabel-input"><input id="userlabel-text-input" type="text" placeholder="'+d.point.env+'">&nbsp;'+
+			'<a href="#void" id="userlabel-save"><i class="fa fa-save"></i></a>&nbsp;'+
+			'<a href="#void" id="userlabel-cancel"><i class="fa fa-close"></i></a></div>'+
+			'<ul style="list-style: none; padding:0px; margin:0px">'+
+			'<li>WiFi: '+(d.point.ssid ? d.point.ssid : 'na')+'</li>'+
+			'<li>Gateway: '+d.point.gateway_ip+'</li>'+
+			'<li>ISP: '+d.point.isp+'</li>'+
+			'<li>Location: '+d.point.city+', '+d.point.country+'</li>'+
+			'</ul>'
+		);
 
-	    text.append('tspan').text(d.env);
+		$('#userlabel-input').hide();
+		$('#userlabel-text').show();
 
-	    var lc = 1;
-	    if (d.ssid) {
-		text.append('tspan')
-		.attr({
-                    x: 0,
-                    y: (lc * 1.1) + 'em'
-                })
-		.text("WiFi: " + d.ssid);
-		lc +=1;
+		$('#userlabel-edit').click(function() {
+		    $('#userlabel-input').toggle();
+		    $('#userlabel-text').toggle();
+		    $("#userlabel-text-input").prop('disabled', false);
+		});
+
+		$('#userlabel-cancel').click(function() {
+		    $('#userlabel-input').toggle();
+		    $('#userlabel-text').toggle();
+		});
+
+		$('#userlabel-save').click(function() {
+		    var olde = d.point.env;
+		    var newe = $('#userlabel-text-input').val();
+		    if (newe && newe.length > 0 && olde !== newe) {
+			console.log(olde + ' -> ' + newe);
+			_.each(ddata, function(d) { 
+			    if (d.env === olde)
+				d.env = newe;
+			});
+			$('#userlabel-s').html(newe);
+		    }
+		    $('#userlabel-input').toggle();
+		    $('#userlabel-text').toggle();
+		});
+
+	    } else {
+		$('#info-env').hide();
+		$('#info-env-default').show();
 	    }
-	    text.append('tspan')
-		.attr({
-                    x: 0,
-                    y: (lc * 1.1) + 'em'
-                })
-		.text("Gateway: " + d.gateway_ip);
-	    lc +=1;
-
-	    text.append('tspan')
-		.attr({
-                    x: 0,
-                    y: (lc * 1.1) + 'em'
-                })
-		.text("ISP: " + d.isp);
-	    lc +=1;
-
-	    text.append('tspan')		
-		.attr({
-                    x: 0,
-                    y: (lc * 1.1) + 'em'
-                })
-		.text("Location: " + d.city + ", " + d.country);
 	}
     });
 };
@@ -304,6 +315,9 @@ var drawenvchart = function(range, data) {
 /** Get baseline data for the range and (re-)draw graphs. */
 var loadgraphs = function(range) {    
     $('#waitspin').show();
+
+    $('#info-env-default').show();
+    $('#info-env').hide();
 
     // clear all figures and set to no data
     $('#chart-env').empty();

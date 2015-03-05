@@ -64,14 +64,14 @@ addon.port.on('resize', function() {
 addon.port.on('fathom', function(status) {
     if (document.getElementById("fathomon") && !status) {
 	document.getElementById("fathomon").className = 
-	    "pure-menu-selected pure-menu-hidden";
+	    "hidden";
 	document.getElementById("fathomoff").className = 
-	    "pure-menu";
+	    "pure-menu-item pure-menu-selected";
     } else if (document.getElementById("fathomon") && status) {
 	document.getElementById("fathomon").className = 
-	    "pure-menu-selected";
+	    "pure-menu-item";
 	document.getElementById("fathomoff").className = 
-	    "pure-menu pure-menu-hidden";
+	    "pure-menu-item hidden";
     } // else just ignore
 });
 

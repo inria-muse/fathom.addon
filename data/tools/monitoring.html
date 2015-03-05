@@ -26,9 +26,9 @@
 
 	<div class="center">
 	  <a id="lastday" class="pure-button pure-button-active" href="#">Last 24h</a>
-	  <a id="lastweek" class="pure-button" href="#">Last 7 days</a>
-	  <a id="lastmonth" class="pure-button" href="#">Last month</a>
-	  <a id="lastyear" class="pure-button" href="#">Last year</a>
+	  <a id="lastweek" class="pure-button" href="#void">Last 7 days</a>
+	  <a id="lastmonth" class="pure-button" href="#void">Last month</a>
+	  <a id="lastyear" class="pure-button" href="#void">Last year</a>
 
 	  <p/>
 
@@ -42,8 +42,24 @@
 	</div> <!-- center -->
 
 	<h2 class="content-subhead">Network Environments</h2>
-	<div id="legend-env"></div>
-	<div id="chart-env"></div>
+
+	<div class="pure-g">
+	  <div class="pure-u-3-5">
+	    <div id="legend-env"></div>
+	    <div id="chart-env"></div>
+	  </div>
+	  <div class="pure-u-2-5">
+	    <div id="info-env-default" class="highlight">
+	      <i class="fa fa-info-circle"></i><br/><i class="small">
+		Click a point to see more info about the network
+	      </i>
+	    </div>
+	    <div id="info-env" class="highlight">
+	      <form class="pure-form">
+	      </form>
+	    </div>
+	  </div>
+	</div>
 
 	<h2 class="content-subhead">Network Traffic</h2>
 	<div id="legend-traffic"></div>
