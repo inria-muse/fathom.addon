@@ -472,7 +472,6 @@ window.onload = function() {
 			win.json = json;
 		    });
 
-
 		    // stop using the extension
 		    fathom.tools.remoteapi.stop(function() {});
 		    fathom.close();

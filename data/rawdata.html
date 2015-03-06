@@ -19,13 +19,18 @@
 
       <div id="json" class="content"></div>
     </div>
+
     <script>
       window.onload = function() {
-        document.getElementById('json').innerHTML = 
-          '<pre>'+ 
-        	JSON.stringify(window.json,null,4)+
-          '</pre>'
-      };
+        if (!window.json || window.json.error) {
+            document.getElementById('json').innerHTML = '<h2 class="content-subhead">Oups no data!</h2><p>If you were looking for the background monitoring data, please wait a few minutes for the next measurement round to take place. For page load metrics, visit some web sites.</p>';
+        } else {	  
+	  document.getElementById('json').innerHTML = 
+              '<pre>'+ 
+              JSON.stringify(window.json,null,4)+
+              '</pre>'
+	}
+      }
     </script>
   </body>
 </html>

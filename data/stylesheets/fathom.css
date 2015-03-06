@@ -178,6 +178,7 @@ blockquote {
      padding: 2.5em 2em 0;
      border-bottom: 1px solid #eee;
  }
+
 .header h1 {
     margin: 0.2em 0;
     font-size: 3em;
@@ -195,6 +196,21 @@ blockquote {
     margin: 30px 0 10px 0;
     font-weight: 300;
     color: #888;
+}
+
+.graph-head {
+    margin: 20px 0 0 0;
+    font-size: 80%; 
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.graph-legend {
+    font-size: 0.7rem;
+    font-weight: 400;
+    text-align: center;
 }
 
 .allow {

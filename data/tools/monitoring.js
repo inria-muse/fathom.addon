@@ -14,21 +14,24 @@
 
 // y-axis metrics
 const ylabels = {
-    'cpu' : 'CPU utilization',
-    'load' : 'Load',
-    'tasks' : 'Number of tasks',
-    'mem' : 'Memory (Bytes)',
-    'traffic' : 'Network traffic (bit/s)',
-    'wifi' : 'Level (dBm)',
-    'rtt' : 'Round-trip-time (ms)'
+    'cpu' :     'utilization',
+    'load' :    'load',
+    'tasks' :   'count',
+    'mem' :     'bytes',
+    'traffic' : 'bit/s',
+    'wifi' :    'dBm',
+    'rtt' :     'ms',
+    'pageload' :'count',
+    'pageload_delay' :'ms'
 };
 
 // map metric group to series and their labels
+// defines the line ordering too
 const linelabels = {
     'tasks' : {
 	'tasks_total' : "All", 
-	'tasks_running' : 'Running', 
-	'tasks_sleeping' : 'Sleeping'
+	'tasks_sleeping' : 'Sleeping',
+	'tasks_running' : 'Running' 
     },
     'load' : {
 	'loadavg_onemin' : '1-min', 
@@ -36,9 +39,9 @@ const linelabels = {
 	'loadavg_fifteenmin' : '15-min'
     },
     'cpu' : {
+	'cpu_idle' : 'Idle',
 	'cpu_user' : 'User', 
-	'cpu_system' : 'System', 
-	'cpu_idle' : 'Idle'
+	'cpu_system' : 'System'
     },
     'mem' : {
 	'mem_total' : 'Available', 
@@ -59,6 +62,16 @@ const linelabels = {
 	'rtt2' : 'Access link (2nd hop)', 
 	'rtt3' : 'ISP (3rd hop)', 
 	'rttx' : 'Measurement server (in France)'
+    },
+    'pageload' : {
+	'pageload_total' : 'Page Load', 
+	'pageload_firstbyte' : 'Network Access',
+	'pageload_dns' : 'DNS request'
+    },
+    'pageload_delay' : {
+	'pageload_total_delay' : 'Page Load Time', 
+	'pageload_firstbyte_delay' : 'Network (first byte)',
+	'pageload_dns_delay' : 'DNS request' 
     }
 }
 
@@ -100,11 +113,12 @@ var drawemptychart = function(metric) {
 	chart_type: 'missing-data',
 	missing_text: 'No data available',
 	target: '#chart-'+metric,
-	width: 640,
-	height: 480,
+	width: $('#chart-'+metric).width(),
+	height: $('#chart-'+metric).width()/1.61,
 	left: 20,
 	right: 20,
 	top: 10,
+	bottom: 10
     });
 };
 
@@ -148,25 +162,39 @@ var drawchart = function(metric, range, data) {
     if (linedata.length <= 0 || linedata[0].length <= 0)
 	return;
 
+    var isdelay = (metric === 'rtt' || metric === 'pageload_delay');
+
+    var min_y = undefined;
+    var max_y = undefined;
+    if (metric === 'rtt') {
+	min_y = 0.1;
+	max_y = 10000;
+    } else if (metric === 'pageload_delay') {
+	min_y = 1;
+	max_y = 30000;
+    }
+	
+
     MG.data_graphic({
-	width: 640,
-	height: 480,
-	left: 120,
-	right: 20,
-	top: 30,
+	width: $('#chart-'+metric).width(),
+	height: $('#chart-'+metric).width()/1.61,
+	left: 80,
+	right: 5,
+	top: 20,
+	bottom: 20,
 	target: '#chart-'+metric,
 	data: linedata,
-	min_y: (metric === 'rtt' ? 0.1 : undefined),
-	max_y: (metric === 'rtt' ? 1000 : undefined),
-	y_autoscale: (metric !== 'rtt'),
+	x_accessor: 'date',
+	y_accessor: 'value',
 	min_x: xrange[0],
 	max_x: xrange[1],
 	interpolate : 'linear',
 	missing_is_undefined : true,
-	x_accessor: 'date',
-	y_accessor: 'value',
+	min_y: min_y,
+	max_y: max_y,
+	y_autoscale: !isdelay,
+	y_scale_type: (isdelay ? 'log' : 'linear'),
 	format: (metric === 'cpu' ? 'percentage' : 'count'),
-	y_scale_type: (metric === 'rtt' ? 'log' : 'linear'),
 	area: false,
 	y_label: ylabels[metric],
 	y_extended_ticks: true,
@@ -177,7 +205,7 @@ var drawchart = function(metric, range, data) {
     });
 };
 
-/** metricsgraphics implementation */
+/** environment timeline */
 var drawenvchart = function(range, data) {
     var xrange = getxrange(range);
     var datainrange = _.filter(data, function(d) {
@@ -185,7 +213,7 @@ var drawenvchart = function(range, data) {
 	return (ts>=xrange[0] && ts<=xrange[1]);
     });
     if (datainrange.length <= 0)
-	return;
+	return; // nothing to show
 
     var idx = 0;
     var envs = {};
@@ -234,6 +262,12 @@ var drawenvchart = function(range, data) {
 	return d;
     });
 
+    // info box template, set the default text visible
+    var infotemplate = document.getElementById('envinfotemplate').innerHTML;
+    Mustache.parse(infotemplate);
+    $('#info-env-default').show();
+    $('#info-env').hide();
+
     MG.data_graphic({
 	data: datainrange,
 	chart_type: 'point',
@@ -258,24 +292,14 @@ var drawenvchart = function(range, data) {
 	show_rollover_text: false,
 //	rollover_no_y: true,
 	mouseclick: function(d, i) {
-	    if (i>0) {
-		$('#info-env-default').hide();
-		$('#info-env').show();
+	    if (i>0 && d && d.point) {
 		$('#info-env').html(
-		    '<div id="userlabel-text"><strong id="userlabel-s">'+d.point.env+'</strong>&nbsp;'+
-			'<a href="#void" id="userlabel-edit"><i class="fa fa-edit"></i></a></div>'+
-			'<div id="userlabel-input"><input id="userlabel-text-input" type="text" placeholder="'+d.point.env+'">&nbsp;'+
-			'<a href="#void" id="userlabel-save"><i class="fa fa-save"></i></a>&nbsp;'+
-			'<a href="#void" id="userlabel-cancel"><i class="fa fa-close"></i></a></div>'+
-			'<ul style="list-style: none; padding:0px; margin:0px">'+
-			'<li>WiFi: '+(d.point.ssid ? d.point.ssid : 'na')+'</li>'+
-			'<li>Gateway: '+d.point.gateway_ip+'</li>'+
-			'<li>ISP: '+d.point.isp+'</li>'+
-			'<li>Location: '+d.point.city+', '+d.point.country+'</li>'+
-			'</ul>'
-		);
+		    Mustache.render(
+			infotemplate, 
+			d.point));
 
 		$('#userlabel-input').hide();
+		$('#userlabel-input-error').hide();
 		$('#userlabel-text').show();
 
 		$('#userlabel-edit').click(function() {
@@ -293,21 +317,41 @@ var drawenvchart = function(range, data) {
 		    var olde = d.point.env;
 		    var newe = $('#userlabel-text-input').val();
 		    if (newe && newe.length > 0 && olde !== newe) {
-			console.log(olde + ' -> ' + newe);
-			_.each(ddata, function(d) { 
-			    if (d.env === olde)
-				d.env = newe;
-			});
-			$('#userlabel-s').html(newe);
-		    }
-		    $('#userlabel-input').toggle();
-		    $('#userlabel-text').toggle();
-		});
+			// update in the baseline db, fails if not unique
+			fathom.internal(function(res) {
+			    if (res.error) {
+				console.log(res);
+				$('#userlabel-input-error').html('Not unique! Try again.');
+				$('#userlabel-input').show();
+				$('#userlabel-text').hide();
+				$('#userlabel-input-error').show();
+				return;
+			    }
 
-	    } else {
-		$('#info-env').hide();
-		$('#info-env-default').show();
+			    // update the graph
+			    _.each(ddata, function(dd) { 
+				if (dd.env_id === d.point.env_id) {
+				    dd.env = newe;
+				    dd.userlabel = newe;
+				}
+			    });
+			    $('#userlabel-s').html(newe);
+
+			    $('#userlabel-input').hide();
+			    $('#userlabel-input-error').hide();
+			    $('#userlabel-text').show();
+
+			},'setenvlabel',[d.point.env_id, newe]);
+		    } else {			       
+			// did not change
+			$('#userlabel-input').toggle();
+			$('#userlabel-text').toggle();
+		    }
+		});
 	    }
+
+	    $('#info-env-default').toggle();
+	    $('#info-env').toggle();
 	}
     });
 };
@@ -315,8 +359,7 @@ var drawenvchart = function(range, data) {
 /** Get baseline data for the range and (re-)draw graphs. */
 var loadgraphs = function(range) {    
     $('#waitspin').show();
-
-    $('#info-env-default').show();
+    $('#info-env-default').hide();
     $('#info-env').hide();
 
     // clear all figures and set to no data
@@ -327,6 +370,35 @@ var loadgraphs = function(range) {
 	drawemptychart(metric);
     });
 
+    // upload preferences
+    var utemplate = document.getElementById('uploadtemplate').innerHTML;
+    Mustache.parse(utemplate);
+    fathom.internal(function(prefs) {
+	var rendered = Mustache.render(
+	    utemplate, 
+	    {
+		upload : (prefs[0] === 'always'),
+		uploadpl : (prefs[1] === 'always')
+	    });
+	var e = document.getElementById('upload');
+	e.innerHTML = rendered;
+
+	$("#showdata").click(function() {
+	    fathom.internal(function(json) {
+		var win = window.open("../rawdata.html");
+		win.json = json;
+	    },'getjson',['baseline']);
+	});
+
+	$("#showdatapl").click(function() {
+	    fathom.internal(function(json) {
+		var win = window.open("../rawdata.html");
+		win.json = json;
+	    },'getjson',['pageload']);
+	});
+
+    }, 'getuserpref', ['baselineupload','pageloadupload']);
+
     var error = function(err) {
 	$('#waitspin').hide();
 	console.error(err);
@@ -334,20 +406,21 @@ var loadgraphs = function(range) {
 	return;
     };
 
+    // get the baselines
     fathom.init(function() {
 	fathom.baseline.getEnv(function(res) {
 	    if (res.error) 
 		return error(res.error);
-	    if (!res.data || res.data.length <= 0) 
-		return error('no baseline env data');
+	    if (!res.data || res.data.length < 2)
+		return error('not enough baseline env data');
 
 	    drawenvchart(range, res.data);
 
 	    fathom.baseline.get(function(res) {
 		if (res.error) 
 		    return error(res.error);
-		if (!res.data || res.data.length <= 0) 
-		    return error('no baseline measurement data');
+		if (!res.data || res.data.length < 2) 
+		    return error('not enough baseline measurement data');
 
 		$('#waitspin').hide();
 		fathom.close();
@@ -399,8 +472,8 @@ var loadgraphs = function(range) {
 		    setTimeout(drawchart,0,metric,range,flatres);
 		});
 
-	    }, range);
-	}, range);
+	    }, range, ['cpu','load','tasks','mem','traffic','wifi','rtt','pageload','pageload_delay']); // getMetrics
+	}, range); // getEnv
     });
 };
 
