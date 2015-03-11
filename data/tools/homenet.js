@@ -21,49 +21,44 @@ var NetGraph = function(elem, clickevents, width) {
 
     // The node label
     var getName = function(n) {
+        var name = '';
 	if (n.type === 'local') {
-	    return 'Your Device';
-
+	    name = 'Your Device';
 	} else if (n.type === 'internet') {
-	    return 'Internet';
-
+	    name = 'Internet';
 	} else if (n.type === 'gw') {
 	    if (n.raw['upnp'] && 
 		n.raw['upnp'].xml && 
 		n.raw['upnp'].xml.friendlyName)
-		return n.raw['upnp'].xml.friendlyName;
+		name = n.raw['upnp'].xml.friendlyName;
 	    else if (n.raw['mdns'] && 
 		     n.raw['mdns'].hostname)
-		return 'Gateway ' + n.raw['mdns'].hostname.replace('.local','');
+		name = 'Gateway ' + n.raw['mdns'].hostname.replace('.local','');
 	    else
-		return 'Gateway';
-	}
-	 
-	// else some other device
-        var name = 'Network Device';
-
-        if (n.raw['upnp']) {
-	    if (n.raw['upnp'].xml && n.raw['upnp'].xml.friendlyName)
-		name = n.raw['upnp'].xml.friendlyName;
-	    else if (n.raw['upnp'].iswin)
-		name = "Windows Device";
-	    else if (n.raw['upnp'].islinux)
-		name = "Linux Device";
-	    else if (n.raw['upnp'].isdarwin)
-		name = "Mac Device";
+		name = 'Gateway';
+	} else {
+            name = 'Network Device';
+            if (n.raw['upnp']) {
+	        if (n.raw['upnp'].xml && n.raw['upnp'].xml.friendlyName)
+		    name = n.raw['upnp'].xml.friendlyName;
+	        else if (n.raw['upnp'].iswin)
+		    name = "Windows Device";
+	        else if (n.raw['upnp'].islinux)
+		    name = "Linux Device";
+	        else if (n.raw['upnp'].isdarwin)
+		    name = "Mac Device";
+            }
+            if (!name && n.raw['mdns']) {
+	        if (n.raw['mdns'].hostname)
+		    name = n.raw['mdns'].hostname.replace('.local','');
+	        else if (n.raw['mdns'].iswin)
+		    name = "Windows Device";
+	        else if (n.raw['mdns'].islinux)
+		    name = "Linux Device";
+	        else if (n.raw['mdns'].isdarwin)
+		    name = "Mac Device";
+            }
         }
-        
-        if (!name && n.raw['mdns']) {
-	    if (n.raw['mdns'].hostname)
-		name = n.raw['mdns'].hostname.replace('.local','');
-	    else if (n.raw['mdns'].iswin)
-		name = "Windows Device";
-	    else if (n.raw['mdns'].islinux)
-		name = "Linux Device";
-	    else if (n.raw['mdns'].isdarwin)
-		name = "Mac Device";
-        }
-
 	return name;
     };
 
@@ -282,9 +277,8 @@ NetGraph.prototype.addNode = function(newnode) {
 	    break;
 
 	case 'peer':
-	    break;
-
 	case 'gw':
+        default:
 	    break;	    
 
 	}
@@ -295,10 +289,10 @@ NetGraph.prototype.addNode = function(newnode) {
 	case 'local':
 	    // override previous (mdns/upnp/fathom) info with local
 	    node.type = 'local';
-	    node.rpc = newnode.rpc;
-	    node.reachable = newnode.reachable;
-	    node.raw = _.extend(node.raw, newnode.raw);
 	    that.localnode = node;
+	    node.rpc = node.reachable || newnode.rpc;
+	    node.reachable = node.reachable || newnode.reachable;
+	    node.raw = _.extend(node.raw, newnode.raw);
 	    break;
 
 	case 'gw':
@@ -316,43 +310,12 @@ NetGraph.prototype.addNode = function(newnode) {
 	    break;
 
 	case 'internet':
+        default:
 	    break;
 	}
     }
 
     // links
-    switch (node.type) {
-    case 'peer':
-	// connect peer to each gw
-	_.each(that.nodes, function(n) {
-	    // FIXME: check that the IP subnets match
-	    if ((n.type === 'gw') &&
-		!that.hasEdge(node,n)) 
-	    {
-		that.addEdge(node,n);
-	    }
-	});
-	break;
-
-    case 'gw':
-	// connect gw to each peer
-	_.each(that.nodes, function(n) {
-	    // FIXME: check that the IP subnets match
-	    if ((n.type === 'peer') &&
-		!that.hasEdge(node,n)) 
-	    {
-		that.addEdge(node,n);
-	    }
-	});
-	break;
-
-    case 'local':
-	break;
-
-    case 'internet':
-	break;
-    }
-
     // check for default gateway link
     if (that.localnode && !that.defaultgw) {
 	var gwip = that.localnode.raw['local'].networkenv.gateway_ip;
@@ -377,6 +340,20 @@ NetGraph.prototype.addNode = function(newnode) {
 	!that.hasEdge(that.internet,that.defaultgw)) 
     {
 	that.addEdge(that.internet,that.defaultgw);
+    }
+
+    // connect peers and the default gw
+    if (that.defaultgw && 
+	(that.defaultgw.reachable || that.defaultgw.raw['route'])) 
+    {
+	_.each(that.nodes, function(n) {
+	    if ((n.type === 'peer' ||
+                 (n.type === 'gw' && n.addres !== that.defaultgw.address)) &&
+		!that.hasEdge(that.defaultgw,n)) 
+	    {
+		that.addEdge(that.defaultgw,n);
+	    }
+	});
     }
 };
 

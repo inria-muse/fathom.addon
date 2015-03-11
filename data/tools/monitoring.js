@@ -236,7 +236,7 @@ var drawenvchart = function(range, data) {
 	return label;
     };
 
-    var ddata = _.map(data, function(d) { 
+    var ddata = _.map(datainrange, function(d) { 
 	if (!envs[d.env_id]) {
 	    idx += 1;
 	    var e = { 
@@ -272,7 +272,7 @@ var drawenvchart = function(range, data) {
 	data: datainrange,
 	chart_type: 'point',
 	width: $('#chart-env').width(),
-	height: 25*_.size(envs)+100,
+	height: 5*_.size(envs)+100,
 	left: 20,
 	right: 20,
 	top: 50,
@@ -284,11 +284,12 @@ var drawenvchart = function(range, data) {
 	color_range : ["#8a89a6", "#6b486b", "#d0743c", "#98abc5", "#7b6888", "#a05d56", "#ff8c00"],
 	x_accessor: 'date',
 	y_accessor: 'y',
+        y_axis: false,
 	color_accessor:'env',
 	color_type:'category',
 	show_secondary_x_label : (range==='year'),
-//	legend : _.uniq(_.pluck(envs, 'l')),
-//	legend_target : '#legend-env',
+	legend : _.uniq(_.pluck(envs, 'l')),
+	legend_target : '#legend-env',
 	show_rollover_text: false,
 //	rollover_no_y: true,
 	mouseclick: function(d, i) {
