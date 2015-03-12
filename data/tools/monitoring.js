@@ -20,6 +20,7 @@ const ylabels = {
     'mem' :     'bytes',
     'traffic' : 'bit/s',
     'wifi' :    'dBm',
+    'wifiq' :   'quality',
     'rtt' :     'ms',
     'pageload' :'count',
     'pageload_delay' :'ms'
@@ -51,7 +52,10 @@ const linelabels = {
     },
     'wifi' : {
 	'wifi_signal' : 'Signal',
-	'wifi_noise' : 'Noise'
+	'wifi_noise' : 'Noise',
+    },
+    'wifiq' : {
+	'wifi_quality' : 'Quality'
     },
     'traffic' : {
 	'rx' : "Received", 
@@ -194,7 +198,7 @@ var drawchart = function(metric, range, data) {
 	max_y: max_y,
 	y_autoscale: !isdelay,
 	y_scale_type: (isdelay ? 'log' : 'linear'),
-	format: (metric === 'cpu' ? 'percentage' : 'count'),
+	format: ((metric === 'cpu' || metric === 'wifiq') ? 'percentage' : 'count'),
 	area: false,
 	y_label: ylabels[metric],
 	y_extended_ticks: true,
