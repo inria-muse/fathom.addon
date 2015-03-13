@@ -110,7 +110,6 @@ var getxrange = function(range) {
     return [min_x,max_x,iv];
 };
 
-/** metricsgraphics implementation */
 var drawemptychart = function(metric) {
     MG.data_graphic({
 	error: 'No data available',
@@ -119,10 +118,10 @@ var drawemptychart = function(metric) {
 	target: '#chart-'+metric,
 	width: $('#chart-'+metric).width(),
 	height: $('#chart-'+metric).width()/1.61,
-	left: 20,
-	right: 20,
-	top: 10,
-	bottom: 10
+	left: 30,
+	right: 30,
+	top: 30,
+	bottom: 30
     });
 };
 
@@ -185,7 +184,7 @@ var drawchart = function(metric, range, data) {
 	left: 80,
 	right: 5,
 	top: 20,
-	bottom: 20,
+	bottom: (range==='year' ? 30 : 20),
 	target: '#chart-'+metric,
 	data: linedata,
 	x_accessor: 'date',
@@ -278,8 +277,9 @@ var drawenvchart = function(range, data) {
 	width: $('#chart-env').width(),
 	height: 5*_.size(envs)+100,
 	left: 20,
-	right: 20,
+	right: 5,
 	top: 50,
+	bottom: (range==='year' ? 30 : 20),
 	target: '#chart-env',
 	min_y: 1,
 	max_y: _.size(envs),

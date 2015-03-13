@@ -25,6 +25,18 @@ exports["testpinglocal"] = function(assert, done) {
     }, { method : 'doPing', params: ['localhost', { count : 1 }]});
 };
 
+exports["testpingcont"] = function(assert, done) {
+    systemapi.exec(function(res, doneflag) {
+	console.log("test doPing",res);
+	assert.ok(!res.error, "doPing no error");
+	assert.ok(res.result.count === 10, "doPing count");
+	if (!doneflag)
+	    assert.ok(res.result.rtt.length > 0, "doPing results");
+	if (doneflag)
+	    done();
+    }, { method : 'doPing', multiresp : true, params: ['localhost', { count : 10 }]});
+};
+
 exports["testpingbcast"] = function(assert, done) {
     systemapi.exec(function(res, doneflag) {
 	console.log("test doPing",res);
