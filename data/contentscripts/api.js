@@ -1382,23 +1382,54 @@ var tools = fathomapi.tools = {};
 var ping = tools.ping = {};
 
 /**
- * @description Start ping.
+ * @description Start a ping client. The implementation runs a ping client
+ * in a ChromeWorker thread and reports results either incrementally or
+ * at completion. The implementation supports the following methods:
+ * 
+ *    - xmlhttpreq : Browser XmlHttpRequest HEAD request, no other payload. 
+ *                   Works with any destination.
+ *    - http       : HTTP HEAD using Fathom tcp socket, no payload. Works
+ *                   with any destination.
+ *    - ws         : WebSocket based ping. Works only with the measurement 
+ *                   server(s).
+ *    - udp        : UDP ping using Fathom sockets. Works between Fathom
+ *                   nodes and with the measurement server(s).
+ *    - tcp        : TCP ping using Fathom sockets. Works between Fathom
+ *                   nodes and with the measurement server(s).
+ *
+ * @param {function} callback - The callback function to invoke when
+ *                              results are available.
+ * @param {string} dst - The host to ping.
+ * @param {object} opt - The command line arguments. Valid keys include:
+ * count (default 3), interval (default 1000ms), packetsize (default 56B), 
+ * proto (xmlhttpreq, ws, http, udp - default), port (default 5790), 
+ * timeout (default 10s).
+ * @param {boolean} incrementaloutput - Send incremental output (optional - 
+ * default false).
+ */
+ping.start = function(callback, dst, opt, incrementaloutput) {
+    makereq(callback, "tools.ping", "start", [dst, opt], incrementaloutput);
+};
+
+/**
+ * @description Start ping server.
  *
  * @param {function} func The callback function to invoke when
- * results are available.
- * @param {object} args command line arguments, these match more or less
- * the arguments (naming and values) that you can give to commandline
- * ping. At minimum { client : <ip> } else runs as server.
+ * results are available. First callback returns the server id.
+ * @param {object} opt The command line arguments. Valid keys include:
+ * proto (default udp), port (default 5790).
+ * @param {boolean} incrementaloutput - Send incremental output (optional - 
+ * default false).
  */
-ping.start = function(callback, args) {
-    makereq(callback, "tools.ping", "start", [args], true);
+ping.server_start = function(callback, opt, incrementaloutput) {
+    makereq(callback, "tools.ping", "start", [opt], incrementaloutput);
 };
 
 /**
  * @description stop running ping server.
  * @param {number} id The id returned by the start call.
  */
-ping.stop = function(callback, id) {
+ping.server_stop = function(callback, id) {
     makereq(callback, "tools.ping", "stop", [id]);
 };
 

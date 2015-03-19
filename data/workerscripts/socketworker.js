@@ -70,21 +70,23 @@ var getBuffer = function(len) {
 
 var cleanup = function() {
     if (worker.socket) {
-	NSPR.sockets.PR_Close(worker.socket);
+	if (worker.socket !== -1)
+	    NSPR.sockets.PR_Close(worker.socket);
 	worker.socket = undefined;
     }
     if (NSPR.closeLib)
 	NSPR.closeLib();
-    NSPR = {}
+    NSPR = {}    
     close();
 };
 
 var sendres = function(id) {
-    return function(data, done) {
+    return function(err, data, done) {
 	var res = {
 	    workerid : worker.id, // this worker id
 	    id : id,      // unique request id
-	    data : data,  // data object or object with error field if failed
+	    data : data,  // data object or undefined if err
+	    error : err,  // err or undefined if ok
 	    done : done   // request done ? 
 	}
 	var msg = JSON.stringify(res);
@@ -109,12 +111,7 @@ onmessage = function(event) {
     if (msg.module === 'tools')
 	api = tools;
 
-    if (msg.createworker) {
-	if (worker.socket) {
-	    sendres(msg.id)({ error: "Socket already open"}, true);
-	    return;
-	}
-	    
+    if (msg.createworker) {	    
 	// init worker config
 	worker.id = msg.workerid;  // just for identifying debugs
 	worker.nsprpath = msg.nsprpath;
@@ -125,6 +122,8 @@ onmessage = function(event) {
 	try {
 	    // NSPR methods, exported to NSPR.*, used by all other scripts
 	    importScripts("./nspr.js");
+
+	    // high-res timer
 	    gettime = function() { return NSPR.util.PR_Now()/1000.0; };
 
 	    // Socket methods, exported to socket.*
@@ -143,7 +142,7 @@ onmessage = function(event) {
 
 	} catch (e) {
 	    error(tag,"importScripts fails: "+e);
-	    sendres(msg.id)({ error: "internal error"}, true);
+	    sendres(msg.id)("internal error", undefined, true);
 	    return;
 	}
 
@@ -153,36 +152,42 @@ onmessage = function(event) {
 	    var s = api[msg.method].apply(null, msg.params);
 	    if (s.error) {
 		sendres(msg.id)(
-		    {error : "Failed to open socket: " + s.error}, 
+		    "Failed to open socket: " + s.error,
+		    undefined,
 		    true);
 		setTimeout(cleanup,0); // kill the worker too
+
 	    } else {
 		// ok
 		worker.socket = s;
-		sendres(msg.id)({}, true);
+		sendres(msg.id)(undefined, {}, true);
 	    }
 
 	} else if (api[msg.submodule][msg.method] && 
-		   typeof api[msg.submodule][msg.method] === 'function') {
+		   typeof api[msg.submodule][msg.method] === 'function') 
+	{
 	    // start ping or iperf
 	    var args = [sendres(msg.id)].concat(msg.params);
 	    var s = api[msg.submodule][msg.method].apply(null, args);
 	    if (s.error) {
 		sendres(msg.id) (
-		    {error : "Failed to start: " + s.error}, 
+		    "Failed to start: " + s.error,
+		    undefined,
 		    true);
 		setTimeout(cleanup,0); // kill the worker too
+
 	    } else {
 		// started ok
 		worker.socket = s;
-		sendres(msg.id)({}, false); // started
+		sendres(msg.id)(undefined, {}, false); // started
 	    }
 
 	} else {
-	    sendres(msg.id)({error: "No such method: "+ 
-			     msg.module + "." + 
-			     (msg.submodule ? msg.submodule + "." : "") +
-			     msg.method}, 
+	    sendres(msg.id)("No such method: "+ 
+			    msg.module + "." + 
+			    (msg.submodule ? msg.submodule + "." : "") +
+			    msg.method,
+			    undefined,
 			    true);
 	}
 
@@ -190,9 +195,10 @@ onmessage = function(event) {
 	cleanup();
 
     } else if (api[msg.method] && 
-	       typeof api[msg.method] === 'function') {
+	       typeof api[msg.method] === 'function') 
+    {
 	if (!worker.socket) {
-	    sendres(msg.id)({ error : "Socket not open" }, true);
+	    sendres(msg.id)("Socket not open", undefined, true);
 	    return;
 	}
 
@@ -200,18 +206,19 @@ onmessage = function(event) {
 	    // multiresponse request, add callback as first param
 	    var args = [sendres(msg.id), worker.socket].concat(msg.params);
 	    var r = api[msg.method].apply(null, args);
-	    sendres(msg.id)(r, false);
+	    sendres(msg.id)(undefined, r, false);
 	} else {
 	    // single response-request, blocks and returns result
 	    var args = [worker.socket].concat(msg.params);
 	    var r = api[msg.method].apply(null, args);
-	    sendres(msg.id)(r, true);
+	    sendres(msg.id)(undefined, r, true);
 	}
 
     } else if (api[msg.submodule][msg.method] && 
-	       typeof api[msg.submodule][msg.method] === 'function') {
+	       typeof api[msg.submodule][msg.method] === 'function') 
+    {
 	if (!worker.socket) {
-	    sendres(msg.id)({ error : "Socket not open" }, true);
+	    sendres(msg.id)("Socket not open", undefined, true);
 	    return;
 	}
 
@@ -219,22 +226,24 @@ onmessage = function(event) {
 	    // multiresponse request, add callback as first param
 	    var args = [sendres(msg.id), worker.socket].concat(msg.params);
 	    var r = api[msg.submodule][msg.method].apply(null, args);
-	    sendres(msg.id)(r, false);
+	    sendres(msg.id)(undefined, r, false);
 	} else {
 	    // single response-request, blocks and returns result
 	    var args = [worker.socket].concat(msg.params);
 	    var r = api[msg.submodule][msg.method].apply(null, args);
-	    sendres(msg.id)(r, true);
+	    sendres(msg.id)(undefined, r, true);
 	}
 
     } else {
-	sendres(msg.id)({ error : "No such method: " + 
-			  msg.module + "." + 
-			  (msg.submodule ? msg.submodule + "." : "") + 
-			  msg.method }, true);
+	sendres(msg.id)("No such method: " + 
+			msg.module + "." + 
+			(msg.submodule ? msg.submodule + "." : "") + 
+			msg.method, 
+			undefined, true);
     }
 };
 
+// fatal errors
 onerror = function(event) { 
     dump("error: fathom: ChromeWorker [socketworker]: " + 
 	 JSON.stringify(event) + "\n");

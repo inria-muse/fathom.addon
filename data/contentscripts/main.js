@@ -94,11 +94,12 @@ if (typeof addon !== "undefined" ||
 	    if (requests[res.id].cb!==undefined && 
 		typeof requests[res.id].cb === 'function') { 
 		if (trusted)
-		    requests[res.id].cb.call(null, res.data); 
+		    requests[res.id].cb.call(null, res.data, res.done); 
 		else
 		    requests[res.id].cb.call(null, 
 					     cloneInto(res.data, 
-						       unsafeWindow)); 
+						       unsafeWindow),
+					     res.done); 
 	    }
 	    
 	    if (res.done)

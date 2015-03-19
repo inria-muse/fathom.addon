@@ -19,21 +19,21 @@ tools.ping = (function() {
     // default settings
     var settings = {
         id : -1,
-        client : undefined,   // if defined, run ping cli to this address, else server
-        port : undefined,     // destination port
-        proto : 'udp',        // one of UDP, TCP, HTTP
-        count : 3,            // number of packets
-        interval : 1.0,       // interval between packets (s)
+        client : undefined,   // client destination
+        port : undefined,     // ping port
+        proto : 'udp',        // one of UDP, TCP, HTTP, WS, XMLHTTPREQ 
+        count : 3,            // number of packets to send
+        interval : 1.0,      // interval between packets (s)
         timeout : 10.0,       // time to wait for answer (s)
-        srciface : undefined, // src IP
-        size : 56,            // number of bytes to send (except HTTP HEAD)
+        size : 56,            // number of bytes to send (except HTTP reqs)
         reports : false,      // periodic reports
-        socket : undefined,   // active socket
+        socket : undefined    // active socket
     };
 
     // Helper to get high-res timestamps
     var timestamper = function() {
-	// current time is calculated as baseTime + (process.hrtime() - baseTimeHr)
+	// current time is calculated as 
+	// baseTime + (process.hrtime() - baseTimeHr)
 	var baseTime = gettimets()*1.0; // milliseconds since epoch
 	var baseTimeHr = gettime(); // high-res timestamp
 	
@@ -72,6 +72,13 @@ tools.ping = (function() {
 	var fail = 0;
 	var prevreport = undefined;
 
+	// additional reporting depending on proto
+	var extra = {};
+
+	var addextra = function(key, value) {
+	    extra[key] = value;
+	}
+
 	var add = function(r,s) {
             if (r.payload)
 		delete r.payload;
@@ -79,38 +86,42 @@ tools.ping = (function() {
 
             if (s) {
 		succ += 1;
-		r.upd = r.r - r.s; // uplink delay
-		updv.push(r.upd);
-
-		r.downd = r.rr - r.r; // downlink delay
-		downdv.push(r.downd);
-
 		times.push(r.time); // rtt
 
-		// keep track of the smallest uplink delay
-		if (minupdv === undefined)
-                    minupdv = r.upd;
-		minupdv = Math.min(minupdv,r.upd);
+		if (r.r) {
+		    // we have server timestamp
 
-		// keep track of the smallest downlink delay
-		if (mindowndv === undefined)
-                    mindowndv = r.downd;
-		mindowndv = Math.min(mindowndv,r.downd);
+		    r.upd = r.r - r.s; // uplink delay
+		    updv.push(r.upd);
 
-		if (prevreport && prevreport.seq == r.seq-1) {
-                    // jitter (RFC 1889)
-                    if (prevreport.upj) {
-			r.upj = 15.0/16.0 * prevreport.upj +
-                            1.0/16.0 * Math.abs(r.upd-prevreport.upd)
-			r.downj = 15.0/16.0 * prevreport.downj +
-                            1.0/16.0 * Math.abs(r.downd-prevreport.downd)
-                    } else {
-			// first jitter (we've got at least two measurements)
-			r.upj = Math.abs(r.upd-prevreport.upd)
-			r.downj = Math.abs(r.downd-prevreport.downd)
-                    }
-                    upj.push(r.upj);
-                    downj.push(r.downj);
+		    // keep track of the smallest uplink delay
+		    if (minupdv === undefined)
+			minupdv = r.upd;
+		    minupdv = Math.min(minupdv,r.upd);
+
+		    r.downd = r.rr - r.r; // downlink delay
+		    downdv.push(r.downd);
+
+		    // keep track of the smallest downlink delay
+		    if (mindowndv === undefined)
+			mindowndv = r.downd;
+		    mindowndv = Math.min(mindowndv,r.downd);
+
+		    if (prevreport && prevreport.seq == r.seq-1) {
+			// jitter (RFC 1889)
+			if (prevreport.upj) {
+			    r.upj = 15.0/16.0 * prevreport.upj +
+				1.0/16.0 * Math.abs(r.upd-prevreport.upd)
+			    r.downj = 15.0/16.0 * prevreport.downj +
+				1.0/16.0 * Math.abs(r.downd-prevreport.downd)
+			} else {
+			    // first jitter (we've got at least two measurements)
+			    r.upj = Math.abs(r.upd-prevreport.upd)
+			    r.downj = Math.abs(r.downd-prevreport.downd)
+			}
+			upj.push(r.upj);
+			downj.push(r.downj);
+		    }
 		}
             } else {
 		fail += 1;
@@ -119,7 +130,7 @@ tools.ping = (function() {
 	};
 
 	var stats = function(data) {
-            if (!data || data.length<=0) return {};
+            if (!data || data.length<=1) return {};
 
             var min = undefined;
             var max = undefined;
@@ -165,21 +176,22 @@ tools.ping = (function() {
             // measures variation with respect to the
             // fastest one-way-delay (could think of as buffering!)
             var tmp = [];
-            for (var v in updv)
-		tmp.push(v - minupdv);
+            for (var i = 0; i < updv.length; i++)
+		tmp.push(Math.abs(updv[i] - minupdv));
             updv = tmp;
 
             tmp = [];
-            for (var v in downdv)
-		tmp.push(v - mindowndv);
+            for (var i = 0; i < downdv.length; i++)
+		tmp.push(Math.abs(downdv[i] - mindowndv));
             downdv = tmp;
 
             var res = {
 		proto : settings.proto,
 		domain : settings.client,
-		ip : settings.client || undefined,
-		port : settings.port || 80,
+		ip : settings.client,
+		port : settings.port,
 		pings : reports,
+		extra : extra,
 		stats : {
                     packets : {
 			sent : sent,
@@ -193,7 +205,7 @@ tools.ping = (function() {
                     downjitter : stats(downj),
                     updv : stats(updv),
                     downdv : stats(downdv),
-		},
+		}
             };
             return res;
 	};
@@ -201,6 +213,7 @@ tools.ping = (function() {
 	// reporter API
 	return {
 	    addreport : add,
+	    addextra : addextra,
 	    getlen : function() { return reports.length;},
 	    getreport : get
 	};
@@ -255,20 +268,131 @@ tools.ping = (function() {
 	return str.length;
     };
 
-    // HTTP cli using XMLHttpRequest / HTTP HEAD
+    // HTTP cli using Fathom sockets + HTTP HEAD
     var httpcli = function() {
-	if (!settings.client) {
-            return {error : "no destination!"};
-	}
+	var tr = new timestamper();
 	return {error : "not implemented"};
     };
 
-    // UDP & TCP ping client.
-    var cli = function() {
-	if (!settings.client) {
-            return {error : "no destination!"};
-	}
+    // HTTP cli using XMLHttpRequest HEAD
+    var xmlhttpreqcli = function() {
+	var tr = new timestamper();
 
+	// reporting
+	var rep = reporter(true);
+	var sent = 0;
+	var resp = 0;
+
+	var stats = {
+            seq:0,
+            s:tr.getts(),
+	};
+
+	var done = function() {
+	    settings.callback(undefined, rep.getreport(), true); // final report
+	    setTimeout(cleanup,0);
+	};
+
+	// request sender
+	var snd = function() {
+            var pstats = {
+		seq:sent,     // seq no
+		s:null, // time sent
+            };
+
+	    var req = new XMLHttpRequest(
+		{ mozAnon : true, mozSystem : true});
+	    req.timeout = settings.timeout;
+
+	    // create unique url for each req to avoid cached responses
+	    var url = 'http://'+settings.client+'/?ts='+tr.getts();
+	    debug('ping','xmlhttpreq ' + url);
+
+	    req.open('HEAD', url, true);
+	    req.setRequestHeader('Connection','keep-alive');
+
+	    req.onreadystatechange = function() {
+		var ts = tr.getts();
+
+		debug('ping','xmlhttpreq req=' +
+		      pstats.seq + 
+		      ' state=' + req.readyState);
+		
+		// ignore the first request (includes conn setup)
+		if (req.readyState==4 && pstats.seq>0) {
+		    resp += 1;
+		    if (req.status >= 200 && req.status < 400) {
+			pstats.status = req.status; // status code
+			pstats.rr = ts;             // time resp received
+			pstats.time = pstats.rr - pstats.s; // rtt
+
+			// server date for owd calculations if avail
+			var serverd = req.getResponseHeader('Date');
+			if (serverd)
+			    pstats.r = Date.parse(serverd);
+
+			rep.addreport(pstats, true);
+
+			// send intermediate reports?
+			if (settings.reports) {
+			    settings.callback(undefined, pstats, false);
+			}
+		    }
+
+		    if (resp === settings.count) {
+			done();		    
+		    }
+	    
+		} else if (req.readyState==4 && pstats.seq==0) {
+		    // handle the first response (includes conn setup delay)
+		    var tmp = req.getAllResponseHeaders().trim().split('\n'); 
+		    var h = {};
+		    for (var i = 0; i < tmp.length; i++) {
+			var headline = tmp[i].trim().split(': ');
+			if (headline.length == 2) {
+			    var k = headline[0].trim().toLowerCase();
+			    h[k] = headline[1].trim();
+			    if (k === 'date')
+				h['server_ts'] = Date.parse(h[k]);
+			} // else some weird format - just ignore
+		    }
+		    rep.addextra('headers',h);
+
+		    pstats.status = req.status; // status code
+		    pstats.rr = ts;             // time resp received
+		    pstats.time = pstats.rr - pstats.s; // rtt
+		    rep.addextra('conn_setup',pstats);
+		}
+	    }
+
+	    pstats.s = tr.getts();
+	    req.send();
+            sent += 1;
+	    
+            // schedule next round ?
+            if (sent <= settings.count) {
+		var diff = tr.diff(pstats.s);
+		var sleep = settings.interval*1000.0 - diff;
+		if (sleep<0 || sent == 1)
+		    sleep = 0;
+		setTimeout(snd, sleep);
+            }
+	}; // snd
+
+        setTimeout(snd,0);
+
+	// dummy socketid
+	return -1;	
+    };
+
+    // WebSocket cli
+    var wscli = function() {
+	var tr = new timestamper();
+	return {error : "not implemented"};
+    };
+
+    // Fathom UDP & TCP ping client.
+    var cli = function() {
 	var tr = new timestamper();
 
 	// fill the request with dummy payload upto requested num bytes
@@ -293,7 +417,7 @@ tools.ping = (function() {
 	var sent = 0;
 
 	var done = function() {
-	    settings.callback(rep.getreport(), true); // final report
+	    settings.callback(undefined, rep.getreport(), true); // final report
 	    setTimeout(cleanup,0);
 	};
 
@@ -329,7 +453,7 @@ tools.ping = (function() {
             pd.in_flags = NSPR.sockets.PR_POLL_READ;
 	    
             var diff = tr.diff(pstats.s);
-            var sleep = settings.interval*1000 - diff;
+            var sleep = settings.interval*1000.0 - diff;
             if (sleep<0)
 		sleep = 0;
 	    
@@ -346,7 +470,7 @@ tools.ping = (function() {
             // schedule next round ?
             if (sent < settings.count) {
 		diff = tr.diff(pstats.s);
-		sleep = settings.interval*1000 - diff;
+		sleep = settings.interval*1000.0 - diff;
 		if (sleep<0)
                     sleep = 0;
 		setTimeout(snd, sleep);
@@ -392,7 +516,7 @@ tools.ping = (function() {
 
 		// send intermediate reports?
 		if (settings.reports) {
-		    settings.callback(pstats, false);
+		    settings.callback(undefined, pstats, false);
 		}
             }
 
@@ -405,9 +529,11 @@ tools.ping = (function() {
 
 	// create and connect the socket
 	if (settings.proto === 'tcp') {
-            settings.socket = NSPR.sockets.PR_OpenTCPSocket(NSPR.sockets.PR_AF_INET);
+            settings.socket = 
+		NSPR.sockets.PR_OpenTCPSocket(NSPR.sockets.PR_AF_INET);
 	} else {
-            settings.socket = NSPR.sockets.PR_OpenUDPSocket(NSPR.sockets.PR_AF_INET);
+            settings.socket = 
+		NSPR.sockets.PR_OpenUDPSocket(NSPR.sockets.PR_AF_INET);
 	}
 
 	var addr = new NSPR.types.PRNetAddr();
@@ -504,8 +630,12 @@ tools.ping = (function() {
     }; // serv
 
     // ------ API ------
+    var start = function(callback, dst, args) {
+	if (!dst) {
+            return {error : "no destination!"};
+	}
+	settings.client = dst;
 
-    var start = function(callback, args) {
 	// override default settings with given arguments
 	args = args || {};
 	for (var k in args) {
@@ -513,31 +643,55 @@ tools.ping = (function() {
 		settings[k] = args[k];
 	}
 
-	debug(settings);
+	debug('ping',settings);
 
 	settings.callback = callback;
 	settings.timeout =  NSPR.util.PR_MillisecondsToInterval(settings.timeout * 1000);
 	
-	if (settings.client) {
-	    if (settings.proto === 'http') {
-		return httpcli();
-	    } else if (settings.proto === 'udp' || settings.proto === 'tcp') {
-		return cli();
-	    } else {
-		return {error : "unsupported client protocol: " + settings.proto};
-	    }
+	if (settings.proto === 'http') {
+	    return httpcli();
+	} else if (settings.proto === 'xmlhttpreq') {
+	    return xmlhttpreqcli();
+	} else if (settings.proto === 'ws') {
+	    return wscli();
+	} else if (settings.proto === 'udp' || settings.proto === 'tcp') {
+	    return cli();
 	} else {
-	    if (settings.proto === 'udp')
-		return serv();
-	    else
-		return {error : "unsupported server protocol: " + settings.proto};
+	    return {
+		error : "unsupported ping client protocol: " + settings.proto
+	    };
 	}
     };
 
-    var stop = function() {
+    var start_server = function(callback, args) {
+	// override default settings with given arguments
+	args = args || {};
+	for (var k in args) {
+	    if (args.hasOwnProperty(k))
+		settings[k] = args[k];
+	}
+
+	debug('ping',settings);
+
+	settings.callback = callback;
+	settings.timeout =  NSPR.util.PR_MillisecondsToInterval(settings.timeout * 1000);
+	
+	if (settings.proto === 'udp')
+	    return serv();
+	else
+	    return {
+		error : "unsupported ping server protocol: " + settings.proto
+	    };
+    };
+
+    var stop_server = function() {
 	worker.multirespstop = true;
 	return {};
     };
 
-    return { start : start, stop : stop };
+    // API tools.ping.*
+    return { start : start, 
+	     start_server : start_server, 
+	     stop_server : stop_server 
+	   };
 }());
