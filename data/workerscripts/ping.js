@@ -283,13 +283,8 @@ tools.ping = (function() {
 	var sent = 0;
 	var resp = 0;
 
-	var stats = {
-            seq:0,
-            s:tr.getts(),
-	};
-
 	var done = function() {
-	    settings.callback(undefined, rep.getreport(), true); // final report
+	    settings.callback(undefined, rep.getreport(), true);
 	    setTimeout(cleanup,0);
 	};
 
@@ -297,26 +292,23 @@ tools.ping = (function() {
 	var snd = function() {
             var pstats = {
 		seq:sent,     // seq no
-		s:null, // time sent
+		s:null,       // time sent
             };
 
-	    var req = new XMLHttpRequest(
-		{ mozAnon : true, mozSystem : true});
-	    req.timeout = settings.timeout;
 
 	    // create unique url for each req to avoid cached responses
 	    var url = 'http://'+settings.client+'/?ts='+tr.getts();
 	    debug('ping','xmlhttpreq ' + url);
 
+	    var req = new XMLHttpRequest({ 
+		mozAnon : true, 
+		mozSystem : true
+	    });
+	    req.timeout = settings.timeout;
 	    req.open('HEAD', url, true);
 	    req.setRequestHeader('Connection','keep-alive');
-
 	    req.onreadystatechange = function() {
 		var ts = tr.getts();
-
-		debug('ping','xmlhttpreq req=' +
-		      pstats.seq + 
-		      ' state=' + req.readyState);
 		
 		// ignore the first request (includes conn setup)
 		if (req.readyState==4 && pstats.seq>0) {
@@ -345,43 +337,46 @@ tools.ping = (function() {
 	    
 		} else if (req.readyState==4 && pstats.seq==0) {
 		    // handle the first response (includes conn setup delay)
-		    var tmp = req.getAllResponseHeaders().trim().split('\n'); 
-		    var h = {};
-		    for (var i = 0; i < tmp.length; i++) {
-			var headline = tmp[i].trim().split(': ');
-			if (headline.length == 2) {
-			    var k = headline[0].trim().toLowerCase();
-			    h[k] = headline[1].trim();
-			    if (k === 'date')
-				h['server_ts'] = Date.parse(h[k]);
-			} // else some weird format - just ignore
+		    if (req.status >= 200 && req.status < 400) {
+			var tmp = 
+			    req.getAllResponseHeaders().trim().split('\n'); 
+			var h = {};
+			for (var i = 0; i < tmp.length; i++) {
+			    var headline = tmp[i].trim().split(': ');
+			    if (headline.length == 2) {
+				var k = headline[0].trim().toLowerCase();
+				h[k] = headline[1].trim();
+				if (k === 'date')
+				    h['server_ts'] = Date.parse(h[k]);
+			    } // else some weird format - just ignore
+			}
+			rep.addextra('headers',h);
 		    }
-		    rep.addextra('headers',h);
-
-		    pstats.status = req.status; // status code
-		    pstats.rr = ts;             // time resp received
-		    pstats.time = pstats.rr - pstats.s; // rtt
+		    pstats.status = req.status;         // status code
+		    pstats.rr = ts;                     // time resp received
+		    pstats.time = pstats.rr - pstats.s; // connection rtt
 		    rep.addextra('conn_setup',pstats);
-		}
+		} // else some other state
 	    }
 
 	    pstats.s = tr.getts();
 	    req.send();
             sent += 1;
 	    
-            // schedule next round ?
+            // schedule next round (sending 1 extra ping due to conn setup)
             if (sent <= settings.count) {
 		var diff = tr.diff(pstats.s);
 		var sleep = settings.interval*1000.0 - diff;
-		if (sleep<0 || sent == 1)
+		if (sleep<0 || sent == 1) // dont sleep after first ping
 		    sleep = 0;
 		setTimeout(snd, sleep);
             }
 	}; // snd
 
+	// start pinging
         setTimeout(snd,0);
 
-	// dummy socketid
+	// dummy socketid (socketworker requires a ret value)
 	return -1;	
     };
 
@@ -417,7 +412,7 @@ tools.ping = (function() {
 	var sent = 0;
 
 	var done = function() {
-	    settings.callback(undefined, rep.getreport(), true); // final report
+	    settings.callback(undefined, rep.getreport(), true);
 	    setTimeout(cleanup,0);
 	};
 
@@ -445,10 +440,16 @@ tools.ping = (function() {
             reqs[pstats.seq] = pstats;
 	    
             var len = setobj(pstats,buf);
-            NSPR.sockets.PR_Send(settings.socket, buf, len, 0, NSPR.sockets.PR_INTERVAL_NO_TIMEOUT);
+            NSPR.sockets.PR_Send(settings.socket, 
+				 buf, 
+				 len, 
+				 0, 
+				 NSPR.sockets.PR_INTERVAL_NO_TIMEOUT);
             sent += 1;
+	    pstats.sent_len = len;
 
-            // now block in Poll for the interval (or until we get an answer back from the receiver)
+            // now block in Poll for the interval (or until we get
+	    // an answer back from the receiver)
             pd.fd = settings.socket;
             pd.in_flags = NSPR.sockets.PR_POLL_READ;
 	    
@@ -483,7 +484,11 @@ tools.ping = (function() {
             if (!settings.socket)
 		return;
 	    
-            var rv = NSPR.sockets.PR_Recv(settings.socket, recvbuf, bufsize, 0, settings.timeout*1000);
+            var rv = NSPR.sockets.PR_Recv(settings.socket, 
+					  recvbuf, 
+					  bufsize, 
+					  0, 
+					  settings.timeout*1000);
             var ts = tr.getts();
 	    
             if (rv == -1) {
@@ -507,12 +512,13 @@ tools.ping = (function() {
 
             if (obj && obj.seq!==undefined && obj.seq>=0) {
 		var pstats = reqs[obj.seq];
+		pstats.recv_len = rv;     // reply bytes
 		pstats.rr = ts;           // resp received
 		pstats.s = obj.s;         // req sent
 		pstats.r = obj.r;         // server received
 		pstats.time = pstats.rr - pstats.s; // rtt
 		rep.addreport(pstats, true);
-		delete reqs[obj.seq]; // TODO: could count dublicates?
+		delete reqs[obj.seq]; // TODO: could count duplicates?
 
 		// send intermediate reports?
 		if (settings.reports) {
@@ -542,9 +548,13 @@ tools.ping = (function() {
 				   NSPR.sockets.PR_AF_INET,
 				   settings.port, addr.address());
 	
-	if (NSPR.sockets.PR_Connect(settings.socket, addr.address(), settings.timeout*1000) < 0) {
+	var rc = NSPR.sockets.PR_Connect(settings.socket, 
+					 addr.address(), 
+					 settings.timeout*1000);
+	if (rc < 0) {
 	    NSPR.sockets.PR_Close(settings.socket);
-	    return {error : "Error connecting : code = " + NSPR.errors.PR_GetError()};
+	    return {error : "Error connecting : code = " + 
+		    NSPR.errors.PR_GetError()};
 	}
 
         setTimeout(snd,0);
