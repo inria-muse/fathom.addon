@@ -20,14 +20,15 @@ tools.ping = (function() {
     var settings = {
         id : -1,
         client : undefined,   // client destination
-        port : undefined,     // ping port
-        proto : 'udp',        // one of UDP, TCP, HTTP, WS, XMLHTTPREQ 
+        port : 5790,          // ping port
+        proto : 'udp',        // one of UDP, HTTP, WS, XMLHTTPREQ 
         count : 3,            // number of packets to send
-        interval : 1.0,      // interval between packets (s)
+        interval : 1.0,       // interval between packets (s)
         timeout : 10.0,       // time to wait for answer (s)
-        size : 56,            // number of bytes to send (except HTTP reqs)
+        size : 56,            // number of bytes to send (UDP)
         reports : false,      // periodic reports
-        socket : undefined    // active socket
+        socket : undefined,   // active socket
+	urlpath : 'fathomapi/wsping' // WS end-point
     };
 
     // Helper to get high-res timestamps
@@ -157,12 +158,23 @@ tools.ping = (function() {
             };
             v = (1.0 * v) / data.length;
 
+	    var med = 0.0;
+	    var sorted = data.slice().sort(function (a, b) { return a-b; });
+	    if (sorted.length % 2 === 1) {
+		med = sorted[(sorted.length - 1) / 2];
+	    } else {
+		var a = sorted[(sorted.length / 2) - 1];
+		var b = sorted[(sorted.length / 2)];
+		med = (a + b) / 2;
+	    }
+
             return {
 		min : min,
 		max : max,
-		avg : avg,
+		mean : avg,
 		variance : v,
-		mdev : Math.sqrt(v),
+		std_dev : Math.sqrt(v),
+		median : med
             };
 	};
 	
@@ -214,52 +226,27 @@ tools.ping = (function() {
 	return {
 	    addreport : add,
 	    addextra : addextra,
-	    getlen : function() { return reports.length;},
 	    getreport : get
 	};
     }; // Reporter
 
-    // get JSON object from ctype buffer
-    var getobj = function(buf,strbuf) {
-	var data = buf.readString();
-
-	if (settings.proto === "udp") {
-            // object per UDP datagram
-            try {
-		var obj = JSON.parse(data);
-		return obj;
-            } catch (e) {
-		debug('malformed ping response: '+e);
-		debug(data);
-            }
-	} else {
-            // in TCP stream objects are separated by double newline
-            var delim = data.indexOf('\n\n');
-            while (delim>=0) {
-		strbuf += data.substring(0,delim);
-		try {
-                    var obj = JSON.parse(strbuf);
-                    return obj;
-		} catch (e) {
-                    debug('malformed ping response: '+e);
-                    debug(strbuf);
-		}
-		data = data.substring(delim+2);
-		delim = data.indexOf('\n\n');
-		strbuf = '';
-            } // end while
-
-            strbuf += data;
-	}
-	return undefined;
+    // get next JSON object from ctype buffer
+    var getobj = function(buf) {
+	var obj = undefined;
+	var data = (buf ? buf.readString() : '');
+        // object per UDP datagram
+        try {
+	    obj = JSON.parse(data);
+        } catch (e) {
+	    debug('ping', 'malformed ping response: '+e);
+	    debug('ping', data);
+        }
+	return obj;
     };
 
     // put obj to ArrayBuffer
     var setobj = function(obj,buf) {
 	var str = JSON.stringify(obj);
-	if (settings.proto === "tcp")
-            str += "\n\n";
-
 	var bufView = new Uint8Array(buf);
 	for (var i=0; i<str.length; i++) {
             bufView[i] = str.charCodeAt(i);
@@ -271,7 +258,189 @@ tools.ping = (function() {
     // HTTP cli using Fathom sockets + HTTP HEAD
     var httpcli = function() {
 	var tr = new timestamper();
-	return {error : "not implemented"};
+
+	settings.timeout = NSPR.util.PR_MillisecondsToInterval(
+	    Math.floor(settings.timeout * 1000));
+
+	// reporting
+	var rep = reporter(true);
+	var sent = 0;
+	var resp = 0;
+	var reqs = {};
+
+	var done = function() {
+	    settings.callback(undefined, rep.getreport(), true);
+	    setTimeout(cleanup,0);
+	};
+
+	// send/recv buffer
+	var bufsize = 65507;
+	var recvbuf = getBuffer(bufsize);
+
+	// HTTP HEAD request
+	var headreq = "HEAD / HTTP/1.1\r\n";
+	headreq += "Host: "+settings.client+"\r\n"; 
+	headreq += "\r\n";
+	var sendbuf = newBufferFromString(headreq);
+
+	var pd = new NSPR.types.PRPollDesc();
+	var snd = function() {
+            var pstats = {
+		seq:sent,
+		s:tr.getts()
+            };
+
+	    var len = NSPR.sockets.PR_Send(settings.socket, 
+					   sendbuf, 
+					   headreq.length, 
+					   0, 
+					   NSPR.sockets.PR_INTERVAL_NO_TIMEOUT);
+	    if (len < 0) {
+		error('ping',"send fails: " + NSPR.errors.PR_GetError());
+		done();
+		return;
+	    }
+	    pstats.sent_len = len;
+            reqs[pstats.seq] = pstats;
+            sent += 1;
+
+            // now block in Poll for the interval (or until we get
+	    // an answer back from the receiver)
+            pd.fd = settings.socket;
+            pd.in_flags = NSPR.sockets.PR_POLL_READ;
+	    
+            var diff = tr.diff(pstats.s);
+            var sleep = settings.interval*1000.0 - diff;
+            if (sleep<0)
+		sleep = 0;
+	    
+            var prv = NSPR.sockets.PR_Poll(pd.address(), 1, Math.floor(sleep));
+            if (prv < 0) {
+		// Failure in polling
+		error('ping',"poll fails: " + NSPR.errors.PR_GetError());
+		done();
+		return;
+            } else if (prv > 0) {
+		rcv(true);
+            } // else timeout
+	    
+            // schedule next round ?
+            if (sent < settings.count) {
+		diff = tr.diff(pstats.s);
+		sleep = settings.interval*1000.0 - diff;
+		if (sleep<0)
+                    sleep = 0;
+		setTimeout(snd, sleep);
+            } else {
+		rcv(false); // make sure we have all answers
+            }
+	}; // snd
+	
+	var rcv = function(noloop) {
+            if (!settings.socket)
+		return;	    
+	     
+            var rv = NSPR.sockets.PR_Recv(settings.socket, 
+					  recvbuf, 
+					  bufsize-1, 
+					  0, 
+					  settings.timeout);
+            var ts = tr.getts();
+	    
+            if (rv == -1) {
+		var e = NSPR.errors.PR_GetError();
+		if (e !== NSPR.errors.PR_IO_TIMEOUT_ERROR) {
+		    error('ping',"recv fails: " + e);
+		} // else nothing more to read (timeout)
+		done();
+		return;
+
+            } else if (rv == 0) {
+		error('ping',"network connection closed");
+		done();
+		return;
+
+            } // else got response
+
+	    resp += 1;
+
+            recvbuf[rv] = 0;
+	    var httpresp = recvbuf.readString();
+
+            if (httpresp && reqs[resp-1]) {
+		var pstats = reqs[resp-1]; 
+		pstats.recv_len = rv;      // bytes received
+		pstats.rr = ts;            // resp received
+		pstats.time = pstats.rr - pstats.s; // rtt
+
+		httpresp = httpresp.trim().split('\n');
+
+		// http status
+		var statusline = httpresp[0].trim().split(' ');
+		pstats.status = parseInt(statusline[1]);
+
+		// headers
+		var h = {};
+		for (var i = 1; i < httpresp.length; i++) {
+		    var headline = httpresp[i].trim().split(': ');
+		    if (headline.length == 2) {
+			var k = headline[0].trim().toLowerCase();
+			h[k] = headline[1].trim();
+			if (k === 'date') {
+			    h['server_ts'] = Date.parse(h[k]);
+			    pstats.r = h['server_ts'];
+			}
+		    } // else some weird format - just ignore
+		}
+
+		rep.addextra('headers',h);
+		rep.addreport(pstats, true);
+
+		// send intermediate reports?
+		if (settings.reports) {
+		    settings.callback(undefined, pstats, false);
+		}
+            }
+
+            if (resp === settings.count) {
+		// got all responses
+		done();
+            } else if (!noloop) {
+		setTimeout(rcv,0); // keep reading
+            }
+	}; // rcv
+	
+	var pstats = {
+	    seq:-1,       // seq no
+	    s:tr.getts()  // time sent
+        };
+
+	// create and connect the socket
+        settings.socket = 
+	    NSPR.sockets.PR_OpenTCPSocket(NSPR.sockets.PR_AF_INET);
+
+	var addr = new NSPR.types.PRNetAddr();
+	addr.ip = NSPR.util.StringToNetAddr(settings.client);
+	NSPR.sockets.PR_SetNetAddr(NSPR.sockets.PR_IpAddrNull,
+				   NSPR.sockets.PR_AF_INET,
+				   settings.port, addr.address());
+
+	var rc = NSPR.sockets.PR_Connect(settings.socket, 
+					 addr.address(), 
+					 settings.timeout);
+	if (rc < 0) {
+	    NSPR.sockets.PR_Close(settings.socket);
+	    return {error : "Error connecting : code = " + 
+		    NSPR.errors.PR_GetError()};
+	}
+
+	pstats.rr = tr.getts();
+	pstats.time = pstats.rr - pstats.s; // connection rtt
+	rep.addextra('conn_setup', pstats);
+        setTimeout(snd,0);
+
+	// for cleanup with the socketworker
+	return settings.socket;	
     };
 
     // HTTP cli using XMLHttpRequest HEAD
@@ -295,16 +464,16 @@ tools.ping = (function() {
 		s:null,       // time sent
             };
 
-
 	    // create unique url for each req to avoid cached responses
-	    var url = 'http://'+settings.client+'/?ts='+tr.getts();
-	    debug('ping','xmlhttpreq ' + url);
+	    var url = 'http://'+settings.client +
+		(settings.port ? ':'+settings.port : '') + 
+		'/?ts='+tr.getts();
 
 	    var req = new XMLHttpRequest({ 
 		mozAnon : true, 
 		mozSystem : true
 	    });
-	    req.timeout = settings.timeout;
+	    req.timeout = Math.floor(settings.timeout*1000);
 	    req.open('HEAD', url, true);
 	    req.setRequestHeader('Connection','keep-alive');
 	    req.onreadystatechange = function() {
@@ -383,18 +552,113 @@ tools.ping = (function() {
     // WebSocket cli
     var wscli = function() {
 	var tr = new timestamper();
-	return {error : "not implemented"};
+
+	// reporting
+	var rep = reporter(true);
+	var sent = 0;
+	var resp = 0;
+	var reqs = {};
+
+	var done = function() {
+	    settings.callback(undefined, rep.getreport(), true);
+	    setTimeout(cleanup,0);
+	};
+
+	// request sender
+	var snd = function() {
+            var pstats = {
+		seq:sent,     // seq no
+		s:tr.getts(), // time sent
+            };
+	    var msg = JSON.stringify(pstats);
+	    s.send(msg);
+	    pstats.sent_len = msg.length;
+	    reqs[pstats.seq] = pstats;
+	    sent += 1;
+	    
+            // schedule next round (sending 1 extra ping due to conn setup)
+            if (sent <= settings.count) {
+		var diff = tr.diff(pstats.s);
+		var sleep = settings.interval*1000.0 - diff;
+		if (sleep<0) // dont sleep after first ping
+		    sleep = 0;
+		setTimeout(snd, sleep);
+            }
+	}; // snd
+
+	var url = 'ws://'+settings.client+
+	    (settings.port ? ':'+settings.port : '')+
+	    '/'+settings.urlpath;
+
+	var pstats = {
+	    seq:-1,       // seq no
+	    s:tr.getts()  // time sent
+        };
+
+	var s = new WebSocket(url);
+
+	s.onopen = function(event) {
+	    pstats.rr = tr.getts();
+	    pstats.time = pstats.rr - pstats.s; // connection rtt
+	    rep.addextra('conn_setup',pstats);
+	    setTimeout(snd,0); // start pinging
+	};
+
+	s.onmessage = function(event) {
+	    resp += 1;
+
+	    var obj = undefined;
+	    try {
+		obj = JSON.parse(event.data);
+	    } catch (e) {
+		debug('ping', 'malformed ping response: '+e);
+		debug('ping', event.data);
+	    }
+
+	    if (obj && obj.seq>=0) {
+		var pstats = reqs[obj.seq];
+		pstats.recv_len = event.data.length;
+		pstats.rr = tr.getts();
+		pstats.time = pstats.rr - pstats.s; // rtt
+		rep.addreport(pstats, true);
+		delete reqs[obj.seq]; // TODO: could count duplicates?
+
+		// send intermediate reports?
+		if (settings.reports) {
+		    settings.callback(undefined, pstats, false);
+		}
+	    }
+	    
+	    if (resp === settings.count) {
+		s.close();
+		done();
+	    }
+	};
+
+	s.onerror = function(err) {
+	    error('ping',err);
+	    s.close();
+	    done();
+	};
+
+	// dummy socketid (socketworker requires a ret value)
+	return -1;	
     };
 
-    // Fathom UDP & TCP ping client.
+    // Fathom UDP ping client.
     var cli = function() {
 	var tr = new timestamper();
+
+	// convert to nspr time interval
+	settings.timeout = NSPR.util.PR_MillisecondsToInterval(
+	    Math.floor(settings.timeout * 1000));
 
 	// fill the request with dummy payload upto requested num bytes
 	var stats = {
             seq:0,
-            s:tr.getts(),
+            s:tr.getts()
 	};
+
 	if (settings.size && settings.size>0) {
             var i = 0;
             for (i = 0; i < settings.size; i++) {
@@ -410,6 +674,8 @@ tools.ping = (function() {
 	// reporting
 	var rep = reporter(true);
 	var sent = 0;
+	var resp = 0;
+	var reqs = {};
 
 	var done = function() {
 	    settings.callback(undefined, rep.getreport(), true);
@@ -425,28 +691,36 @@ tools.ping = (function() {
 
 	// incoming data handler
 	var recvbuf = getBuffer(bufsize);
-	var strbuf = '';
+	settings.strbuf = '';
+
+	var pd = new NSPR.types.PRPollDesc();
 
 	// request sender
-	var reqs = {};
-	var pd = new NSPR.types.PRPollDesc();
 	var snd = function() {
             var pstats = {
 		seq:sent,
-		s:tr.getts(),
+		s:null
             };
             if (stats.payload)
 		pstats.payload = stats.payload;
-            reqs[pstats.seq] = pstats;
-	    
+
+	    pstats.s = tr.getts();
             var len = setobj(pstats,buf);
-            NSPR.sockets.PR_Send(settings.socket, 
-				 buf, 
-				 len, 
-				 0, 
-				 NSPR.sockets.PR_INTERVAL_NO_TIMEOUT);
-            sent += 1;
+            len = NSPR.sockets.PR_Send(settings.socket, 
+				       buf, 
+				       len, 
+				       0, 
+				       NSPR.sockets.PR_INTERVAL_NO_TIMEOUT);
+
+	    if (len < 0) {
+		error('ping',"send fails: " + NSPR.errors.PR_GetError());
+		done();
+		return;
+	    }
+
 	    pstats.sent_len = len;
+            reqs[pstats.seq] = pstats;
+            sent += 1;
 
             // now block in Poll for the interval (or until we get
 	    // an answer back from the receiver)
@@ -461,7 +735,7 @@ tools.ping = (function() {
             var prv = NSPR.sockets.PR_Poll(pd.address(), 1, Math.floor(sleep));
             if (prv < 0) {
 		// Failure in polling
-		error("ping: poll fails: " + NSPR.errors.PR_GetError());
+		error('ping',"poll fails: " + NSPR.errors.PR_GetError());
 		done();
 		return;
             } else if (prv > 0) {
@@ -482,37 +756,40 @@ tools.ping = (function() {
 	
 	var rcv = function(noloop) {
             if (!settings.socket)
-		return;
-	    
+		return;	    
+	     
             var rv = NSPR.sockets.PR_Recv(settings.socket, 
 					  recvbuf, 
-					  bufsize, 
+					  bufsize-1, 
 					  0, 
-					  settings.timeout*1000);
+					  settings.timeout);
             var ts = tr.getts();
 	    
             if (rv == -1) {
 		var e = NSPR.errors.PR_GetError();
 		if (e !== NSPR.errors.PR_IO_TIMEOUT_ERROR) {
-		    error("ping: recv fails: " + e);
-		} // else nothing more to read
+		    error('ping',"recv fails: " + e);
+		} // else nothing more to read (timeout)
 		done();
 		return;
 
             } else if (rv == 0) {
-		error("ping: network connection closed");
+		error('ping',"network connection closed");
 		done();
 		return;
 
             } // else got response
-	    
+
+	    resp += 1;
+
             // make sure the string terminates at correct place as buffer reused
             recvbuf[rv] = 0;
-	    var obj = getobj(recvbuf,strbuf);
 
+	    // read all available objects from the buffer
+	    var obj = getobj(recvbuf);
             if (obj && obj.seq!==undefined && obj.seq>=0) {
 		var pstats = reqs[obj.seq];
-		pstats.recv_len = rv;     // reply bytes
+		pstats.recv_len = rv;     // bytes received
 		pstats.rr = ts;           // resp received
 		pstats.s = obj.s;         // req sent
 		pstats.r = obj.r;         // server received
@@ -526,7 +803,8 @@ tools.ping = (function() {
 		}
             }
 
-            if (rep.getlen() === settings.count) {
+            if (resp === settings.count) {
+		// got all responses
 		done();
             } else if (!noloop) {
 		setTimeout(rcv,0); // keep reading
@@ -534,13 +812,8 @@ tools.ping = (function() {
 	}; // rcv
 
 	// create and connect the socket
-	if (settings.proto === 'tcp') {
-            settings.socket = 
-		NSPR.sockets.PR_OpenTCPSocket(NSPR.sockets.PR_AF_INET);
-	} else {
-            settings.socket = 
-		NSPR.sockets.PR_OpenUDPSocket(NSPR.sockets.PR_AF_INET);
-	}
+        settings.socket = 
+	    NSPR.sockets.PR_OpenUDPSocket(NSPR.sockets.PR_AF_INET);
 
 	var addr = new NSPR.types.PRNetAddr();
 	addr.ip = NSPR.util.StringToNetAddr(settings.client);
@@ -550,7 +823,7 @@ tools.ping = (function() {
 	
 	var rc = NSPR.sockets.PR_Connect(settings.socket, 
 					 addr.address(), 
-					 settings.timeout*1000);
+					 settings.timeout);
 	if (rc < 0) {
 	    NSPR.sockets.PR_Close(settings.socket);
 	    return {error : "Error connecting : code = " + 
@@ -607,8 +880,11 @@ tools.ping = (function() {
 			obj.rp = NSPR.util.PR_ntohs(peeraddr.port);
 			
 			var len = setobj(obj,buf);
-			NSPR.sockets.PR_SendTo(settings.socket, buf, len, 0,
-                                               peeraddr.address(), NSPR.sockets.PR_INTERVAL_NO_TIMEOUT);
+			NSPR.sockets.PR_SendTo(
+			    settings.socket, 
+			    buf, len, 0,
+                            peeraddr.address(), 
+			    NSPR.sockets.PR_INTERVAL_NO_TIMEOUT);
                     }
 		}
             } // else nothing to read
@@ -656,7 +932,6 @@ tools.ping = (function() {
 	debug('ping',settings);
 
 	settings.callback = callback;
-	settings.timeout =  NSPR.util.PR_MillisecondsToInterval(settings.timeout * 1000);
 	
 	if (settings.proto === 'http') {
 	    return httpcli();
@@ -664,7 +939,7 @@ tools.ping = (function() {
 	    return xmlhttpreqcli();
 	} else if (settings.proto === 'ws') {
 	    return wscli();
-	} else if (settings.proto === 'udp' || settings.proto === 'tcp') {
+	} else if (settings.proto === 'udp') {
 	    return cli();
 	} else {
 	    return {
@@ -683,9 +958,7 @@ tools.ping = (function() {
 
 	debug('ping',settings);
 
-	settings.callback = callback;
-	settings.timeout =  NSPR.util.PR_MillisecondsToInterval(settings.timeout * 1000);
-	
+	settings.callback = callback;	
 	if (settings.proto === 'udp')
 	    return serv();
 	else

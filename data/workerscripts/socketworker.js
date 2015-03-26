@@ -61,7 +61,8 @@ var worker = {
 };
 
 var getBuffer = function(len) {
-    if (worker.buf == null || worker.buflen < len) {
+    if (!worker.buf || worker.buflen < len) {
+	dump('create buffer size='+len+'B\n');
 	worker.buf = newBuffer(len);
 	worker.buflen = len;
     }
@@ -248,6 +249,7 @@ onerror = function(event) {
     dump("error: fathom: ChromeWorker [socketworker]: " + 
 	 JSON.stringify(event) + "\n");
     postMessage(JSON.stringify({error : event, done : true}));
+    cleanup();
 };
 
 
