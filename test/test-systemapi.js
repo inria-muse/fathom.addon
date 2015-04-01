@@ -1,5 +1,5 @@
-const config = require("./config");
-const systemapi = require("./systemapi");
+const config = require("config");
+const systemapi = require("systemapi");
 const system = require("sdk/system");
 const _ = require('underscore');
 
@@ -80,7 +80,7 @@ exports["testpingbcast"] = function(assert, done) {
 	 params: ['192.168.1.255',{ count : 2, interval : 1, bcast : true }]});
 };
 
-exports["testpingttl"] = function(assert, done) {
+exports["testpingttl1"] = function(assert, done) {
     systemapi.exec(function(res, doneflag) {
 		console.log("test doPing with ttl",res);
 		assert.ok(!res.error, "doPing no error");
@@ -98,13 +98,15 @@ exports["testpingttl3"] = function(assert, done) {
 		console.log("test doPing with ttl",res);
 		assert.ok(!res.error, "doPing no error");
 		assert.ok(res.result.count === 1, "doPing count == 1");
-		assert.ok(res.result.lost === 1, "lost at ttl 3");
+		assert.ok(res.result.time_exceeded_from, 
+				  "doPing got time exceeded from " + 
+				  res.result.time_exceeded_from);
 		done();
     }, { method : 'doPing', params: [config.MSERVER_FR, 
 				     { count : 1, ttl : 3, timeout : 1}]});
 };
 
-exports["testtraceroute"] = function(assert, done) {
+exports["testtraceroutelocal"] = function(assert, done) {
     systemapi.exec(function(res, doneflag) {
 		console.log("test doTraceroute",res);
 		assert.ok(!res.error, "doTraceroute no error");
@@ -119,10 +121,12 @@ exports["testtraceroutelong"] = function(assert, done) {
     systemapi.exec(function(res, doneflag) {
 		console.log("test doTraceroute",res);
 		assert.ok(!res.error, "doTraceroute no error");
-		assert.ok(res.result.hops.length>0, "doTraceroute got results");
+		if (res.result) {
+			assert.ok(res.result.hops.length>0, "doTraceroute got results");
+		}
 		done();
     }, { method : 'doTraceroute', params: ['www.google.com', {
-		count : 1, waittime : 1
+		count : 1, waittime : 1, maxttl : 20
     }]});
 };
 
@@ -237,7 +241,7 @@ exports["testmem"] = function(assert, done) {
 	if (system.platform !== 'darwin' && system.platform !== 'winnt') {
 	    assert.ok(!res.error && res.result.memfree > 0, "getMemInfo");
 	} else {
-	    assert.ok(res.error, "getMemInfo");
+	    assert.ok(res.error, "getMemInfo not avail (expected)");
 	}
 	done();
     }, { method : 'getMemInfo'});
@@ -250,7 +254,7 @@ exports["testsysinfo"] = function(assert, done) {
 	    assert.ok(!res.error && res.result.memfree > 0, "getSysInfo");
 	} else {
 		// not available
-	    assert.ok(res.error, "getSysInfo not available");
+	    assert.ok(res.error, "getSysInfo not available (expected)");
 	}
 	done();
     }, { method : 'getSysInfo'});
