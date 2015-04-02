@@ -160,11 +160,6 @@ p a, p a:visited { line-height: inherit; }
 
 b { color: #0A0545; }
 
-.testname {
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
 blockquote {
     border-left: 2px solid #0A0545;
     padding-left: 4px;
@@ -223,7 +218,13 @@ blockquote {
 .test {
     margin-bottom: 3px;
     padding-left: 4px;
-    color: #777;
+    color: #0A0545;
+}
+
+.testname {
+    font-weight: 500;
+    text-transform: uppercase;
+    padding-left: 8px;
 }
 
 .test-not-running {
@@ -268,13 +269,13 @@ blockquote {
     background: rgba(0,0,0,.7);
     border-radius: 5px;
     color: #fff;
-    left: -200px;
+    left: -300px;
     bottom: 26px;
     content: attr(help);
     padding: 5px 15px;
     position: absolute;
     z-index: 98;
-    width: 220px;
+    width: 300px;
     font-size: 1em;
 }
 
