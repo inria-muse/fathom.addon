@@ -161,14 +161,14 @@ sys.getActiveInterfaces = function(callback) {
 };
 
 /**
- * @description This function retrieves the active wireless network
- * interface and its configuration.  
+ * @description This function retrieves the wireless network
+ * interface and its configuration (if available).  
  *
  * @param {function} callback - The callback Fathom invokes once the
  * call completes. On error contains "error" member.
  */       
-sys.getActiveWifiInterface = function(callback) {
-    makereq(callback, "system","getActiveWifiInterface");
+sys.getWifiInterface = function(callback) {
+    makereq(callback, "system","getWifiInterface");
 };
 
 /*
@@ -185,7 +185,8 @@ sys.getArpCache = function(callback, hostname) {
 };
 
 /**
- * @description This function retrieves the client's current routing table.
+ * @description This function retrieves the client's current routing table
+ * and the default gateway.
  *
  * @param {function} callback - The callback Fathom invokes once the
  * call completes. On error contains "error" member.

@@ -256,7 +256,39 @@ blockquote {
     background-color: rgba(221,81,76,0.25);
 }
 
-/* CSS Spinner */
+.test-tooltip {
+    color: #777;
+    display: inline;
+    position: relative;
+    text-decoration: none;
+}
+        
+.test-tooltip:hover:after {
+    background: #333;
+    background: rgba(0,0,0,.7);
+    border-radius: 5px;
+    color: #fff;
+    left: -200px;
+    bottom: 26px;
+    content: attr(help);
+    padding: 5px 15px;
+    position: absolute;
+    z-index: 98;
+    width: 220px;
+    font-size: 1em;
+}
+
+.test-tooltip:hover:before {
+    border: solid;
+    border-color: #333 transparent;
+    border-width: 6px 6px 0 6px;
+    bottom: 20px;
+    content: "";
+    left: 50%;
+    position: absolute;
+    z-index: 99;
+    font-size: 1em;
+}
 
 .floatright {
     float: right;
@@ -291,44 +323,7 @@ ul.whitelist li {
   display:inline-block;
 }
 
-.spinner {
-    color: #0A0545;
-    height: 15px;
-    display: inline-block;
-    margin: 3px 3px 0 0;
-}
-
-.spinner > div {
-  background-color: #FFB515;
-  height: 100%;
-  width: 4px;
-  animation: stretchdelay 1.2s infinite ease-in-out;
-  display: inline-block;
-}
-
-.spinner .rect2 {
-  animation-delay: -1.1s;
-}
-
-.spinner .rect3 {
-  animation-delay: -1.0s;
-}
-
-.spinner .rect4 {
-  animation-delay: -0.9s;
-}
-
-.spinner .rect5 {
-  animation-delay: -0.8s;
-}
-
-@keyframes stretchdelay {
-  0%, 40%, 100% { 
-    transform: scaleY(0.4);
-  }  20% { 
-    transform: scaleY(1.0);
-  }
-}
+/* Graphics */
 
 div .infofloat {
     z-index: 10;

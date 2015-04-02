@@ -164,9 +164,11 @@ exports["testnslookup"] = function(assert, done) {
 
 exports["testgetroute"] = function(assert, done) {
     systemapi.exec(function(res, doneflag) {
-		console.log(res);
+		console.log(JSON.stringify(res,null,4));
 		assert.ok(!res.error, "getRoutingTable no error");
 		assert.ok(!_.isEmpty(res.result.routes), "getRoutingTable has results");
+		assert.ok(_.find(res.result.routes, function(r) { return r.defaultroute;}), "getRoutingTable finds defaultroute(s)");
+		assert.ok(res.result.defaultgateway, "getRoutingTable finds defaultgateway");
 		done();
     }, { method : 'getRoutingTable'});
 };
@@ -211,7 +213,7 @@ exports["testgetwifi"] = function(assert, done) {
     systemapi.exec(function(res, doneflag) {
 		console.log(res);
 		if (!res.error && res.result.bssid) {
-		    assert.ok(res.result.bssid,"getActiveWifiInterface bssid " + res.result.bssid);
+		    assert.ok(res.result.bssid,"getWifiInterface bssid " + res.result.bssid);
 		    
 		    systemapi.exec(function(res2, doneflag) {
 			console.log(res2);
@@ -229,10 +231,10 @@ exports["testgetwifi"] = function(assert, done) {
 		    }, { method : 'getWifiSignal'});
 		    
 		} else {
-		    assert.ok(res!==undefined, "getActiveWifiInterface no wifi or offline");
+		    assert.ok(res!==undefined, "getWifiInterface no wifi or offline");
 		    done();
 		}
-    }, { method : 'getActiveWifiInterface'});
+    }, { method : 'getWifiInterface'});
 };
 
 exports["testmem"] = function(assert, done) {

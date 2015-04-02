@@ -1,81 +1,75 @@
 <!DOCTYPE html>
 <html>
-  
-  <head>
+
+<head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <title>Debug My Connection</title>
-
-  <link rel="icon" type="../image/png" id="favicon" href="../icons/icon-32.png"/>
-  
+  <link rel="icon" type="../image/png" id="favicon" href="../icons/icon-32.png"/>  
   <link href="../stylesheets/pure-min.css" type="text/css" rel="stylesheet">
   <link href="../stylesheets/grids-responsive-min.css" type="text/css" rel="stylesheet">
   <link href="../stylesheets/font-awesome.min.css" type="text/css" rel="stylesheet">
   <link href="../stylesheets/fathom.css" type="text/css" rel="stylesheet">
-  </head>
-  
-  <body>
-    <div id="container">
-      <div class="header">
-        <h1><i class="fa fa-wrench"></i>&nbsp;Debug My Connection</h1>
-        <h2>Test your network configuration and Internet connectivity</h2>
-      </div>
+</head>
 
-      <!-- placeholder for results -->
-      <div id="results" class="content"></div>
+<body>
+  <div id="container">
+    <div class="header">
+      <h1><i class="fa fa-wrench"></i>&nbsp;Debug My Connection</h1>
+      <h2>Test your network configuration and Internet connectivity</h2>
+    </div>
 
-      <div class="center">
-	<button class="pure-button pure-button-primary" 
-		onclick="location.reload();">
-	  <i class="fa fa-refresh"></i> Run Again
-	</button>
-      </div>
+    <!-- placeholder for results -->
+    <div id="results" class="content"></div>
 
-      <div id="upload" class="content"></div>
+    <div class="center">
+      <button class="pure-button pure-button-primary" 
+        onclick="location.reload();">
+          <i class="fa fa-refresh"></i> Run Again
+      </button>
+    </div>
 
-    </div> <!-- container -->
+    <div id="upload" class="content"></div>
 
-    <!-- The main template -->
-    <script id="template" type="x-tmpl-mustache">
-      {{#testsuites}}
-      <h2 class="content-subhead">{{name}}</h2>
+  </div> <!-- container -->
+
+  <!-- The main template -->
+  <script id="template" type="x-tmpl-mustache">
+    {{#testsuites}}
+      <h2 class="content-subhead">{{name}}&nbsp;<a href="#void" class="test-tooltip" help="{{help}}"><i class="fa fa-question-circle"></i></a></h2>
       {{#tests}}
       <div id="test{{id}}"></div>
       {{/tests}}
-      {{/testsuites}}
-    </script>
+    {{/testsuites}}
+  </script>
 
-    <!-- Template for tests tag -->
-    <script id="testtemplate" type="x-tmpl-mustache">
-      <div class="test {{status}}">
-	<span class="testname">{{name}}</span> <i>{{desc}}</i>
-	{{#isrunning}}
-	<div class="spinner floatright">
-	  <div class="rect1"></div>
-	  <div class="rect2"></div>
-	  <div class="rect3"></div>
-	  <div class="rect4"></div>
-	  <div class="rect5"></div>
-	</div>
-	{{/isrunning}}
+  <!-- Template for tests tag -->
+  <script id="testtemplate" type="x-tmpl-mustache">
+    <div class="test {{status}}">
+    <span class="testname">{{name}}</span> <i>{{statustxt}}</i>
+      <div class="floatright">
+      {{#isrunning}}
+      <i class="fa fa-cog fa-spin"></i>&nbsp;
+      {{/isrunning}}
+      <a href="#void" class="test-tooltip" help="{{help}}"><i class="fa fa-question-circle"></i></a>&nbsp;
       </div>
-    </script>
+    </div>
+  </script>
 
-    <!-- Template for data upload disclaimer -->
-    <script id="uploadtemplate" type="x-tmpl-mustache">
-      <blockquote>
-	<i class="small">
-	You have {{#upload}}<span class="allow">allowed</span>{{/upload}}{{^upload}}<span class="disallow">disallowed</span>{{/upload}} the sharing of the results from this tool. {{#ready}}<a href="#void" id="showdata"><i class="fa fa-external-link"></i> See the data!</a>{{/ready}}</i>
-	</blockquote>
-    </script>
-    
-    <!-- UI library scripts -->
-    <script src="../extscripts/jquery.min.js"></script>
-    <script src="../extscripts/underscore-min.js"></script>
-    <script src="../extscripts/backbone-min.js"></script>
-    <script src="../extscripts/mustache.js"></script>
-    <!-- the tool script -->
-    <script src="./debugtool.js"></script>
-  </body>
+  <!-- Template for data upload disclaimer -->
+  <script id="uploadtemplate" type="x-tmpl-mustache">
+    <blockquote>
+    <i class="small">
+    You have {{#upload}}<span class="allow">allowed</span>{{/upload}}{{^upload}}<span class="disallow">disallowed</span>{{/upload}} the sharing of the results from this tool. {{#ready}}<a href="#void" id="showdata"><i class="fa fa-external-link"></i> See the data!</a>{{/ready}}</i>
+    </blockquote>
+  </script>
+
+  <!-- UI library scripts -->
+  <script src="../extscripts/jquery.min.js"></script>
+  <script src="../extscripts/underscore-min.js"></script>
+  <script src="../extscripts/backbone-min.js"></script>
+  <script src="../extscripts/mustache.js"></script>
+  <!-- the tool script -->
+  <script src="./debugtool.js"></script>
+</body>
 </html>
