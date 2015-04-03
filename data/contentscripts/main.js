@@ -251,8 +251,10 @@ if (typeof addon !== "undefined" ||
                         // re-calling init, cleanup previous state
                         makereq(undefined, 'internal', 'close', undefined);
                         // reset exposed api
-                        fathom = cloneInto(dummyfathom, unsafeWindow,
-                         { cloneFunctions: true });
+                        fathom = cloneInto(
+                            dummyfathom, 
+                            unsafeWindow,
+                            { cloneFunctions: true });
                         unsafeWindow.fathom = fathom;
                     }
                     nextreqid = 1;
@@ -295,8 +297,10 @@ if (typeof addon !== "undefined" ||
             };
 
             // create initial Fathom object and expose it to page script(s)
-            fathom = cloneInto(dummyfathom, unsafeWindow,
-             { cloneFunctions: true });
+            fathom = cloneInto(
+                dummyfathom, 
+                unsafeWindow,
+                { cloneFunctions: true });
             unsafeWindow.fathom = fathom;
 
         } else {

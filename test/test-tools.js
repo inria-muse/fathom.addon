@@ -120,7 +120,7 @@ exports["testdiscmdns"] = function(assert, done) {
 		else
 		    done();
     }, { method : 'discovery',
-	 params : [5,['mdns']]}, {neighbors : {}});
+	 params : [10,['mdns']]}, {neighbors : {}});
 };
 
 exports["testdiscping"] = function(assert, done) {
@@ -142,7 +142,7 @@ exports["testdiscupnp"] = function(assert, done) {
 		else
 		    done();
     }, { method : 'discovery',
-	 params : [5,['upnp']]}, {neighbors : {}});
+	 params : [10,['upnp']]}, {neighbors : {}});
 };
 
 exports["testdiscall"] = function(assert, done) {

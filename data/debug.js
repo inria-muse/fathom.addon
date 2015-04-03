@@ -5,7 +5,7 @@
                            International Computer Science Institute (ICSI)
 
    See LICENSE for license and terms of usage. 
-   */
+*/
 
 /**
  * @fileoverfiew Debug page helper script to fetch and render stats 
@@ -28,6 +28,7 @@
     });
 
     window.fathom.internal(function(stats) {
+        console.log(stats);
         var robj = {
             components : _.map(_.keys(stats), function(k) {
                 return { 

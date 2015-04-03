@@ -224,7 +224,7 @@ blockquote {
 .testname {
     font-weight: 500;
     text-transform: uppercase;
-    padding-left: 8px;
+    padding-right: 8px;
 }
 
 .test-not-running {
