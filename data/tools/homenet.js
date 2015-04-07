@@ -5,7 +5,7 @@
                            International Computer Science Institute (ICSI)
 
    See LICENSE for license and terms of usage. 
-   */
+*/
 
 /**
  * @fileoverview Homenet discovery tool.
@@ -17,6 +17,7 @@ var NetGraph = function(elem, clickevents, width) {
     var canvas = $(elem); // canvas div
     var width = this.width = (width || 0.85*canvas.width());
     var height = this.height = width/1.61;
+
     var nodeid = this.nodeid = 0;
 
     // The node label
@@ -24,8 +25,10 @@ var NetGraph = function(elem, clickevents, width) {
         var name = '';
         if (n.type === 'local') {
             name = 'Your Device';
+
         } else if (n.type === 'internet') {
             name = 'Internet';
+
         } else if (n.type === 'gw') {
             if (n.raw['upnp'] && 
                 n.raw['upnp'].xml && 
@@ -35,9 +38,10 @@ var NetGraph = function(elem, clickevents, width) {
                n.raw['mdns'].hostname)
                 name = 'Gateway ' + n.raw['mdns'].hostname.replace('.local','');
             else
-                name = 'Gateway';
+                name = 'Internet Gateway';
+
         } else {
-            name = '';
+            name = undefined;
             if (n.raw['upnp']) {
                 if (n.raw['upnp'].xml && n.raw['upnp'].xml.friendlyName)
                     name = n.raw['upnp'].xml.friendlyName;
@@ -60,10 +64,14 @@ var NetGraph = function(elem, clickevents, width) {
                     name = "Mac Device";
             }
 
-            if (!name && n.raw['ping'].arp && n.raw['ping'].arp.hostname) {
+            if (!name && n.raw['ping'] && n.raw['ping'].arp && n.raw['ping'].arp.hostname) {
                 name = n.raw['ping'].arp.hostname;
+                if (name === '?')
+                    name = undefined;
             }
 
+            if (!name)
+                name = 'Network Device';
         }
         return name;
     };
@@ -73,22 +81,37 @@ var NetGraph = function(elem, clickevents, width) {
         switch (n.type) {
         case 'local':    
             res += "<li>Hostname: "+n.raw['local'].hostname+"</li>";
-            res += "<li>IP: "+n.address+"</li>";
+            if (n.ipv4)
+                res += "<li>IP: "+n.ipv4+"</li>";
+            else if (n.ipv6)
+                res += "<li>IP: "+n.ipv6+"</li>";
             break;
 
         case 'peer':    
-            res += "<li>IP: "+n.address+"</li>";
+            if (n.ipv4)
+                res += "<li>IP: "+n.ipv4+"</li>";
+            else if (n.ipv6)
+                res += "<li>IP: "+n.ipv6+"</li>";
             break;
 
         case 'gw':
-            res += "<li>IP: "+n.address+"</li>";
+            if (n.ipv4)
+                res += "<li>IP: "+n.ipv4+"</li>";
+            else if (n.ipv6)
+                res += "<li>IP: "+n.ipv6+"</li>";
             break;
 
         case 'internet':
-            res += "<li>Public IP: "+n.address+"</li>";
-            res += "<li>ISP: "+n.raw['internet'].isp+"</li>";
-            res += "<li>Location: "+n.raw['internet'].city+
-            ", "+n.raw['internet'].country+"</li>";
+            if (n.raw['internet']) {
+                res += "<li>Public IP: "+n.raw['internet'].ip+"</li>";
+                res += "<li>ISP: "+n.raw['internet'].isp+"</li>";
+                if (n.raw['internet'].city)
+                    res += "<li>Location: "+n.raw['internet'].city;
+                if (n.raw['internet'].country)
+                    res += " ("+n.raw['internet'].country+")</li>";
+            } else {
+                res += "<li>Not connected!</li>";
+            }
             break;
         }
 
@@ -124,7 +147,7 @@ var NetGraph = function(elem, clickevents, width) {
         .attr("class", "infofloat")
         .style("position", "absolute")
         .style('top', '5px')
-        .style('left', '60%')
+        .style('left', '50%')
         .style('margin-left', (-width/2+10)+'px')
         .style("opacity", 0); // hidden
 
@@ -152,41 +175,44 @@ var NetGraph = function(elem, clickevents, width) {
     var node = ng.selectAll(".circle"); // circle group
     var link = eg.selectAll(".line");   // edge group
 
-    // node radiuses
-    var normalr = 0.03 * width;
-    var smallr = 0.008 * width;
+    // node radius
+    var defaultr = 0.03 * width;
+    var getdefaultr = function(n) {
+        if (nodes.length > 20 && n.type === 'peer') {
+            return defaultr / 3.0;
+        } else if (nodes.length > 10 && n.type === 'peer') {
+            return defaultr / 2.0;
+        } else {
+            return defaultr;
+        }        
+    }
+    var gettransr = function(n) {
+        if (nodes.length > 20 && n.type === 'peer') {
+            return defaultr / 3.0;
+        } else if (nodes.length > 10 && n.type === 'peer') {
+            return (defaultr + defaultr/3.0) / 2.0;
+        } else {
+            return (defaultr + defaultr/3.0);
+        }
+    }
 
     var nodemouseover = function(n) {
         infobox.html(formatInfoStr(n));
         infobox.transition()
             .duration(300)
             .style("opacity", .9);
-
         d3.select(this).select("circle").transition()
             .duration(300)
-            .attr("r", function(d) {
-                if (d.type === 'peer' && d.raw['ping'] && _.size(d.raw) === 1) {
-                    return smallr+smallr/2.0;
-                } else {
-                    return defaultr+defaultr/3.0;
-                }
-            });
+            .attr("r", gettransr);
     };
 
     var nodemouseout = function () {
         infobox.transition()
             .duration(300)
-            .style("opacity", 0)
-
+            .style("opacity", 0);
         d3.select(this).select("circle").transition()
             .duration(300)
-            .attr("r", function(d) {
-                if (d.type === 'peer' && d.raw['ping'] && _.size(d.raw) === 1) {
-                    return smallr;
-                } else {
-                    return defaultr;
-                }
-            });
+            .attr("r", getdefaultr);
     };
 
     var clickednode = undefined;
@@ -197,30 +223,17 @@ var NetGraph = function(elem, clickevents, width) {
             infobox.transition()
                 .duration(300)
                 .style("opacity", .9);
-
             clickednode.select("circle").transition()
                 .duration(300)
-                .attr("r", function(d) {
-                if (d.type === 'peer' && d.raw['ping'] && _.size(d.raw) === 1) {
-                    return smallr+smallr/2.0;
-                } else {
-                    return defaultr+defaultr/3.0;
-                }
-            });
+                .attr("r", gettransr);
+
         } else {
             infobox.transition()
                 .duration(300)
                 .style("opacity", 0)
-
             clickednode.select("circle").transition()
                 .duration(300)
-                .attr("r", function(d) {
-                    if (d.type === 'peer' && d.raw['ping'] && _.size(d.raw) === 1) {
-                        return smallr;
-                    } else {
-                        return defaultr;
-                    }
-                });
+                .attr("r", getdefaultr);                
             clickednode = undefined;
         }
     };
@@ -231,7 +244,7 @@ var NetGraph = function(elem, clickevents, width) {
 
         // enter
         link.enter().append("line")
-                .attr("class", "edge"); // TODO: wireless or fixed link ?
+                .attr("class", "edge");
 
         // data join
         node = node.data(nodes);
@@ -248,14 +261,8 @@ var NetGraph = function(elem, clickevents, width) {
         }
 
         g.append("circle")
-            .attr("r", function(d) {
-                if (d.type === 'peer' && d.raw['ping'] && _.size(d.raw) === 1) {
-                    return smallr;
-                } else {
-                    return defaultr;
-                }
-            });
-        
+            .attr("r", getdefaultr);
+
         g.append("text")
             .attr("class", "label")
             .attr("dx", 10)
@@ -269,17 +276,21 @@ var NetGraph = function(elem, clickevents, width) {
             case 'internet':
                 return 'node i-node';
                 break;
+
             case 'local':
                 return 'node localhost-node';
                 break;
+
             case 'peer':
                 return 'node ' + ((n.rpc ? 'rpc-' : '') + 'peer-node');
                 break;
+
             case 'gw':
                 return 'node ' + ((n.rpc ? 'rpc-' : '') + 'gw-node');
                 break;      
+            default:
+                return 'node';
             }
-            return 'node';
         });
 
         force.start();
@@ -292,17 +303,18 @@ var NetGraph = function(elem, clickevents, width) {
 NetGraph.prototype.addNode = function(newnode) {
     var that = this;
 
-    console.log(newnode);
-
     // check if we already know this node ?
     var node = _.find(that.nodes, function(n) {
-        return (n.address === newnode.address);
+        return ((n.ipv4!==undefined && n.ipv4 === newnode.ipv4) || 
+                (n.ipv6!=undefined && n.ipv6 === newnode.ipv6));
     });
 
     if (!node) {
         // new node !
+        console.log('newnode',newnode);
         node = newnode;
         node.id = that.nodeid++;
+
         switch (node.type) {
         case 'internet':
             // fix the internet node to top of the graph
@@ -315,85 +327,103 @@ NetGraph.prototype.addNode = function(newnode) {
         case 'local':
             that.localnode = node;
             break;
-
-        case 'peer':
-        case 'gw':
-            default:
         }
         that.nodes.push(node);
 
     } else {
+        console.log('updatenode',node);
+        console.log('updatenode with',newnode);
+
         switch (newnode.type) {
         case 'local':
             // override previous (mdns/upnp/fathom) info with local
             node.type = 'local';
-            that.localnode = node;
-            node.rpc = node.reachable || newnode.rpc;
+            node.rpc = node.rpc || newnode.rpc;
             node.reachable = node.reachable || newnode.reachable;
             node.raw = _.extend(node.raw, newnode.raw);
+            that.localnode = node;
             break;
 
         case 'gw':
-            node.type = newnode.type; // peer turns into gw
+            node.type = 'gw'; // peer turns into gw
             node.rpc = node.rpc || newnode.rpc;
             node.reachable = node.reachable || newnode.reachable;
             node.raw = _.extend(node.raw, newnode.raw);
             break;
 
         case 'peer':
-            // don't override previous type (local or gw)
+            // keep original type
             node.rpc = node.rpc || newnode.rpc;
             node.reachable = node.reachable || newnode.reachable;
             node.raw = _.extend(node.raw, newnode.raw);
             break;
-
-        case 'internet':
-            default:
         }
     }
 
-    // links
-    // check for default gateway link
-    if (that.localnode && !that.defaultgw) {
-        var gwip = that.localnode.raw['local'].networkenv.gateway_ip;
-        var gw = _.find(that.nodes, function(n) {
-            return (n.type === 'gw' &&
-                n.address === gwip);
-        });
-
-        if (gw) {
-            that.defaultgw = gw;
-            // link to gw if reachable (from some discovery proto) or in the routing table
-            if ((gw.reachable || gw.raw['route']) && !that.hasEdge(that.localnode,gw))
-                that.addEdge(that.localnode,gw);
+    // update links
+    var gws = _.filter(that.nodes, function (n) { return (n.type === 'gw'); });
+    _.each(gws, function(gw) {
+        // local - > gw
+        if (that.localnode && gw.reachable && !that.hasEdge(that.localnode, gw)) {
+            that.addEdge(that.localnode, gw);
         }
-    }
 
-    // check for internet link
-    if (that.defaultgw && 
-        (that.defaultgw.reachable || that.defaultgw.raw['route']) && 
-        that.internet && 
-        that.internet.reachable && 
-        !that.hasEdge(that.internet,that.defaultgw)) 
-    {
-        that.addEdge(that.internet,that.defaultgw);
-    }
+        // gw -> internet
+        if (that.internet && (gw.internet_reachable || that.internet.reachable) && !that.hasEdge(gw, that.internet)) {
+            that.addEdge(gw, that.internet);
+        }
+    }); 
 
-    // connect peers and the default gw
-    if (that.defaultgw && 
-        (that.defaultgw.reachable || that.defaultgw.raw['route'])) 
-    {
-        _.each(that.nodes, function(n) {
-            if ((n.type === 'peer' ||
-               (n.type === 'gw' && n.addres !== that.defaultgw.address)) &&
-                !that.hasEdge(that.defaultgw,n)) 
-            {
-                that.addEdge(that.defaultgw,n);
+    // check peer connections (after basic network is there)
+    if (gws.length > 0 && that.localnode && that.internet) {
+        // loop over peers
+        _.each(_.filter(that.nodes, function (n) { return (n.type === 'peer'); }), function(peer) {            
+            if (!that.isConnected(peer)) {
+                console.log('check peer', peer);
+
+                var longestgw = undefined;
+                var bitsv4 = 0;
+                var bitsv6 = 0;
+
+                // do longest prefix match to find the correct gw
+                _.each(gws, function(gw) {
+                    if (peer.ipv4 && gw.ipv4) {
+                        var bits = 32;
+                        while (bits >= bitsv4) {
+                            var addr = ipaddr.parse(peer.ipv4);
+                            var range = ipaddr.parse(gw.ipv4);
+                            if (addr.match(range, bits)) {
+                                bitsv4 = bits;
+                                longestgw = gw;
+                                bits = 0;
+                            }
+                            bits -= 1;
+                        }
+                    } else if (peer.ipv6 && gw.ipv6) {
+                        var bits = 64;
+                        while (bits >= bitsv6) {
+                            var addr = ipaddr.parse(peer.ipv6);
+                            var range = ipaddr.parse(gw.ipv6);
+                            if (addr.match(range, bits)) {
+                                bitsv6 = bits;
+                                longestgw = gw;
+                                bits = 0;
+                            }
+                            bits -= 1;
+                        }
+                    } // else dunno how to match
+                });
+                console.log('longest', longestgw);
+
+                if (longestgw && (bitsv6 > 0 || bitsv4 > 0)) {
+                    that.addEdge(peer, longestgw);
+                }
             }
         });
     }
 };
 
+/** Connect nodes a and b. */
 NetGraph.prototype.addEdge = function(a, b) {
     this.links.push({
         source : a,
@@ -401,12 +431,21 @@ NetGraph.prototype.addEdge = function(a, b) {
     });
 };
 
+/** Are nodes a and b connected ? */
 NetGraph.prototype.hasEdge = function(a, b) {
     return (_.find(this.links, function(e) {
-        return ((e.source.address === a.address &&
-           e.target.address === b.address) ||
-        (e.source.address === b.address &&
-           e.target.address === a.address))
+        return ((e.source.id === a.id &&
+                 e.target.id === b.id) ||
+                (e.source.id === b.id &&
+                 e.target.id === a.id));
+    }) !== undefined);
+};
+
+/** Is node connected to some other node ? */
+NetGraph.prototype.isConnected = function(a) {
+    return (_.find(this.links, function(e) {
+        return (e.source.id === a.id ||
+                e.target.id === a.id);
     }) !== undefined);
 };
 
@@ -438,11 +477,22 @@ window.onload = function() {
         // start the remote API for discovering other Fathoms
         fathom.tools.remoteapi.start(function() {});
 
+        // local discovery
         fathom.tools.discovery(function(node) {
-            if (node.type) {
+            if (node && node.type) {
                 g.addNode(node);
                 g.redraw();
-            } else {
+                return;
+            }
+
+            // local stuff done, do more discovery
+            fathom.tools.discovery(function(node) {
+                if (node && node.type) {
+                    g.addNode(node);
+                    g.redraw();
+                    return;
+                }
+
                 // all done
                 var elapsed = (window.performance.now() - startts); // ms
                 $('#waitspin').hide();
@@ -469,8 +519,8 @@ window.onload = function() {
                       "px",
                       "py",
                       "fixed");
-                })
-                
+                });
+                        
                 // queue for upload
                 fathom.internal(function(userok) {
                     // update the upload block
@@ -496,8 +546,9 @@ window.onload = function() {
                     elapsed : elapsed,
                     results : json
                 }); // upload
-            }
-        }); // disc 
+                
+            }, 10, ['ping','mdns','upnp','fathom']); // disc other networking protos
+        }, 5, ['local','internet','route']); // disc local stuff
     }); // init
 }; // onload
 

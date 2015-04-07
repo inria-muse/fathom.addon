@@ -83,15 +83,17 @@ var cleanup = function() {
 
 var sendres = function(id) {
     return function(err, data, done) {
+        if (err)
+            debug(tag, "sendres error: " + JSON.stringify(err));
+        
         var res = {
             workerid : worker.id, // this worker id
             id : id,      // unique request id
             data : data,  // data object or undefined if err
             error : err,  // err or undefined if ok
             done : done   // request done ? 
-        }
-        var msg = JSON.stringify(res);
-        postMessage(msg);
+        };
+        postMessage(JSON.stringify(res));
     };
 };
 
@@ -118,6 +120,7 @@ onmessage = function(event) {
         worker.nsprpath = msg.nsprpath;
         worker.nsprname = msg.nsprname;
         worker.os = msg.os;
+        debug(tag, "createworker " + worker.id);
 
         // load helper scripts
         try {
@@ -191,6 +194,7 @@ onmessage = function(event) {
 
     } else if (msg.method === 'close') {
         cleanup();
+
     } else if (api[msg.method] && 
                typeof api[msg.method] === 'function') {
 

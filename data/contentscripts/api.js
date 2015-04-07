@@ -47,7 +47,7 @@ sys.getOS = function(callback) {
  *
  * @param {function} callback - The callback Fathom invokes once the
  * call completes. On error contains "error" member.
- * @param {string} host  - The host (name or IP address) to run a
+ * @param {string} host  - The host (name or IP/IPv6 address) to run a
  * traceroute to.
  * @param {object} opt - Optional parameters (count, iface, waittime).
  * @param {boolean} incrementaloutput - Incremental output (optional - default false).
@@ -62,7 +62,7 @@ sys.doTraceroute = function(callback, host, opt, incrementaloutput) {
  *
  * @param {function} callback - The callback Fathom invokes once the
  * call completes. On error contains "error" member.
- * @param {string} host - The host (name or IP address) to ping.
+ * @param {string} host - The host (name or IPv4/IPv6 address) to ping.
  * @param {object} opt - Optional parameters (count, iface, interval, bcast).
  * @param {boolean} incrementaloutput - Send incremental output (optional - default false).
  */
@@ -89,12 +89,12 @@ sys.doPingToHop = function(callback, hop, opt, incrementaloutput) {
 };
 
 /** 
- * @description This function runs iperf test (client mode) to the given
+ * @description This function runs system iperf (client mode) to the given
  * destination and, upon completion, returns the results as JSON.
  *
  * @param {function} callback - The callback Fathom invokes once the
  * call completes. On error contains "error" member.
- * @param {string} host - The host (name or IP address) of the server.
+ * @param {string} host - The host (name or IPv4 address) of the server.
  * @param {object} opt  Optional parameters (proto, bandwidth,
  *                      time, num, port, len, window).
  * @param {boolean} incrementaloutput Send incremental output.
@@ -295,6 +295,7 @@ sys.getBrowserMemoryUsage = function(callback) {
 
 /** 
  * @description fathom.socket.* namespace. Low level TCP/UDP sockets.
+ * Works with IPv4 only for now.
  *
  * @exports fathom/socket
  */
@@ -1562,10 +1563,11 @@ tools.getDesc.addononly = true;
  * @description Do full network neighbour search (uses any available
  *              means to discover devices in the local network).
  * @access private
- * @param {number} timeout Time to wait devices (in seconds).
+ * @param {number} timeout - Time to wait devices (in seconds).
+ * @param {Array} protocols - List of discovery protocols.
  */
-tools.discovery = function(callback, timeout) {
-    makereq(callback, "tools", "discovery", [timeout]);
+tools.discovery = function(callback, timeout, protocols) {
+    makereq(callback, "tools", "discovery", [timeout, protocols]);
 };
 tools.discovery.addononly = true;
 

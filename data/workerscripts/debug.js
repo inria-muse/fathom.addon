@@ -12,17 +12,17 @@
  * @author Anna-Kaisa Pietilainen <anna-kaisa.pietilainen@inria.fr> 
  */
 
-var debugoff = true;
+var debugoff = false;
 
 var debug = function(tag, msg) {
     if (debugoff) return;
     if (typeof msg !== "string")
-	msg = JSON.stringify(msg);
+      msg = JSON.stringify(msg);
     dump("debug: fathom: ChromeWorker ["+tag+"worker]: " + msg + "\n");
 };
 
 var error = function(tag, msg) {
     if (typeof msg !== "string")
-	msg = JSON.stringify(msg);
+       msg = JSON.stringify(msg);
     dump("error: fathom: ChromeWorker ["+tag+"worker]: " + msg + "\n");
 };

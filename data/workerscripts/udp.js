@@ -23,26 +23,28 @@ socket.udpOpen = function() {
 socket.udpBind = function(s, ip, port, reuse) {
     reuse = (reuse!==undefined ? reuse : false);
     if (reuse) {
-	var res = socket.setSocketOption(s,'reuseaddr',true); 
-	if (res.error) {
-	    return res;
-	}
+        var res = socket.setSocketOption(s,'reuseaddr',true); 
+        if (res.error) {
+            return res;
+        }
     }
     
     var addr = new NSPR.types.PRNetAddr();
     var localaddr = NSPR.sockets.PR_IpAddrAny;
     if (ip!==0) {
-	// TODO: bind to local interface
-	return {error : 
-		"Binding to local interface is not implemented, use 0."};
+        // TODO: bind to local interface
+        return {error : 
+            "Binding to local interface is not implemented, use 0."};
     }
 
-    NSPR.sockets.PR_SetNetAddr(localaddr, 
-			       NSPR.sockets.PR_AF_INET, 
-			       port, addr.address());
+    NSPR.sockets.PR_SetNetAddr(
+        localaddr, 
+        NSPR.sockets.PR_AF_INET, 
+        port, 
+        addr.address());
 
     if (NSPR.sockets.PR_Bind(s, addr.address()) != 0)
-	return {error: "Error binding: " + NSPR.errors.PR_GetError()};
+        return {error: "Error binding: " + NSPR.errors.PR_GetError()};
 
     // ok
     return {};
@@ -52,12 +54,15 @@ socket.udpConnect = function(s, ip, port) {
     var timeout = NSPR.util.PR_MillisecondsToInterval(1000);
     var addr = new NSPR.types.PRNetAddr();
     addr.ip = NSPR.util.StringToNetAddr(ip);
-    NSPR.sockets.PR_SetNetAddr(NSPR.sockets.PR_IpAddrNull, 
-			       NSPR.sockets.PR_AF_INET, 
-			       port, addr.address());
-  
+
+    NSPR.sockets.PR_SetNetAddr(
+        NSPR.sockets.PR_IpAddrNull, 
+        NSPR.sockets.PR_AF_INET, 
+        port, 
+        addr.address());
+
     if (NSPR.sockets.PR_Connect(s, addr.address(), timeout) < 0)
-	return {error : "Error connecting: " + NSPR.errors.PR_GetError()};
+        return {error : "Error connecting: " + NSPR.errors.PR_GetError()};
 
     // ok
     return {};
@@ -66,23 +71,26 @@ socket.udpConnect = function(s, ip, port) {
 socket.udpSendTo = function(s, msg, ip, port) {
     var addr = new NSPR.types.PRNetAddr();
     addr.ip = NSPR.util.StringToNetAddr(ip);
+
     NSPR.sockets.PR_SetNetAddr(
-	NSPR.sockets.PR_IpAddrNull, 
-	NSPR.sockets.PR_AF_INET, port, addr.address());
+        NSPR.sockets.PR_IpAddrNull, 
+        NSPR.sockets.PR_AF_INET, 
+        port, 
+        addr.address());
 
     var sendBuf = newBufferFromString(msg);
 
     var res = NSPR.sockets.PR_SendTo(s, 
-				     sendBuf, 
-				     msg.length, 
-				     0, 
-				     addr.address(),
-				     NSPR.sockets.PR_INTERVAL_NO_WAIT);
+       sendBuf, 
+       msg.length, 
+       0, 
+       addr.address(),
+       NSPR.sockets.PR_INTERVAL_NO_WAIT);
 
     if (res < 0) {
-	return {error : "Error sending: " + NSPR.errors.PR_GetError()};
+        return {error : "Error sending: " + NSPR.errors.PR_GetError()};
     } else {
-	return {length : res};
+        return {length : res};
     }
 };
 
@@ -94,28 +102,29 @@ socket.udpRecvFrom = function(s, asstring, timeout, size) {
 
     var to = NSPR.sockets.PR_INTERVAL_NO_WAIT;
     if (timeout && timeout < 0) {
-	to = NSPR.sockets.PR_NO_TIMEOUT;
+        to = NSPR.sockets.PR_NO_TIMEOUT;
     } else if (timeout && timeout > 0) {
-	to = NSPR.util.PR_MillisecondsToInterval(timeout);
+        to = NSPR.util.PR_MillisecondsToInterval(timeout);
     }
 
     var addr = new NSPR.types.PRNetAddr(); 
-    var res = NSPR.sockets.PR_RecvFrom(s, 
-				       recvbuf, 
-				       bufsize, 
-				       0, 
-				       addr.address(), 
-				       to);
+    var res = NSPR.sockets.PR_RecvFrom(
+        s, 
+        recvbuf, 
+        bufsize, 
+        0, 
+        addr.address(), 
+        to);
 
     if (res < 0) {
-	var e = NSPR.errors.PR_GetError();
-	if (e === NSPR.errors.PR_IO_TIMEOUT_ERROR) {
-	    return {error : "Request timeout", timeout : true};
-	} else {
-	    return {error : "Error receiving: " + e};
-	}
+        var e = NSPR.errors.PR_GetError();
+        if (e === NSPR.errors.PR_IO_TIMEOUT_ERROR) {
+            return {error : "Request timeout", timeout : true};
+        } else {
+            return {error : "Error receiving: " + e};
+        }
     } else if (res === 0) {
-	return {error : "Network connection is closed"}; 
+        return {error : "Network connection is closed"}; 
     }
 
     // remote peer
@@ -124,51 +133,54 @@ socket.udpRecvFrom = function(s, asstring, timeout, size) {
 
     var out = undefined;
     if (asstring) {
-	// make sure the string terminates at correct place as buffer reused
-	recvbuf[res] = 0; 
-	out = recvbuf.readString();
+        // make sure the string terminates at correct place as buffer reused
+        recvbuf[res] = 0; 
+        out = recvbuf.readString();
     } else {
-	// FIXME: is there any native way to do the copying?
-	out = [];
-	for (var i = 0; i < res; i++) {
-	    out.push(recvbuf[i]);
-	}
+        // FIXME: is there any native way to do the copying?
+        out = [];
+        for (var i = 0; i < res; i++) {
+            out.push(recvbuf[i]);
+        }
     }
     return {
-	data: out, 
-	length: res, 
-	address: ip, 
-	port: port
+        data: out, 
+        length: res, 
+        address: ip, 
+        port: port
     };
 };
 
 socket.udpSendRecv = function(s, msg, asstring, timeout, size) {
     var res = socket.send(s,msg);
     if (res.error)
-	return res;
+        return res;
     return socket.recv(s,asstring,timeout,size);
 };
 
 socket.udpRecvStart = function(callback, s, asstring, size) {
     var loopto = 100; // ms
     function loop() {
-	var res = socket.recv(s,asstring,loopto,size);
-	if (worker.multirespstop) {
-	    // stop requested, send last data/error if any
-	    if (res.error && res.timeout)
-		res = {};
-	    callback(res, true);
-	} else if (res.error && !res.timeout) {
-	    // stop on error (other than timeout)
-	    callback(res, true);
-	} else if (res.error && res.timeout) {
-	    // normal timeout - reloop
-	    setTimeout(loop,0);
-	} else {
-	    // data and reloop
-	    callback(res, false);
-	    setTimeout(loop,0);
-	}	    
+        var res = socket.recv(s,asstring,loopto,size);
+        if (worker.multirespstop) {
+            // stop requested, send last data/error if any
+            if (res.error && res.timeout)
+                res = { timeout : true};
+            callback(undefined, res, true);
+
+        } else if (res.error && !res.timeout) {
+            // stop on error (other than timeout)
+            callback(res.error, undefined, true);
+
+        } else if (res.error && res.timeout) {
+            // normal timeout - reloop
+            setTimeout(loop,0);
+
+        } else {
+            // data and reloop
+            callback(undefined, res, false);
+            setTimeout(loop,0);
+        }
     };
     setTimeout(loop,0);
     return {};
@@ -177,23 +189,26 @@ socket.udpRecvStart = function(callback, s, asstring, size) {
 socket.udpRecvFromStart = function(callback, s, asstring, size) {
     var loopto = 100; // ms
     function loop() {
-	var res = socket.udpRecvFrom(s,asstring,loopto,size);
-	if (worker.multirespstop) {
-	    // stop requested, send last data/error if any
-	    if (res.error && res.timeout)
-		res = {};
-	    callback(res, true);
-	} else if (res.error && !res.timeout) {
-	    // stop on error (other than timeout)
-	    callback(res, true);
-	} else if (res.error && res.timeout) {
-	    // normal timeout - reloop
-	    setTimeout(loop,0);
-	} else {
-	    // send recved data and reloop
-	    callback(res, false);
-	    setTimeout(loop,0);
-	}    
+        var res = socket.udpRecvFrom(s,asstring,loopto,size);
+        if (worker.multirespstop) {
+            // stop requested, send last data/error if any
+            if (res.error && res.timeout)
+                res = {timeout : true};
+            callback(undefined, res, true);
+
+        } else if (res.error && !res.timeout) {
+            // stop on error (other than timeout)
+            callback(res.error, undefined, true);
+
+        } else if (res.error && res.timeout) {
+            // normal timeout - reloop
+            setTimeout(loop,0);
+
+        } else {
+            // send recved data and reloop
+            callback(undefined, res, false);
+            setTimeout(loop,0);
+        }
     };
     setTimeout(loop,0);
     return {};

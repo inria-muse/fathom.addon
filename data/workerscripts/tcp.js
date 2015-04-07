@@ -16,18 +16,20 @@
  * @author Anna-Kaisa Pietilainen <anna-kaisa.pietilainen@inria.fr> 
  */
 
-socket.tcpOpenSendSocket = function(ip, port) {
+ socket.tcpOpenSendSocket = function(ip, port) {
     var s = NSPR.sockets.PR_OpenTCPSocket(NSPR.sockets.PR_AF_INET);
 
     var timeout = NSPR.util.PR_MillisecondsToInterval(1000);
     var addr = new NSPR.types.PRNetAddr();
     addr.ip = NSPR.util.StringToNetAddr(ip);
-    NSPR.sockets.PR_SetNetAddr(NSPR.sockets.PR_IpAddrNull, 
-			       NSPR.sockets.PR_AF_INET, 
-			       port, addr.address());
-  
+    NSPR.sockets.PR_SetNetAddr(
+        NSPR.sockets.PR_IpAddrNull, 
+        NSPR.sockets.PR_AF_INET, 
+        port, 
+        addr.address());
+
     if (NSPR.sockets.PR_Connect(s, addr.address(), timeout) < 0)
-	return {error : "Error connecting: " + NSPR.errors.PR_GetError()};
+        return {error : "Error connecting: " + NSPR.errors.PR_GetError()};
 
     // ok
     return s;
@@ -37,22 +39,22 @@ socket.tcpOpenReceiveSocket = function(port, reuse) {
     var s = NSPR.sockets.PR_OpenTCPSocket(NSPR.sockets.PR_AF_INET);
     reuse = (reuse!==undefined ? reuse : false);
     if (reuse) {
-	var res = socket.setSocketOption(s,'reuseaddr',true); 
-	if (res.error) {
-	    return res;
-	}
-    }	
-  
+        var res = socket.setSocketOption(s,'reuseaddr',true); 
+        if (res.error) {
+            return res;
+        }
+    }   
+
     var addr = new NSPR.types.PRNetAddr();
     NSPR.sockets.PR_SetNetAddr(NSPR.sockets.PR_IpAddrAny, 
-			       NSPR.sockets.PR_AF_INET,
-			       port, addr.address());
+     NSPR.sockets.PR_AF_INET,
+     port, addr.address());
 
     if (NSPR.sockets.PR_Bind(s, addr.address()) != 0)
-	return {error: "Error binding: " + NSPR.errors.PR_GetError()};
+        return {error: "Error binding: " + NSPR.errors.PR_GetError()};
 
     if (NSPR.sockets.PR_Listen(s, 1) != 0)
-	return {error: "Error listening: " + NSPR.errors.PR_GetError()};
+        return {error: "Error listening: " + NSPR.errors.PR_GetError()};
 
     // ok
     return {};
@@ -67,26 +69,26 @@ socket.tcpOpenReceiveSocket = function(port, reuse) {
 socket.tcpAccept = function(s, timeout) {
     var to = NSPR.sockets.PR_INTERVAL_NO_WAIT;
     if (timeout && timeout < 0) {
-	to = NSPR.sockets.PR_NO_TIMEOUT;
+        to = NSPR.sockets.PR_NO_TIMEOUT;
     } else if (timeout && timeout > 0) {
-	to = NSPR.util.PR_MillisecondsToInterval(timeout);
+        to = NSPR.util.PR_MillisecondsToInterval(timeout);
     }
 
     var addr = new NSPR.types.PRNetAddr();
     var sin = NSPR.sockets.PR_Accept(s, 
-				     addr.address(), 
-				     to);
+       addr.address(), 
+       to);
 
     if (!sin.isNull()) {
-	// close the listening socket and replace the current listening socket
-	// with the incoming client socket
-	NSPR.sockets.PR_Close(s); 
-	worker.socket = sin;
+        // close the listening socket and replace the current listening socket
+        // with the incoming client socket
+        NSPR.sockets.PR_Close(s); 
+        worker.socket = sin;
 
-	var port = NSPR.util.PR_ntohs(addr.port);
-	var ip = NSPR.util.NetAddrToString(addr);
-	return {port : port, ip : ip};
+        var port = NSPR.util.PR_ntohs(addr.port);
+        var ip = NSPR.util.NetAddrToString(addr);
+        return {port : port, ip : ip};
     } else {
-	return {error : "got empty incoming socket"};
+        return {error : "got empty incoming socket"};
     }
 };
