@@ -306,7 +306,8 @@ NetGraph.prototype.addNode = function(newnode) {
     // check if we already know this node ?
     var node = _.find(that.nodes, function(n) {
         return ((n.ipv4!==undefined && n.ipv4 === newnode.ipv4) || 
-                (n.ipv6!=undefined && n.ipv6 === newnode.ipv6));
+                (n.ipv6!=undefined && n.ipv6 === newnode.ipv6) ||
+                (n.type === 'local' && newnode.ipv4 === '127.0.0.1'));
     });
 
     if (!node) {
