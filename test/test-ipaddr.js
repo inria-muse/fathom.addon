@@ -3,12 +3,14 @@ var _ = require('underscore');
 
 exports["testRangeMatch"] = function(assert) {
     var addr = ipaddr.parse("2001:db8:1234::1");
+    console.log(addr.range());
     var range = ipaddr.parse("2001:db8::");
 
     assert.ok(addr.match(range, 32), "matches");
 
 
     var addr2 = ipaddr.parse("128.93.62.141");
+    console.log(addr2.range());
     var range2 = ipaddr.parse("128.93.1.100");
 
     assert.ok(addr2.match(range2, 16), "matches");
