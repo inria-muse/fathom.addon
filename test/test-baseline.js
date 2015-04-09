@@ -19,8 +19,13 @@ exports["testnetworkfull"] = function(assert, done) {
 		baseline.getnetworkenv(function(res) {
 		    console.log(JSON.stringify(res));
 		    assert.ok(!res.error, "no error");
-		    baseline.stop();
-		    done();	
+			baseline.getnetworkenv(function(res) {
+			    console.log(JSON.stringify(res));
+			    assert.ok(!res.error, "no error");
+			    assert.ok(res.cached, "got cached on 2nd req");
+		    	baseline.stop();
+			    done();	
+			});
 		});
     },15);
 };
