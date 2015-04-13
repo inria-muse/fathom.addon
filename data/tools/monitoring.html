@@ -17,123 +17,102 @@
   
   <body>
     <div id="container">
+
       <div class="header">
         <h1><i class="fa fa-bar-chart"></i>&nbsp;Monitoring Graphs</h1>
-        <h2>Explore performance monitoring statistics over time</h2>
+        <h2>Explore background monitoring statistics over time</h2>
       </div>
 
       <div class="content">
 
-	<div class="center">
-	  <a id="lastday" class="pure-button pure-button-active" href="#">Last 24h</a>
-	  <a id="lastweek" class="pure-button" href="#void">Last 7 days</a>
-	  <a id="lastmonth" class="pure-button" href="#void">Last month</a>
-	  <a id="lastyear" class="pure-button" href="#void">Last year</a>
-	  <!--<a id="pageload" class="pure-button" href="#void">Top-K Pageloads</a>-->
+		<div class="center">
+		  <a id="lastday" class="pure-button pure-button-active" href="#">Last 24h</a>
+		  <a id="lastweek" class="pure-button" href="#void">Last 7 days</a>
+		  <a id="lastmonth" class="pure-button" href="#void">Last month</a>
+		  <a id="lastyear" class="pure-button" href="#void">Last year</a>
+		  <!--<a id="pageload" class="pure-button" href="#void">Top-K Pageloads</a>-->
 
-	  <p/>
+		  <p/>
 
-	  <div id="waitspin" class="spinner">
-	    <div class="rect1"></div>
-	    <div class="rect2"></div>
-	    <div class="rect3"></div>
-	    <div class="rect4"></div>
-	    <div class="rect5"></div>
-	  </div>
+		</div> <!-- center -->
 
-	</div> <!-- center -->
+		<h2 class="content-subhead center">Network Environments&nbsp;<a href="#void" id="toggleenv"><i class="fa fa-minus-square-o"></i></a></h2>
 
-	<div id="baselines">
+		<div id="env" class="center"> 
+		    <div id="info-env-default" class="highlightenv">
+		      <i class="fa fa-info-circle"></i>&nbsp;<i class="small">
+				Click on a point to see the network details
+			  </i>
+			</div>
+		    <div id="info-env" class="highlightenv"></div>
+		    <div id="chart-env"></div>
+		    <div id="legend-env" class="graph-legend"></div>
+		</div>
 
-	<h2 class="content-subhead">Network Environments</h2>
+		<h2 class="content-subhead center">Pageload Performance&nbsp;<a href="#void" id="togglepage"><i class="fa fa-minus-square-o"></i></a></h2>
 
-	<div class="pure-g">
-	  <div class="pure-u-3-5">
-	    <div id="chart-env"></div>
-	    <div id="legend-env" class="graph-legend"></div>
-	  </div>
-	  <div class="pure-u-2-5">
-	    <div id="info-env-default" class="highlight">
-	      <i class="fa fa-info-circle"></i>&nbsp;<i class="small">
-		Click on a point to see the network details
-	      </i>
-	    </div>
-	    <div id="info-env" class="highlight"></div>
-	  </div>
-	</div>
+		<div id="page" class="pure-g">
+		  <div class="pure-u-1-2">
+		    <h3 class="graph-head">Page Load Activity</h3>
+		    <div id="chart-pageload"></div>
+		    <div id="legend-pageload" class="graph-legend"></div>
+		  </div>
+		  <div class="pure-u-1-2">
+		    <h3 class="graph-head">Page Load Delays</h3>
+		    <div id="chart-pageload_delay"></div>
+		    <div id="legend-pageload_delay" class="graph-legend"></div>
+		  </div>
+		</div>
 
-	<h2 class="content-subhead">Pageload Performance</h2>
+		<h2 class="content-subhead center">Network Performance&nbsp;<a href="#void" id="togglenet"><i class="fa fa-minus-square-o"></i></a></h2>
 
-	<div class="pure-g">
-	  <div class="pure-u-1-2">
-	    <h3 class="graph-head">Page Load Activity</h3>
-	    <div id="chart-pageload"></div>
-	    <div id="legend-pageload" class="graph-legend"></div>
-	  </div>
-	  <div class="pure-u-1-2">
-	    <h3 class="graph-head">Page Load Delays</h3>
-	    <div id="chart-pageload_delay"></div>
-	    <div id="legend-pageload_delay" class="graph-legend"></div>
-	  </div>
-	</div>
+		<div id="net" class="pure-g">
+		  <div class="pure-u-1-2">
+		    <h3 class="graph-head">Network Delays</h3>
+		    <div id="chart-rtt"></div>
+		    <div id="legend-rtt" class="graph-legend"></div>
+		  </div>
+		  <div class="pure-u-1-2">
+		    <h3 class="graph-head">Network Cross-Traffic</h3>
+		    <div id="chart-traffic"></div>
+		    <div id="legend-traffic" class="graph-legend"></div>
+		  </div>
+		  <div class="pure-u-1-2">
+		    <h3 class="graph-head">Wireless Signal Quality</h3>
+		    <div id="chart-wifi"></div>
+		    <div id="legend-wifi" class="graph-legend"></div>
+		  </div>
+		</div>
 
-	<h2 class="content-subhead">Network Performance</h2>
+		<h2 class="content-subhead center">System Performance&nbsp;<a href="#void" id="togglesys"><i class="fa fa-minus-square-o"></i></a></h2>
 
-	<div class="pure-g">
-	  <div class="pure-u-1-2">
-	    <h3 class="graph-head">Network Cross-Traffic</h3>
-	    <div id="chart-traffic"></div>
-	    <div id="legend-traffic" class="graph-legend"></div>
-	  </div>
-	  <div class="pure-u-1-2">
-	    <h3 class="graph-head">Network Delays</h3>
-	    <div id="chart-rtt"></div>
-	    <div id="legend-rtt" class="graph-legend"></div>
-	  </div>
-	  <div class="pure-u-1-2">
-	    <h3 class="graph-head">Wireless Signal Strength</h3>
-	    <div id="chart-wifi"></div>
-	    <div id="legend-wifi" class="graph-legend"></div>
-	  </div>
-	  <div class="pure-u-1-2">
-	    <h3 class="graph-head">Wireless Link Quality</h3>
-	    <div id="chart-wifiq"></div>
-	    <div id="legend-wifiq" class="graph-legend"></div>
-	  </div>
-	</div>
+		<div id="sys" class="pure-g">
+		  <div class="pure-u-1-2">
+		    <h3 class="graph-head">CPU Utilization</h3>
+		    <div id="chart-cpu"></div>
+		    <div id="legend-cpu" class="graph-legend"></div>
+		  </div>
+		  <div class="pure-u-1-2">
+		    <h3 class="graph-head">CPU Load</h3>
+		    <div id="chart-load"></div>
+		    <div id="legend-load" class="graph-legend"></div>
+		  </div>
+		  <div class="pure-u-1-2">
+		    <h3 class="graph-head">Running Tasks</h3>
+		    <div id="chart-tasks"></div>
+		    <div id="legend-tasks" class="graph-legend"></div>
+		  </div>
+		  <div class="pure-u-1-2">
+		    <h3 class="graph-head">Memory Utilization</h3>
+		    <div id="chart-mem"></div>
+		    <div id="legend-mem" class="graph-legend"></div>
+		  </div>
+		</div>
 
-	<h2 class="content-subhead">System Performance</h2>
+		<!-- Note about upload prefs -->
+		<div id="upload" style="margin-top:50px;"></div>
 
-	<div class="pure-g">
-	  <div class="pure-u-1-2">
-	    <h3 class="graph-head">CPU Utilization</h3>
-	    <div id="chart-cpu"></div>
-	    <div id="legend-cpu" class="graph-legend"></div>
-	  </div>
-	  <div class="pure-u-1-2">
-	    <h3 class="graph-head">CPU Load</h3>
-	    <div id="chart-load"></div>
-	    <div id="legend-load" class="graph-legend"></div>
-	  </div>
-	  <div class="pure-u-1-2">
-	    <h3 class="graph-head">Running Tasks</h3>
-	    <div id="chart-tasks"></div>
-	    <div id="legend-tasks" class="graph-legend"></div>
-	  </div>
-	  <div class="pure-u-1-2">
-	    <h3 class="graph-head">Memory Utilization</h3>
-	    <div id="chart-mem"></div>
-	    <div id="legend-mem" class="graph-legend"></div>
-	  </div>
-	</div>
-	</div> <!-- baselines -->
-
-	
-
-	<!-- Note about upload prefs -->
-	<div id="upload" style="margin-top:50px;"></div>
-
-      </div> <!-- content -->
+	  </div> <!-- content -->
     </div> <!-- container -->
 
     <!-- Templates for rendered content -->
