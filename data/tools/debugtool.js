@@ -15,14 +15,15 @@
  /** Test status (maps to CSS classes used to render the UI). */
  const TESTSTATUS = {
     NOT_STARTED : 'test-not-running',
-    RUNNING : 'test-running',
-    SKIP : 'test-skip',
-    SUCCESS : 'test-success',
-    ERRORS : 'test-errors',
-    FAILURE : 'test-failure'
+    RUNNING :     'test-running',
+    SKIP :        'test-skip',
+    SUCCESS :     'test-success',
+    ERRORS :      'test-errors',
+    FAILURE :     'test-failure'
 };
 
 // measurement server IP (hosted server at online.net)
+// FIXME: should come from the extension (or defined runtime as closest mserver ... )
 const MSERVER = '62.210.73.169';
 
 // public DNS resolver (google resolver)
@@ -219,17 +220,17 @@ var TestSuites = Backbone.Collection.extend({
         shortname: 'conn2',
         help: "Checks if other than loopback interface is available. If the test fails, make sure your network interface is enabled, cables are connected and that you network router/gateway/modem/wifi access point is switched on.",
         'test-running-txt' : 'Checking network interfaces ...',
-        'test-success-txt' : 'Found network interface(s) with non-loopback address.',
+        'test-success-txt' : 'Found network interface(s) with non-loopback IP address.',
         'test-failure-txt' : 'Only the loopback interface is available.',
     });
     conntest2.exec = function(next, res) {
         var that = this;
         that.start();
-        var pass = _.filter(res, function(iface) {
+        var pass = _.filter(res, function(iface) {            
             if (iface.ipv4) {
-                return iface.ipv4!=='127.0.0.1';
+                return (ipaddr.IPv4.isValid(iface.ipv4) && ipaddr.parse(iface.ipv4).range() !=='loopback');
             } else if (iface.ipv6) {
-                return iface.ipv6!=='fe80::1';
+                return (ipaddr.IPv6.isValid(iface.ipv6) && ipaddr.parse(iface.ipv6).range() !=='loopback');
             } else {
                 // No IP address
                 return false;
@@ -258,15 +259,16 @@ var TestSuites = Backbone.Collection.extend({
         that.start();
         var pass = _.filter(res, function(iface) {
             if (iface.ipv4) {
-                // Anything starting with 169.254 is link-local
-                return iface.ipv4.indexOf('169.254')!==0;
+                var addr = (ipaddr.IPv4.isValid(iface.ipv4) ? ipaddr.parse(iface.ipv4) : undefined);
+                return (addr && (addr.range() === 'unicast' || addr.range() === 'private'));
             } else if (iface.ipv6) {
-                // Anything starting with fe80: is link-local
-                return iface.ipv6.indexOf('fe80:')!==0;
+                var addr = (ipaddr.IPv6.isValid(iface.ipv6) ? ipaddr.parse(iface.ipv6) : undefined);
+                return (addr && (addr.range() === 'unicast' || addr.range() === 'uniqueLocal' || addr.range() === 'ipv4Mapped'));
             } else {
-                return false; // should not happen, filtered out already
+                return false;
             }
         });
+
         if (pass.length>0) {
             that.end(TESTSTATUS.SUCCESS,pass);
             next(false,undefined);
@@ -316,12 +318,12 @@ var TestSuites = Backbone.Collection.extend({
     var dnstest2 = new Test({
         name: "DNS lookup with local resolver",
         shortname: 'dns2',
-        help: "Tries to resolve '"+HOST+"' IP address with your local DNS resolver. If the test fails, your local DNS resolver is not working correctly. You can try a public resolver such as '8.8.8.8' instead.",
+        help: "Resolves '"+HOST+"' IP address with your local DNS resolver using Fathom DNS implementation over UDP. If the test fails, your local DNS resolver may not be working correctly or UDP is blocked in your network.",
         'test-running-txt' : 'Resolving ' + HOST + '...',
         'test-skip-txt' : 'Skipped. No local DNS resolvers found.',
         'test-success-txt' : 'Resolution completed succesfully.',
         'test-failure-txt' : '"' + HOST + '" not found.',
-        'test-errors-txt' : 'Connection problem while trying to resolve the name.',                
+        'test-errors-txt' : 'Fathom had a problem while trying to resolve the name.',                
     });
     dnstest2.exec = function(next, res) {
         var that = this;
@@ -338,7 +340,7 @@ var TestSuites = Backbone.Collection.extend({
                         } else {
                             that.end(TESTSTATUS.SUCCESS,res3);
                         }
-                        next(false,undefined); // continue to next
+                        next(false,undefined); // continue to next in anycase
                     }, res2, HOST);
                 } else {
                     that.end(TESTSTATUS.ERRORS,res2);
@@ -351,38 +353,14 @@ var TestSuites = Backbone.Collection.extend({
         }
     };
 
-
-    var dnstest4 = new Test({
-        name: "DNS lookup with Firefox name lookup",
-        shortname: 'dns4',
-        help: "Tries to resolve '"+HOST+"' IP address with Firefox name lookup. If the test fails, your local DNS resolver is not working correctly. You can try a public resolver such as '8.8.8.8' instead.",
-        'test-running-txt' : 'Resolving ' + HOST + ' with Firefox...',
-        'test-success-txt' : 'Resolution completed succesfully.',
-        'test-failure-txt' : '"' + HOST + ' not found.'
-    });
-    dnstest4.exec = function(next, res) {
-        var that = this;
-        that.start();
-
-        fathom.tools.lookupHostname(function(res2) {
-            if (!res2.error) {
-                that.end(TESTSTATUS.SUCCESS,res2);
-                next(false,undefined);
-            } else {
-                that.end(TESTSTATUS.FAILURE,res2);
-                next(false,undefined);
-            }
-        }, HOST);
-    };
-
     var dnstest3 = new Test({
         name: "DNS lookup with public DNS resolver",
         shortname: 'dns3',
-        help: "Tries to resolve '"+HOST+"' IP address with a public DNS resolver '"+DNSSERVER+"'. If the test fails, something seems to be wrong with the public DNS service.",
-        'test-running-txt' : 'Resolving ' + HOST + ' with public DNS...',
+        help: "Tries to resolve '"+HOST+"' IP address with a public DNS resolver '"+DNSSERVER+"' using Fathom DNS implementation over UDP. If the test fails, the public DNS service may not be reachable or UDP is blocked in your network.",
+        'test-running-txt' : 'Resolving "' + HOST + '" with public DNS...',
         'test-success-txt' : 'Resolution completed succesfully.',
-        'test-failure-txt' : '"' + HOST + ' not found.',
-        'test-errors-txt' : 'Connection problem while trying to resolve the name.', 
+        'test-failure-txt' : '"' + HOST + '" not found.',
+        'test-errors-txt' : 'Fathom had a problem while trying to resolve the name.', 
     });
     dnstest3.exec = function(next, res) {
         var that = this;
@@ -406,10 +384,33 @@ var TestSuites = Backbone.Collection.extend({
         }, DNSSERVER, 'udp', 53);
     };
 
+    var dnstest4 = new Test({
+        name: "DNS lookup with Firefox name lookup",
+        shortname: 'dns4',
+        help: "Resolves '"+HOST+"' IP address with Firefox name lookup. If the test fails, your local DNS configuration is not correct.",
+        'test-running-txt' : 'Resolving "' + HOST + '" with Firefox...',
+        'test-success-txt' : 'Resolution completed succesfully.',
+        'test-failure-txt' : '"' + HOST + '" not found.'
+    });
+    dnstest4.exec = function(next, res) {
+        var that = this;
+        that.start();
+        fathom.tools.lookupHostname(function(res2) {
+            if (!res2.error && res2.answers && !_.isEmpty(res2.answers)) {
+                that.end(TESTSTATUS.SUCCESS,res2);
+                next(false,undefined);
+            } else {
+                that.end(TESTSTATUS.FAILURE,res2);
+                next(false,undefined);
+            }
+        }, HOST);
+    };
+
+
     addtest(testsuite2, dnstest1);
     addtest(testsuite2, dnstest2);
-    addtest(testsuite2, dnstest4); // running this first
     addtest(testsuite2, dnstest3);
+    addtest(testsuite2, dnstest4);
     testsuites.add(testsuite2);
 
     // ------------------------------------------
@@ -828,6 +829,6 @@ window.onload = function() {
                 elapsed : elapsed,
                 results : json
             });
-        });
-    });
+        }); // exec
+    }); // init
 };
