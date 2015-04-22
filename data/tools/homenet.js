@@ -70,35 +70,55 @@ var NetGraph = function(elem, clickevents, width) {
                     name = undefined;
             }
 
+            if (!name && n.raw['arp'] && n.raw['arp'].hostname)
+                name = n.raw['arp'].hostname;
+
+            if (!name && n.raw['devinfo'])
+                name = n.raw['devinfo'].company + ' Device';
+
             if (!name)
                 name = 'Network Device';
         }
-        return name;
+
+        // Make sure is capitalized
+        return name.charAt(0).toUpperCase() + name.slice(1);
+    };
+
+    var getHostname = function(n) {
+        var res = undefined;
+        if (n.type === 'local') {
+            res = n.raw['local'].hostname;
+        } else if (n.raw['mdns'] && n.raw['mdns'].hostname) {
+            res = n.raw['mdns'].hostname;
+        } else if (n.raw['arp'] && n.raw['arp'].hostname) {
+            res = n.raw['arp'].hostname;
+        }
+        return res;
     };
 
     var formatInfoStr = function(n) {
         var res = "<h5 class=\"upper\">"+getName(n)+"</h5><p><ul>";
+        var hn = getHostname(n);
+        if (hn)
+            res += "<li>Hostname: "+hn+"</li>";
+
         switch (n.type) {
         case 'local':    
-            res += "<li>Hostname: "+n.raw['local'].hostname+"</li>";
-            if (n.ipv4)
-                res += "<li>IP: "+n.ipv4+"</li>";
-            else if (n.ipv6)
-                res += "<li>IP: "+n.ipv6+"</li>";
-            break;
-
         case 'peer':    
-            if (n.ipv4)
-                res += "<li>IP: "+n.ipv4+"</li>";
-            else if (n.ipv6)
-                res += "<li>IP: "+n.ipv6+"</li>";
-            break;
-
         case 'gw':
             if (n.ipv4)
                 res += "<li>IP: "+n.ipv4+"</li>";
             else if (n.ipv6)
                 res += "<li>IP: "+n.ipv6+"</li>";
+
+            if (n.raw['arp'] && n.raw['arp'].mac)
+                res += "<li>Interface MAC: "+n.raw['arp'].mac+"</li>";
+            else if (n.raw['local'] && n.raw['local'].networkenv)
+                res += "<li>Interface MAC: "+n.raw['local'].networkenv.default_iface_mac+"</li>";
+
+            if (n.raw['devinfo'] && n.raw['devinfo'].company)
+                res += "<li>Interface Manufacturer: "+n.raw['devinfo'].company+"</li>";
+
             break;
 
         case 'internet':
@@ -282,11 +302,11 @@ var NetGraph = function(elem, clickevents, width) {
                 break;
 
             case 'peer':
-                return 'node ' + ((n.rpc ? 'rpc-' : '') + 'peer-node');
+                return 'node peer-node';
                 break;
 
             case 'gw':
-                return 'node ' + ((n.rpc ? 'rpc-' : '') + 'gw-node');
+                return 'node gw-node';
                 break;      
             default:
                 return 'node';
@@ -460,12 +480,17 @@ window.onload = function() {
 
     var utemplate = document.getElementById('uploadtemplate').innerHTML;
     Mustache.parse(utemplate);
-    fathom.internal(function(pref) {
-        var rendered = Mustache.render(
-            utemplate, 
-            {upload : (pref === 'always'), ready : false });
+    var renderu = function(params) {
+        var rendered = Mustache.render(utemplate, params);
         var e = document.getElementById('upload');
-        e.innerHTML = rendered;
+        e.innerHTML = rendered;        
+    };    
+
+    // check the upload prefs
+    fathom.internal(function(pref) {
+        if (pref !== 'askme') {
+            renderu({upload : (pref === 'always'), ready : false });
+        }
     }, 'getuserpref', 'homenetupload');
 
     fathom.init(function() {
@@ -473,10 +498,41 @@ window.onload = function() {
         var startts = window.performance.now();
 
         // FIXME: mobile flag + adjust width ?
-        var g = new NetGraph('#canvas', false, 600);
+        var g = new NetGraph('#canvas', false, 650);
 
-        // start the remote API for discovering other Fathoms
-        fathom.tools.remoteapi.start(function() {});
+        var done = function() {
+            var elapsed = (window.performance.now() - startts); // ms
+            $('#waitspin').hide();
+
+            // get raw data
+            var json = _.map(g.nodes, function(o) {
+                // remove UI related keys from the json data
+                return _.omit(o,
+                  "id",
+                  "index",
+                  "weight",
+                  "x",
+                  "y",
+                  "px",
+                  "py",
+                  "fixed");
+            });
+                    
+            fathom.internal(function(userok) {
+                renderu({upload : userok, ready : true});
+                $("#showdata").click(function() {
+                    var win = window.open("../rawdata.html");
+                    setTimeout(function() { win.json = json; },0);
+                });
+            }, 'upload', { 
+                ts : ts.getTime(),
+                timezoneoffset : ts.getTimezoneOffset(),
+                elapsed : elapsed,
+                results : json
+            }); // upload
+
+            setTimeout(function() { fathom.close(); }, 0);
+        };
 
         // local discovery
         fathom.tools.discovery(function(node) {
@@ -494,62 +550,42 @@ window.onload = function() {
                     return;
                 }
 
-                // all done
-                var elapsed = (window.performance.now() - startts); // ms
-                $('#waitspin').hide();
+                // get ArpCache and resolve MACs to manufacturers
+                fathom.system.getArpCache(function(res) {
+                    if (!res.error) {
+                        var pending = res.result.length;                        
+                       _.each(res.result, function(neigh) {
+                            var node = _.find(g.nodes, function(n) {
+                                return (n.ipv4!==undefined && n.ipv4 === neigh.address);
+                            });
 
-                // contains lots of duplicate info, strip down before upload
-                if (g.localnode && g.localnode.raw['fathom']) {
-                    g.localnode.raw['fathom'] = {
-                        "address" : g.localnode.raw['fathom'].address,
-                        "descriptor" : {
-                            "fathom_node_id" : g.localnode.raw['fathom'].descriptor.fathom_node_id
-                        }
-                    };
-                }
+                            if (node) {
+                                node.raw['arp'] = neigh;
 
-                // get raw data
-                var json = _.map(g.nodes, function(o) {
-                    // remove UI related keys from the json data
-                    return _.omit(o,
-                      "id",
-                      "index",
-                      "weight",
-                      "x",
-                      "y",
-                      "px",
-                      "py",
-                      "fixed");
+                                fathom.tools.lookupMAC(function(lookupres) {
+                                    console.log(lookupres);
+                                    if (lookupres && !lookupres.error) {
+                                        node.raw['devinfo'] = lookupres;
+                                    }
+
+                                    pending -= 1;
+                                    if (pending <= 0) {
+                                        done();
+                                    }
+                               }, neigh.mac);
+
+                            } else {
+                                pending -= 1;
+                                if (pending <= 0) {
+                                    done();
+                                }
+                            }
+                        });
+                    } else {
+                        done();
+                    }
                 });
-                        
-                // queue for upload
-                fathom.internal(function(userok) {
-                    // update the upload block
-                    var rendered = Mustache.render(
-                        utemplate, 
-                        {upload : userok, ready : true});
-                    var e = document.getElementById('upload');
-                    e.innerHTML = rendered;
-
-                    // enable the data link
-                    $("#showdata").click(function() {
-                        var win = window.open("../rawdata.html");
-                        win.json = json;
-                    });
-
-                    // stop using the extension
-                    fathom.tools.remoteapi.stop(function() {});
-                    fathom.close();
-                    
-                }, 'upload', { 
-                    ts : ts.getTime(),
-                    timezoneoffset : ts.getTimezoneOffset(),
-                    elapsed : elapsed,
-                    results : json
-                }); // upload
-                
-            }, 10, ['ping','mdns','upnp','fathom']); // disc other networking protos
-        }, 5, ['local','internet','route']); // disc local stuff
+            }, 10, ['ping','mdns','upnp']);  // disc using networking protos
+        }, 5, ['local','internet','route']); // disc based on local info
     }); // init
 }; // onload
-

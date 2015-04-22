@@ -5,7 +5,7 @@
     "description": "A Browser-based Network Measurement Platform",
     "author": "MUSE Inria Paris-Rocquencourt <muse.fathom@inria.fr> (https://team.inria.fr/muse/)",
     "license": "MIT",
-    "version": "2.0.21",
+    "version": "2.0.21-dev", 
     "contributors": "Anna-Kaisa Pietilainen, Stéphane Archer, Renata Teixeira, Christian Kreibich, Mohan Dhawan, Justin Samuel, Nick Weaver, Mark Allman, Vern Paxson",
     "homepage": "https://muse.inria.fr/fathom",
     "icon": "data/icons/icon-80.png",
@@ -15,14 +15,21 @@
     },
     "dependencies": ["underscore","ipaddr","ieee754","base64-js","buffer","buffercursor","subprocess","addon-sdk"],
     "preferences": [
-    	{
+        {
+            "type": "control",
+            "label": "Show",
+            "name": "welcome",
+            "title": "About Fathom",
+            "description" : "Show the 'Welcome to Fathom' page where you can find more information about Fathom and the various settings."
+        },
+        {
             "name": "enablefathomapi",
             "type": "bool",
             "title": "Enable Fathom for Regular Web Pages",
             "description" : "Enable Fathom APIs for any regular web page. Fathom will always ask your approval before a page can access any of the Fathom features. If you disable Fathom, web pages will not know that Fathom is installed. The built-in Fathom tools remain always available.",
             "value": true
-	   },
-	   {
+	    },
+	    {
             "name": "debugtoolupload",
             "type": "radio",
             "title": "Share 'Debug My Connection' Tool Reports",
@@ -66,14 +73,14 @@
             "type": "bool",
             "name": "enablebaseline",
             "value": true,
-            "title": "Enable Background Performance Monitoring of Your System and Network Connection",
-	        "description" : "Allow Fathom to collect system and network peformance metrics periodically on the background."
+            "title": "Enable Performance Monitoring of Your System and Network Connections",
+	        "description" : "Allow Fathom to system collect and network peformance metrics periodically on the background."
     	},
     	{
             "name": "baselineupload",
             "type": "radio",
-            "title": "Share Background Monitoring Performance Reports",
-            "description" : "Allow uploading of background monitoring reports to our secure servers for network research. No data is shared with third parties.",
+            "title": "Share Performance Monitoring Reports",
+            "description" : "Allow uploading of performance monitoring reports to our secure servers for network research. No data is shared with third parties.",
             "value": "always",
             "options": [
     		{
@@ -89,7 +96,7 @@
             "type": "bool",
             "name": "enablepageload",
             "value": true,
-            "title": "Enable Background Performance Monitoring of Page Load Times",
+            "title": "Enable Performance Monitoring of Page Load Times",
     	    "description" : "Allow Fathom to monitor the page load times of visited web pages."
     	},
     	{

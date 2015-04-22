@@ -20,42 +20,40 @@
       <h1><i class="fa fa-home"></i>&nbsp;Homenet Discovery</h1>
       <h2>Find out about devices connected to your local network</h2>
     </div>
-
-    <!-- the canvas -->
     <div class="content">
       <div class="center">
         <div id="waitspin">
           Looking for devices&nbsp;<i class="fa fa-cog fa-spin"></i>
         </div>
-
         <div id="canvas"></div>
+        </br>
+        <button class="pure-button pure-button-primary button-small" onclick="location.reload();">
+          <i class="fa fa-refresh"></i> Run Again
+        </button>
+      </div> <!-- center -->
+      <div id="upload"></div>
+    </div> <!-- content -->
+  </div> <!-- container -->
 
-        <button class="pure-button pure-button-primary" 
-        onclick="location.reload();">
-        <i class="fa fa-refresh"></i> Run Again
-      </button>
-    </div> <!-- center -->
 
-    <div id="upload" class="content"></div>
+  <!-- Template for data upload disclaimer -->
+  <script id="uploadtemplate" type="x-tmpl-mustache">
+    <blockquote>
+      <i class="small">
+        {{#upload}}<span class="allow">Thanks! You are contributing these measurement results for Internet research.</span>{{/upload}}
+        {{^upload}}<span class="disallow">You have chosen not to contribute these measurement results for Internet research. Please consider contributing!</span> <br/>Change your preferences at <b>Menu -> Addons -> Fathom</b>.{{/upload}}
+        {{#ready}} <a href="#void" id="showdata" class="pure-button button-xsmall">See raw data <i class="fa fa-external-link"></i></a>{{/ready}}
+      </i>
+    </blockquote>
+  </script>
 
-  </div> <!-- content -->
-</div> <!-- container -->
-
-<!-- Template for data upload disclaimer -->
-<script id="uploadtemplate" type="x-tmpl-mustache">
-<blockquote>
-<i class="small">
-You have {{#upload}}<span class="allow">allowed</span>{{/upload}}{{^upload}}<span class="disallow">disallowed</span>{{/upload}} the sharing of the results from this tool. {{#ready}}<a href="#void" id="showdata"><i class="fa fa-external-link"></i> See the data!</a>{{/ready}}</i>
-</blockquote>
-</script>
-
-<!-- UI library scripts -->
-<script src="../extscripts/ipaddr.min.js"></script>
-<script src="../extscripts/jquery.min.js"></script>
-<script src="../extscripts/underscore-min.js"></script>
-<script src="../extscripts/d3.v3.min.js"></script>
-<script src="../extscripts/mustache.js"></script>
-<!-- main test script -->
-<script src="./homenet.js"></script>
+  <!-- libs -->
+  <script src="../extscripts/ipaddr.min.js"></script>
+  <script src="../extscripts/jquery.min.js"></script>
+  <script src="../extscripts/underscore-min.js"></script>
+  <script src="../extscripts/d3.v3.min.js"></script>
+  <script src="../extscripts/mustache.js"></script>
+  <!-- main test script -->
+  <script src="./homenet.js"></script>
 </body>
 </html>

@@ -16,13 +16,13 @@
 const ylabels = {
     'cpu' :     'utilization',
     'load' :    'load',
-    'tasks' :   'count',
+    'tasks' :   'number of tasks',
     'mem' :     'bytes',
     'traffic' : 'bit/s',
     'wifi' :    'quality',
-    'rtt' :     'ms',
-    'pageload' :'count',
-    'pageload_delay' :'ms'
+    'rtt' :     'delay (ms)',
+    'pageload' :'number of events',
+    'pageload_delay' :'delay (ms)'
 };
 
 // map metric group to series and their labels
@@ -135,73 +135,73 @@ var drawchart = function(metric, range, data) {
 	    // filter away non range values
 	    return (d['date']>=xrange[0] && d['date']<=xrange[1]);
 	});
+
 	// add zeroes to hide gaps
 	var res = [];
 	var prev = undefined;
 	var lim = 2*xrange[2]*1000; // twice the measurement iv (ms)
 	_.each(tmp, function(v) {
 	    if (prev && (v['date'].getTime()-prev['date'].getTime()) > lim) {
-		// gap
-		res.push({ 
-		    date : new Date(prev['date'].getTime()+1000*xrange[2]/2),
-		    value : null,
-		    missing : true,
-		    metric : prev['metric']});
-		res.push({ 
-		    date : new Date(v['date'].getTime()-1000*xrange[2]/2),
-		    value : null,
-		    missing : true,
-		    metric : prev['metric']});
-	    }
-	    res.push(v);
-	    prev = v;
-	});
-	return res;
+			// gap
+			res.push({ 
+			    date : new Date(prev['date'].getTime()+1000*xrange[2]/2),
+			    value : null,
+			    missing : true,
+			    metric : prev['metric']});
+			res.push({ 
+			    date : new Date(v['date'].getTime()-1000*xrange[2]/2),
+			    value : null,
+			    missing : true,
+			    metric : prev['metric']});
+		    }
+		    res.push(v);
+		    prev = v;
+		});
+		return res;
     });
 
     if (linedata.length <= 0 || linedata[0].length <= 0)
-	return;
+		return;
 
     var isdelay = (metric === 'rtt' || metric === 'pageload_delay');
 
     var min_y = undefined;
     var max_y = undefined;
     if (metric === 'rtt') {
-	min_y = 0.1;
-	max_y = 10000;
+		min_y = 0.1;
+		max_y = 10000;
     } else if (metric === 'pageload_delay') {
-	min_y = 1;
-	max_y = 30000;
-    }
-	
+		min_y = 1;
+		max_y = 30000;
+    }	
 
     MG.data_graphic({
-	width: $('#chart-'+metric).width(),
-	height: $('#chart-'+metric).width()/1.61,
-	left: 80,
-	right: 5,
-	top: 20,
-	bottom: (range==='year' ? 30 : 20),
-	target: '#chart-'+metric,
-	data: linedata,
-	x_accessor: 'date',
-	y_accessor: 'value',
-	min_x: xrange[0],
-	max_x: xrange[1],
-	interpolate : 'linear',
-	missing_is_undefined : true,
-	min_y: min_y,
-	max_y: max_y,
-	y_autoscale: !isdelay,
-	y_scale_type: (isdelay ? 'log' : 'linear'),
-	format: ((metric === 'cpu' || metric === 'wifiq') ? 'percentage' : 'count'),
-	area: false,
-	y_label: ylabels[metric],
-	y_extended_ticks: true,
-	show_secondary_x_label : (range==='year'),
-	legend : lines,
-	legend_target : '#legend-'+metric,
-	aggregate_rollover: true
+		width: $('#chart-'+metric).width(),
+		height: $('#chart-'+metric).width()/1.61,
+		left: 80,
+		right: 5,
+		top: 20,
+		bottom: (range==='year' ? 30 : 20),
+		target: '#chart-'+metric,
+		data: linedata,
+		x_accessor: 'date',
+		y_accessor: 'value',
+		min_x: xrange[0],
+		max_x: xrange[1],
+		interpolate : 'linear',
+		missing_is_undefined : true,
+		min_y: min_y,
+		max_y: max_y,
+		y_autoscale: !isdelay,
+		y_scale_type: (isdelay ? 'log' : 'linear'),
+		format: ((metric === 'cpu' || metric === 'wifiq') ? 'percentage' : 'count'),
+		area: false,
+		y_label: ylabels[metric],
+		y_extended_ticks: true,
+		show_secondary_x_label : (range==='year'),
+		legend : lines,
+		legend_target : '#legend-'+metric,
+		aggregate_rollover: true
     });
 };
 
@@ -265,8 +265,10 @@ var drawenvchart = function(range, data) {
     // info box template, set the default text visible
     var infotemplate = document.getElementById('envinfotemplate').innerHTML;
     Mustache.parse(infotemplate);
-    $('#info-env-default').show();
     $('#info-env').hide();
+
+    var formatter = d3.time.format('%Y-%m-%d %X');
+
 
     MG.data_graphic({
 		data: datainrange,
@@ -294,10 +296,13 @@ var drawenvchart = function(range, data) {
 		show_rollover_text: false,
 		mouseclick: function(d, i) {
 		    if (i>0 && d && d.point) {
+		    	d.point.datefmt = formatter(d.point.date);
 				$('#info-env').html(
 				    Mustache.render(
 					infotemplate, 
 					d.point));
+				var chartloc = $('#chart-env').offset();
+				$('#info-env').css({ top: (chartloc.top+d[0][1]-20) + 'px', left: (chartloc.left+d[0][0]+10) + 'px' });
 
 				$('#userlabel-input').hide();
 				$('#userlabel-input-error').hide();
@@ -351,7 +356,6 @@ var drawenvchart = function(range, data) {
 				});
 		    }
 
-		    $('#info-env-default').toggle();
 		    $('#info-env').toggle();
 		}
     });
@@ -359,7 +363,6 @@ var drawenvchart = function(range, data) {
 
 /** Get baseline data for the range and (re-)draw graphs. */
 var loadgraphs = function(range) {    
-    $('#info-env-default').hide();
     $('#info-env').hide();
 
 	// make visible for rendering
@@ -388,8 +391,7 @@ var loadgraphs = function(range) {
 
     fathom.internal(function(prefs) {
 		var rendered = Mustache.render(
-		    utemplate, 
-		    {
+		    utemplate, {
 				upload : (prefs[0] === 'always'),
 				uploadpl : (prefs[1] === 'always')
 		    });
@@ -398,104 +400,117 @@ var loadgraphs = function(range) {
 
 		$("#showdata").click(function() {
 		    fathom.internal(function(json) {
-			var win = window.open("../rawdata.html");
-			win.json = json;
+				var win = window.open("../rawdata.html");
+				setTimeout(function() { win.json = json; }, 0);
 		    },'getjson',['baseline']);
 		});
 
 		$("#showdatapl").click(function() {
 		    fathom.internal(function(json) {
-			var win = window.open("../rawdata.html");
-			win.json = json;
+				var win = window.open("../rawdata.html");
+				setTimeout(function() { win.json = json; }, 0);
 		    },'getjson',['pageload']);
 		});
 
     }, 'getuserpref', ['baselineupload','pageloadupload']);
 
-    var error = function(err) {
-		console.error(err);
-		fathom.close();
-		return;
-    };
-
-    // get the baselines
     fathom.init(function() {
-		fathom.baseline.getEnv(function(res) {
-		    if (res.error) 
-				return error(res.error);
-		    if (!res.data || res.data.length < 1)
-				return error('not enough baseline env data');
+	    var error = function(err) {
+			console.error(err);
+			fathom.close();
+			return;
+	    };
 
-		    drawenvchart(range, res.data);
+    	fathom.system.getOS(function(os) {
+    		// available wifi metrics depend on OS
+    		if (os === 'linux' || os === 'android' || os === 'darwin')
+    			ylabels['wifi'] = 'quality (dBm)'; // signal + noise lines
+    		else
+    			ylabels['wifi'] = 'quality (%)'; // quality
 
-		    fathom.baseline.get(function(res) {				
-				if (res.error) 
-				    return error(res.error);
-				if (!res.data || res.data.length < 2) 
-				    return error('not enough baseline measurement data');
+			fathom.baseline.getEnv(function(res) {
+			    if (res.error) 
+					return error(res.error);
+			    if (!res.data || res.data.length < 1)
+					return error('not enough baseline env data');
 
-				fathom.close();
+				// plot environment timeline
+			    drawenvchart(range, res.data);
 
-				_.each(_.keys(linelabels), function(metric) {
-				    var flatres = [];
-				    var tmp = { tx : -1, rx : -1, txts : undefined, rxts : undefined };
+			    // get baselines
+			    fathom.baseline.get(function(res) {				
+					if (res.error) 
+					    return error(res.error);
+					if (!res.data || res.data.length < 2) 
+					    return error('not enough baseline measurement data');
 
-				    _.each(res.data, function(sample) {
-						_.each(linelabels[metric], function(stitle,sname) {
-						    if (!sample[sname]) return; // ignore empty vals
+					fathom.close();
 
-						    var obj = {
-								date : new Date(sample.ts),
-								value : sample[sname],
-								metric : sname
-						    };
+					_.each(_.keys(linelabels), function(metric) {
+					    var flatres = [];
+					    var tmp = { tx : -1, rx : -1, txts : undefined, rxts : undefined };
 
-						    if (metric == 'cpu')
-								obj.value = obj.value/100.0;
+					    _.each(res.data, function(sample) {
+							_.each(linelabels[metric], function(stitle,sname) {
+							    if (!sample[sname]) return; // ignore empty vals
 
-						    if (metric == 'traffic' && sname == 'tx') {
-								if (tmp.txts && sample.ts-tmp.txts>0) {
-								    // average cross-traffic bit/s
-								    obj.value = ((sample[sname] - tmp.tx)*8.0)/(sample.ts - tmp.txts);
-								} else {
-								    obj = undefined;
+							    var obj = {
+									date : new Date(sample.ts),
+									value : sample[sname],
+									metric : sname
+							    };
+
+							    if (metric == 'cpu')
+									obj.value = obj.value/100.0;
+
+								if (metric == 'traffic') {
+									// calculate difference to prev sample
+								    if (sname == 'tx') {
+										if (tmp.txts && sample.ts-tmp.txts>0) {
+										    // average cross-traffic bit/s
+										    if (sample[sname] - tmp.tx > 0)
+											    obj.value = ((sample[sname] - tmp.tx)*8.0)/(sample.ts - tmp.txts);
+											else
+												obj.value = sample[sname]; // counter wrapped around
+										} else {
+										    obj = undefined;
+										}
+										tmp.tx = sample[sname];
+										tmp.txts = sample.ts;
+
+								    } else if (sname == 'rx') {
+										if (tmp.rxts && sample.ts-tmp.rxts>0) {
+										    // average cross-traffic bit/s
+										    if (sample[sname] - tmp.rx > 0)
+											    obj.value = ((sample[sname] - tmp.rx)*8.0)/(sample.ts - tmp.rxts);
+											else
+												obj.value = sample[sname]; // counter wrapped around											
+										} else {
+										    obj = undefined;
+										}
+										tmp.rx = sample[sname];
+										tmp.rxts = sample.ts;
+								    }
 								}
-								tmp.tx = sample[sname];
-								tmp.txts = sample.ts;
-						    }
+							    if (obj)
+									flatres.push(obj);
+							});
+					    });
 
-						    if (metric == 'traffic' && sname == 'rx') {
-								if (tmp.rxts && sample.ts-tmp.rxts>0) {
-								    // average cross-traffic bit/s
-								    obj.value = ((sample[sname] - tmp.rx)*8.0)/(sample.ts - tmp.rxts);
-								} else {
-								    obj = undefined;
-								}
-								tmp.rx = sample[sname];
-								tmp.rxts = sample.ts;
-						    }
+					    flatres = _.groupBy(flatres, 'metric');
+					    setTimeout(drawchart,0,metric,range,flatres);
+					}); // each metric group
 
-						    if (metric == 'wifi') {
-						    	return; // FIXME
-						    }
-
-						    if (obj)
-								flatres.push(obj);
-						});
-				    });
-
-				    flatres = _.groupBy(flatres, 'metric');
-				    setTimeout(drawchart,0,metric,range,flatres);
-				});
-				setTimeout(function() {
-					// hide sys graphs by default
-					$('#togglesys').children('.fa').removeClass('fa-minus-square-o');
-					$('#togglesys').children('.fa').addClass('fa-plus-square-o');
-					$('#sys').hide();
-				},0);
-		    }, range, ['cpu','load','tasks','mem','traffic','wifi','rtt','pageload','pageload_delay']); // getMetrics
-		}, range); // getEnv
-    });
+					setTimeout(function() {
+						// hide sys graphs by default
+						$('#togglesys').children('.fa').removeClass('fa-minus-square-o');
+						$('#togglesys').children('.fa').addClass('fa-plus-square-o');
+						$('#sys').hide();
+					},0);					
+			    }, range, ['cpu','load','tasks','mem','traffic','wifi','rtt','pageload','pageload_delay']); // getMetrics
+			}, range); // getEnv
+	    }); // getOS
+    }); // init
 };
 
 $(window).load(function() {

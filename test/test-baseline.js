@@ -33,6 +33,7 @@ exports["testnetworkfull"] = function(assert, done) {
 exports["testmeasurements"] = function(assert, done) {
     baseline.domeasurements(function(res) {
 		console.log(JSON.stringify(res, null, 4));
+		console.log(JSON.stringify(res.rtt, null, 4));
 		assert.ok(!res.error, "no error");
 		done();	
     });

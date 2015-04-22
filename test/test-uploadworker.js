@@ -23,15 +23,13 @@ exports["testWorker"] = function(assert, done) {
     };
 
     var obj = { 'url' : 'http://localhost:3001',
-		'data' : [
-		    { 
+		'data' : [{ 
 			'collection' : 'test',
 			'uuid' : 'foobar',
 			'objectid' : 1,
 			'values' : [1,2,3,4]
-	            }
-		]
-	      };
+	        }]
+	};
 
     uploadworker.postMessage(JSON.stringify(obj));
 };

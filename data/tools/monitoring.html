@@ -30,20 +30,11 @@
 		  <a id="lastweek" class="pure-button" href="#void">Last 7 days</a>
 		  <a id="lastmonth" class="pure-button" href="#void">Last month</a>
 		  <a id="lastyear" class="pure-button" href="#void">Last year</a>
-		  <!--<a id="pageload" class="pure-button" href="#void">Top-K Pageloads</a>-->
-
-		  <p/>
-
 		</div> <!-- center -->
 
 		<h2 class="content-subhead center">Network Environments&nbsp;<a href="#void" id="toggleenv"><i class="fa fa-minus-square-o"></i></a></h2>
 
 		<div id="env" class="center"> 
-		    <div id="info-env-default" class="highlightenv">
-		      <i class="fa fa-info-circle"></i>&nbsp;<i class="small">
-				Click on a point to see the network details
-			  </i>
-			</div>
 		    <div id="info-env" class="highlightenv"></div>
 		    <div id="chart-env"></div>
 		    <div id="legend-env" class="graph-legend"></div>
@@ -115,19 +106,35 @@
 	  </div> <!-- content -->
     </div> <!-- container -->
 
-    <!-- Templates for rendered content -->
-    <script id="uploadtemplate" type="x-tmpl-mustache">
-      <blockquote>
-	<i class="small">
-	You have {{#upload}}<span class="allow">allowed</span>{{/upload}}{{^upload}}<span class="disallow">disallowed</span>{{/upload}} the sharing of the background system performance measurement results. <a href="#void" id="showdata"><i class="fa fa-external-link"></i> See the data!</a></i><br/>
-	<i class="small">
-	You have {{#uploadpl}}<span class="allow">allowed</span>{{/uploadpl}}{{^uploadpl}}<span class="disallow">disallowed</span>{{/uploadpl}} the sharing of the background pageload performance results. <a href="#void" id="showdatapl"><i class="fa fa-external-link"></i> See the data!</a></i>
-      </blockquote>
-    </script>
+  <!-- Template for data upload disclaimer -->
+  <script id="uploadtemplate" type="x-tmpl-mustache">
+    <blockquote>
+      <i class="small">
+        {{#upload}}
+        <span class="allow">You are contributing baseline system measurement results for Internet research.</span>
+        {{/upload}}
+        {{^upload}}
+        <span class="disallow">You have chosen not to contribute baseline system measurement results for Internet research. Please consider contributing!</span>
+        {{/upload}}
+        <br/>
+        {{#uploadpl}}
+        <span class="allow">You are contributing page load measurement results for Internet research.</span>
+        {{/uploadpl}}
+        {{^uploadpl}}
+        <span class="disallow">You have chosen not to contribute page load measurement results for Internet research. Please consider contributing!</span>
+        {{/uploadpl}}
+        <br/>Change your upload preferences at <b>Menu -> Addons -> Fathom</b>.
+        <br/>
+        <a href="#void" id="showdata" class="pure-button button-xsmall">See example baseline data <i class="fa fa-external-link"></i></a>
+        <a href="#void" id="showdatapl" class="pure-button button-xsmall">See example page load data <i class="fa fa-external-link"></i></a>
 
-    <script id="envinfotemplate" type="x-tmpl-mustache">
+      </i>
+    </blockquote>
+  </script>
+
+  <script id="envinfotemplate" type="x-tmpl-mustache">
 	<div id="userlabel-text">
-	  <strong id="userlabel-s">{{env}}</strong>
+	  <span id="userlabel-s" class="envname">{{env}}</span>
 	  &nbsp;
 	  <a href="#void" id="userlabel-edit"><i class="fa fa-edit"></i></a>
 	</div>
@@ -141,20 +148,24 @@
 	    <a href="#void" id="userlabel-cancel"><i class="fa fa-close"></i></a>
 	  </form>
 	</div>
-	<ul style="list-style: none; padding:0px; margin:0px">
-	  {{#ssid}}<li>WiFi: {{ssid}}</li>{{/ssid}}
-	  <li>Gateway: {{gateway_ip}}</li>
-	  <li>ISP: {{isp}}</li>
-	  <li>Location: {{city}}, {{country}}</li>
+	<ul>
+	  <li><span class="envkey">Time</span> <span class="envvalue">{{datefmt}}</span></li>
+	  {{#ssid}}
+	  <li><span class="envkey">WiFi</span> <span class="envvalue"> {{ssid}}</span></li>
+	  {{/ssid}}
+	  <li><span class="envkey">Gateway</span> <span class="envvalue"> {{gateway_ip}}</span></li>
+	  <li><span class="envkey">ISP</span> <span class="envvalue"> {{isp}}</span></li>
+	  <li><span class="envkey">Location</span> <span class="envvalue"> {{#city}}{{city}},{{/city}} {{country}}</span></li>
 	</ul>
-    </script>
+  </script>
     
-    <!-- UI library scripts -->
-    <script src="../extscripts/jquery.min.js"></script>
-    <script src="../extscripts/underscore-min.js"></script>
-    <script src="../extscripts/d3.v3.min.js"></script>
-    <script src="../extscripts/metricsgraphics.min.js"></script>
-    <script src="../extscripts/mustache.js"></script>
-    <script src="./monitoring.js"></script>
-  </body>
+  <!-- libs -->
+  <script src="../extscripts/jquery.min.js"></script>
+  <script src="../extscripts/underscore-min.js"></script>
+  <script src="../extscripts/d3.v3.min.js"></script>
+  <script src="../extscripts/metricsgraphics.min.js"></script>
+  <script src="../extscripts/mustache.js"></script>
+  <!-- main tool script -->
+  <script src="./monitoring.js"></script>
+</body>
 </html>

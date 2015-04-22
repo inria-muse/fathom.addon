@@ -37,18 +37,18 @@ var Test = Backbone.Model.extend({
     defaults: {
         id: -1,
         status: TESTSTATUS.NOT_STARTED,
-        statustxt: "Not started yet.",
+        statustxt: "waiting ...",
         isrunning: false,
         starttime: undefined, // start called
         endtime: undefined,   // succ/fail called
         name: '',             
         shortname: '',
         help: '',
-        'test-running-txt' :     'Executing ...',
-        'test-skip-txt' :        'Skipped.',
-        'test-success-txt' :     'Success!',
-        'test-errors-txt' :      'Errors encountered during the test. This may indicate a problem.',
-        'test-failure-txt' :     'Failed.',
+        'test-running-txt' :     'executing ...',
+        'test-skip-txt' :        'skipped',
+        'test-success-txt' :     'success',
+        'test-errors-txt' :      'errors encountered during the test',
+        'test-failure-txt' :     'failed',
         json : undefined      // test results to upload
     },
     initialize: function() {
@@ -196,9 +196,9 @@ var TestSuites = Backbone.Collection.extend({
         name: "Network interface availability",
         shortname: 'conn1',
         help: "Checks if you have active network interfaces. If the test fails, make sure your network interface is enabled, cables are connected and that you network router/gateway/modem/wifi access point is switched on.",
-        'test-running-txt' : 'Retrieving available network interfaces ...',
-        'test-success-txt' : 'Found network interface(s).',
-        'test-failure-txt' : 'No network interfaces found.',
+        'test-running-txt' : 'retrieving available network interfaces ...',
+        'test-success-txt' : 'found network interface(s)',
+        'test-failure-txt' : 'bo network interfaces found',
     });
 
     conntest1.exec = function(next) {
@@ -219,9 +219,9 @@ var TestSuites = Backbone.Collection.extend({
         name: "Network interface type",
         shortname: 'conn2',
         help: "Checks if other than loopback interface is available. If the test fails, make sure your network interface is enabled, cables are connected and that you network router/gateway/modem/wifi access point is switched on.",
-        'test-running-txt' : 'Checking network interfaces ...',
-        'test-success-txt' : 'Found network interface(s) with non-loopback IP address.',
-        'test-failure-txt' : 'Only the loopback interface is available.',
+        'test-running-txt' : 'checking network interfaces ...',
+        'test-success-txt' : 'found network interface(s) with non-loopback IP address',
+        'test-failure-txt' : 'only the loopback interface is available',
     });
     conntest2.exec = function(next, res) {
         var that = this;
@@ -250,9 +250,9 @@ var TestSuites = Backbone.Collection.extend({
         name: "Network interface configuration",
         shortname: 'conn3',
         help: "Checks if there are interfaces with valid IP address available. If the test fails, most likely your gateway/router/modem/wifi access point does not provide you an IP address. Check both your local and the gateway's configurations.",
-        'test-running-txt' : 'Checking network interface(s) configuration ...',
-        'test-success-txt' : 'Found network interface(s) with valid address.',
-        'test-failure-txt' : 'All interface(s) have link-local address.',
+        'test-running-txt' : 'checking network interface(s) configuration ...',
+        'test-success-txt' : 'found network interface(s) with valid address',
+        'test-failure-txt' : 'all interface(s) have link-local address',
     });
     conntest3.exec = function(next, res) {
         var that = this;
@@ -294,9 +294,9 @@ var TestSuites = Backbone.Collection.extend({
         name: "DNS resolver configuration",
         shortname: 'dns1',
         help: "Checks if there are configured DNS resolvers. If this test has erros, most likely your gateway/router/modem/wifi access point does not provide you a valid DNS configuration. Check both your local and the gateway's configurations.",
-        'test-running-txt' : 'Retrieving DNS configuration ...',
-        'test-success-txt' : 'Found local DNS resolver(s).',
-        'test-errors-txt' : 'No local DNS resolver(s) found.',        
+        'test-running-txt' : 'retrieving DNS configuration ...',
+        'test-success-txt' : 'found local DNS resolver(s)',
+        'test-errors-txt' : 'no local DNS resolver(s) found',        
     });
     dnstest1.exec = function(next, res) {
         var that = this;
@@ -319,11 +319,11 @@ var TestSuites = Backbone.Collection.extend({
         name: "DNS lookup with local resolver",
         shortname: 'dns2',
         help: "Resolves '"+HOST+"' IP address with your local DNS resolver using Fathom DNS implementation over UDP. If the test fails, your local DNS resolver may not be working correctly or UDP is blocked in your network.",
-        'test-running-txt' : 'Resolving ' + HOST + '...',
-        'test-skip-txt' : 'Skipped. No local DNS resolvers found.',
-        'test-success-txt' : 'Resolution completed succesfully.',
-        'test-failure-txt' : '"' + HOST + '" not found.',
-        'test-errors-txt' : 'Fathom had a problem while trying to resolve the name.',                
+        'test-running-txt' : 'resolving ' + HOST + '...',
+        'test-skip-txt' : 'skipped - no local DNS resolvers found',
+        'test-success-txt' : 'resolution completed succesfully',
+        'test-failure-txt' : '"' + HOST + '" not found',
+        'test-errors-txt' : 'fathom had a problem while trying to resolve the name',                
     });
     dnstest2.exec = function(next, res) {
         var that = this;
@@ -357,10 +357,10 @@ var TestSuites = Backbone.Collection.extend({
         name: "DNS lookup with public DNS resolver",
         shortname: 'dns3',
         help: "Tries to resolve '"+HOST+"' IP address with a public DNS resolver '"+DNSSERVER+"' using Fathom DNS implementation over UDP. If the test fails, the public DNS service may not be reachable or UDP is blocked in your network.",
-        'test-running-txt' : 'Resolving "' + HOST + '" with public DNS...',
-        'test-success-txt' : 'Resolution completed succesfully.',
-        'test-failure-txt' : '"' + HOST + '" not found.',
-        'test-errors-txt' : 'Fathom had a problem while trying to resolve the name.', 
+        'test-running-txt' : 'resolving "' + HOST + '" with public DNS ...',
+        'test-success-txt' : 'resolution completed succesfully',
+        'test-failure-txt' : '"' + HOST + '" not found',
+        'test-errors-txt' : 'fathom had a problem while trying to resolve the name', 
     });
     dnstest3.exec = function(next, res) {
         var that = this;
@@ -388,9 +388,9 @@ var TestSuites = Backbone.Collection.extend({
         name: "DNS lookup with Firefox name lookup",
         shortname: 'dns4',
         help: "Resolves '"+HOST+"' IP address with Firefox name lookup. If the test fails, your local DNS configuration is not correct.",
-        'test-running-txt' : 'Resolving "' + HOST + '" with Firefox...',
-        'test-success-txt' : 'Resolution completed succesfully.',
-        'test-failure-txt' : '"' + HOST + '" not found.'
+        'test-running-txt' : 'resolving "' + HOST + '" with Firefox...',
+        'test-success-txt' : 'resolution completed succesfully',
+        'test-failure-txt' : '"' + HOST + '" not found'
     });
     dnstest4.exec = function(next, res) {
         var that = this;
@@ -424,10 +424,10 @@ var TestSuites = Backbone.Collection.extend({
         name: "Default gateway and routes",
         shortname: 'net1',
         help: "Checks your network route configuration. If this test fails, check your network configuration. If it has errors, some of the network traffic may not be routed correctly.",
-        'test-running-txt' : "Retrieving the route configuration ...",
-        'test-success-txt' : 'Found default gateway and route(s).',
-        'test-errors-txt' : 'No default gateway or route(s) found.',
-        'test-failure-txt' : 'No route(s) found.'
+        'test-running-txt' : "retrieving the route configuration ...",
+        'test-success-txt' : 'found default gateway and route(s)',
+        'test-errors-txt' : 'no default gateway or route(s) found',
+        'test-failure-txt' : 'no route(s) found'
     });
     nettest1.exec = function(next) {
         var that = this;
@@ -450,10 +450,10 @@ var TestSuites = Backbone.Collection.extend({
         name: "Default gateway reachability",
         shortname: 'net2',
         help: "Checks if we can reach (ping) the default gateway. If the test has errors, this may just be a problem with ping (e.g. the gateway does not support pinging).",
-        'test-running-txt' : "Trying to reach the default gateway ...",
-        'test-success-txt' : 'Got a response from the default gateway.',
-        'test-errors-txt' : 'No response from the default gateway.',
-        'test-skip-txt' : 'Skipped. Could not detect the default gateway.'
+        'test-running-txt' : "trying to reach the default gateway ...",
+        'test-success-txt' : 'got a response from the default gateway',
+        'test-errors-txt' : 'no response from the default gateway',
+        'test-skip-txt' : 'skipped - could not detect the default gateway'
     });
     nettest2.exec = function(next,res) {
         var that = this;
@@ -480,9 +480,9 @@ var TestSuites = Backbone.Collection.extend({
         name: "Internet reachability",
         shortname: 'net3',
         help: "Checks if we can reach (ping) a test server in the internet. If the test has errors, this may just be a problem with ping (e.g. the network blocks ping traffic or the server is temporarily down).",
-        'test-running-txt' : "Trying to reach the test server ...",
-        'test-success-txt' : 'Got a response from the test server.',
-        'test-errors-txt' : 'No response from the test server.'
+        'test-running-txt' : "trying to reach the test server ...",
+        'test-success-txt' : 'got a response from the test server',
+        'test-errors-txt' : 'no response from the test server'
     });
     nettest3.exec = function(next, res) {
         var that = this;
@@ -501,9 +501,9 @@ var TestSuites = Backbone.Collection.extend({
         name: "Internet reachability ("+HOST+")",
         shortname: 'net4',
         help: "Check if we can reach (ping) \""+HOST+"\". If the test has errors, this may just be a problem with ping (e.g. the network blocks ping traffic or the server is temporarily down).",
-        'test-running-txt' : "Trying to reach \""+HOST+"\" ...",
-        'test-success-txt' : 'Got a response from "'+HOST+'".',
-        'test-errors-txt' : 'No response from "'+HOST+'".'
+        'test-running-txt' : "trying to reach \""+HOST+"\" ...",
+        'test-success-txt' : 'got a response from "'+HOST+'"',
+        'test-errors-txt' : 'no response from "'+HOST+'"'
     });
     nettest4.exec = function(next, res) {
         var that = this;
@@ -535,10 +535,10 @@ var TestSuites = Backbone.Collection.extend({
         name: "HTTP page load from the test server",
         shortname: 'http1',
         help: "Checks if we can retrieve a web page from a test server. If the test has errors, this may indicate a problem with your network connection. If it fails, the test server may be temporarily down.",
-        'test-running-txt' : 'Retrieving a web page from the test server ...',
-        'test-success-txt' : 'HTTP download from test server succeeded.',
-        'test-errors-txt' : 'Connection problem while trying to download from the test server.', 
-        'test-failure-txt' : 'HTTP download from test server failed.'
+        'test-running-txt' : 'retrieving a web page from the test server ...',
+        'test-success-txt' : 'HTTP download from test server succeeded',
+        'test-errors-txt' : 'connection problem while trying to download from the test server', 
+        'test-failure-txt' : 'HTTP download from test server failed'
     });
     httptest1.exec = function(next,res) {
         var that = this;
@@ -559,10 +559,10 @@ var TestSuites = Backbone.Collection.extend({
         name: 'HTTP page load ('+HOST+')',
         shortname: 'http2',
         help: 'Checks if we can retrieve a web page from "'+HOST+'". If the has errors, this may indicate a problem with your network connection. If it fails, "'+HOST+'" may be temporarily down.',
-        'test-running-txt' : 'Retrieving http://'+HOST+'/ ...',
-        'test-success-txt' : 'HTTP download from "'+HOST+'" succeeded.',
-        'test-errors-txt' : 'Connection problem while trying to download from "'+HOST+'".', 
-        'test-failure-txt' : 'HTTP download from "'+HOST+'" failed.'
+        'test-running-txt' : 'retrieving http://'+HOST+'/ ...',
+        'test-success-txt' : 'HTTP download from "'+HOST+'" succeeded',
+        'test-errors-txt' : 'connection problem while trying to download from "'+HOST+'"', 
+        'test-failure-txt' : 'HTTP download from "'+HOST+'" failed'
     });
     httptest2.exec = function(next,res) {
         var that = this;
@@ -602,10 +602,10 @@ var TestSuites = Backbone.Collection.extend({
             name: "Hostname lookup",
             shortname: 'dns',
             help: "Checks if we can resolve IP address of the host. If this test fails, you don't see the page because its IP address could not be found.",
-            'test-running-txt' : 'Resolving ' + l.hostname + '...',
-            'test-success-txt' : 'Resolution completed succesfully.',
-            'test-failure-txt' : '"' + l.hostname + '" not found.',
-            'test-errors-txt' : 'Connection problem while trying to resolve the name.'
+            'test-running-txt' : 'resolving ' + l.hostname + '...',
+            'test-success-txt' : 'resolution completed succesfully',
+            'test-failure-txt' : '"' + l.hostname + '" not found',
+            'test-errors-txt' : 'connection problem while trying to resolve the name'
         });
 
         test1.exec = function(next,res) {
@@ -650,9 +650,9 @@ var TestSuites = Backbone.Collection.extend({
             name: "Server reachability",
             shortname: 'network',
             help: "Checks if we can reach (ping) the server. If the test has errors, the server may be temporarily down or does not respond to pings.",
-            'test-running-txt' : "Trying to reach \""+l.hostname+"\" ...",
-            'test-success-txt' : 'Got a response from "'+l.hostname+'".',
-            'test-errors-txt' : 'No response from "'+l.hostname+'".'                
+            'test-running-txt' : "trying to reach \""+l.hostname+"\" ...",
+            'test-success-txt' : 'got a response from "'+l.hostname+'"',
+            'test-errors-txt' : 'no response from "'+l.hostname+'"'                
         });
 
         test2.exec = function(next,res) {
@@ -685,10 +685,10 @@ var TestSuites = Backbone.Collection.extend({
             name: "Download page",
             shortname: 'http',
             help: "Checks if we can download the page.",
-            'test-running-txt' : 'Retrieving http://'+url+'/ ...',
-            'test-success-txt' : 'HTTP download from "'+url+'" succeeded.',
-            'test-errors-txt' : 'Connection problem while trying to download from "'+url+'".', 
-            'test-failure-txt' : 'HTTP download from "'+url+'" failed.'
+            'test-running-txt' : 'retrieving http://'+url+'/ ...',
+            'test-success-txt' : 'HTTP download from "'+url+'" succeeded',
+            'test-errors-txt' : 'connection problem while trying to download from "'+url+'"', 
+            'test-failure-txt' : 'HTTP download from "'+url+'" failed'
         });
         test3.exec = function(next,res) {
             var that = this;
@@ -784,14 +784,20 @@ window.onload = function() {
     if (!fathom)
         throw "Fathom not found";
 
+    // note about data contribution status + link to raw data
     var utemplate = document.getElementById('uploadtemplate').innerHTML;
     Mustache.parse(utemplate);
-    fathom.internal(function(pref) {
-        var rendered = Mustache.render(
-            utemplate, 
-            {upload : (pref === 'always'), ready : false });
+    var renderu = function(params) {
+        var rendered = Mustache.render(utemplate, params);
         var e = document.getElementById('upload');
-        e.innerHTML = rendered;
+        e.innerHTML = rendered;        
+    };
+
+    // check the upload prefs
+    fathom.internal(function(pref) {
+        if (pref !== 'askme') {
+            renderu({upload : (pref === 'always'), ready : false });
+        }
     }, 'getuserpref', 'debugtoolupload');
 
     fathom.init(function() {
@@ -800,35 +806,25 @@ window.onload = function() {
 
         var ts = new Date(); // starttime
         var startts = window.performance.now();
+
         testsuites.exec(function(obj) {
             var elapsed = (window.performance.now() - startts); // ms
-
-            // get raw data
             var json = testsuites.toUploadJSON();
-
-            // queue for upload
             fathom.internal(function(userok) {
-                // update the upload block
-                var rendered = Mustache.render(
-                    utemplate, 
-                    {upload : userok, ready : true});
-                var e = document.getElementById('upload');
-                e.innerHTML = rendered;
-
-                // enable the data link
+                // update the upload block and handler for raw data link
+                renderu({upload : userok, ready : true});
                 $("#showdata").click(function() {
                     var win = window.open("../rawdata.html");
                     win.json = json;
                 });
-
-                fathom.close();
-
             }, 'upload', { 
                 ts : ts.getTime(),
                 timezoneoffset : ts.getTimezoneOffset(),
                 elapsed : elapsed,
                 results : json
             });
+
+            fathom.close();
         }); // exec
     }); // init
-};
+}; // onload

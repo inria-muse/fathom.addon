@@ -16,16 +16,21 @@
 if (typeof self !== "undefined" && self.options.enableperf) {
     var ts = new Date();
     setTimeout(function() {
-	self.port.emit('perf', { 
-	    ts : ts.getTime(),
-	    timezoneoffset : ts.getTimezoneOffset(),
-	    performance: window.performance,
-	    https : (window.location.protocol === 'https:'),
-	    http : (window.location.protocol === 'http:'),
-	    location: {
-		origin : window.location.origin,
-		host : window.location.host
-	    }
-	});
+    	var obj = { 
+		    ts : ts.getTime(),
+		    timezoneoffset : ts.getTimezoneOffset(),
+		    performance: {
+		    	navigation : window.performance.navigation,
+		    	timing : window.performance.timing,		    
+		    	resourcetiming : window.performance.getEntries()
+		    },
+			protocol : window.location.protocol.replace(':',''),
+		    location: {
+				host : window.location.host,
+				origin : window.location.origin,
+				name : window.location.pathname
+		    }
+		}
+		self.port.emit('perf', obj);
     }, 250);
 }
