@@ -82,10 +82,26 @@ sys.doPing = function(callback, host, opt, incrementaloutput) {
  * call completes. On error contains "error" member.
  * @param {string} hop - The hop (0 == localhost, 1 == default gateway, etc) to ping.
  * @param {object} opt - Optional parameters (count, iface, interval, bcast).
+ * @param {string} dst - The destination towards which the route is resolved (optional).
  * @param {boolean} incrementaloutput - Send incremental output (optional - default false).
  */
-sys.doPingToHop = function(callback, hop, opt, incrementaloutput) {
-    makereq(callback, "system","doPing", [hop,opt], incrementaloutput);
+sys.doPingToHop = function(callback, hop, opt, dst, incrementaloutput) {
+    makereq(callback, "system","doPingToHop", [hop,opt,dst], incrementaloutput);
+};
+
+/** 
+ * @description This function emulates traceroute using ping (for platforms that do
+ * not have traceroute or when UDP is blocked).
+ *
+ * @param {function} callback - The callback Fathom invokes once the
+ * call completes. On error contains "error" member.
+ * @param {string} host  - The host (name or IP/IPv6 address) to run a
+ * ping traceroute to.
+ * @param {object} opt - Optional parameters (count, iface, interval, timeout).
+ * @param {boolean} incrementaloutput - Send incremental output (optional - default false).
+ */
+sys.doPingTr = function(callback, host, opt, incrementaloutput) {
+    makereq(callback, "system","doPingTr", [host,opt], incrementaloutput);
 };
 
 /** 
@@ -1491,6 +1507,13 @@ iperf.stop = function(callback, id) {
 };
 
 /**
+ * @description Do we have Internet connectivity ?
+ */
+tools.isConnected = function(callback) {
+    makereq(callback, "tools", "isConnected", []);
+};
+
+/**
  * @description  This function gets a certificate chain information for 
  * the specified uri.
  *
@@ -1529,8 +1552,9 @@ tools.lookupHostname = function(callback, hostname) {
     makereq(callback, "tools", "lookupHostname", [hostname]);
 };
 
+
 /**
- * @description device manufacturer lookup based on the MAC address. 
+ * @description Device manufacturer lookup based on the MAC address. 
  * @param {string} mac The mac addres.
  * @access private
  */
@@ -1549,27 +1573,17 @@ tools.lookupIP = function(callback) {
 tools.lookupIP.addononly = true;
 
 /**
- * @description Get this node description (as send out in response to
- *              Fathom discovery queries). Static node info + current
- *              active interfaces + network env.
- * @access private
- */
-tools.getDesc = function(callback) {
-    makereq(callback, "tools", "getDesc", []);
-};
-tools.getDesc.addononly = true;
-
-/**
- * @description Do full network neighbour search (uses any available
- *              means to discover devices in the local network).
+ * @description Do network neighbour discovery.
  * @access private
  * @param {number} timeout - Time to wait devices (in seconds).
- * @param {Array} protocols - List of discovery protocols.
+ * @param {Array} protocols - List of discovery protocols, valid values: 'local', 'route', 'internet', 'upnp', 'mdns', 'ping', 'arptable'.
  */
 tools.discovery = function(callback, timeout, protocols) {
     makereq(callback, "tools", "discovery", [timeout, protocols]);
 };
 tools.discovery.addononly = true;
+
+
 
 /**
  * @description Fathom remote API implementation. Includes discovery and

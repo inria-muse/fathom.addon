@@ -66,15 +66,13 @@ var NetGraph = function(elem, clickevents, width) {
 
             if (!name && n.raw['ping'] && n.raw['ping'].arp && n.raw['ping'].arp.hostname) {
                 name = n.raw['ping'].arp.hostname;
-                if (name === '?')
-                    name = undefined;
             }
 
-            if (!name && n.raw['arp'] && n.raw['arp'].hostname)
-                name = n.raw['arp'].hostname;
+            if (!name && n.raw['arptable'] && n.raw['arptable'].hostname)
+                name = n.raw['arptable'].hostname;
 
-            if (!name && n.raw['devinfo'])
-                name = n.raw['devinfo'].company + ' Device';
+            if (!name && n.raw['arptable'] && n.raw['arptable'].devinfo)
+                name = n.raw['arptable'].devinfo.company + ' Device';
 
             if (!name)
                 name = 'Network Device';
@@ -90,8 +88,8 @@ var NetGraph = function(elem, clickevents, width) {
             res = n.raw['local'].hostname;
         } else if (n.raw['mdns'] && n.raw['mdns'].hostname) {
             res = n.raw['mdns'].hostname;
-        } else if (n.raw['arp'] && n.raw['arp'].hostname) {
-            res = n.raw['arp'].hostname;
+        } else if (n.raw['arptable'] && n.raw['arptable'].hostname) {
+            res = n.raw['arptable'].hostname;
         }
         return res;
     };
@@ -108,16 +106,17 @@ var NetGraph = function(elem, clickevents, width) {
         case 'gw':
             if (n.ipv4)
                 res += "<li>IP: "+n.ipv4+"</li>";
-            else if (n.ipv6)
-                res += "<li>IP: "+n.ipv6+"</li>";
+            if (n.ipv6)
+                res += "<li>IPv6: "+n.ipv6+"</li>";
 
-            if (n.raw['arp'] && n.raw['arp'].mac)
-                res += "<li>Interface MAC: "+n.raw['arp'].mac+"</li>";
+            if (n.raw['arptable'] && n.raw['arptable'].mac)
+                res += "<li>Interface MAC: "+n.raw['arptable'].mac+"</li>";
+            
             else if (n.raw['local'] && n.raw['local'].networkenv)
                 res += "<li>Interface MAC: "+n.raw['local'].networkenv.default_iface_mac+"</li>";
 
-            if (n.raw['devinfo'] && n.raw['devinfo'].company)
-                res += "<li>Interface Manufacturer: "+n.raw['devinfo'].company+"</li>";
+            if (n.raw['arptable'] && n.raw['arptable'].devinfo && n.raw['arptable'].devinfo.company)
+                res += "<li>Interface Manufacturer: "+n.raw['arptable'].devinfo.company+"</li>";
 
             break;
 
@@ -359,7 +358,6 @@ NetGraph.prototype.addNode = function(newnode) {
         case 'local':
             // override previous (mdns/upnp/fathom) info with local
             node.type = 'local';
-            node.rpc = node.rpc || newnode.rpc;
             node.reachable = node.reachable || newnode.reachable;
             node.raw = _.extend(node.raw, newnode.raw);
             that.localnode = node;
@@ -367,14 +365,12 @@ NetGraph.prototype.addNode = function(newnode) {
 
         case 'gw':
             node.type = 'gw'; // peer turns into gw
-            node.rpc = node.rpc || newnode.rpc;
             node.reachable = node.reachable || newnode.reachable;
             node.raw = _.extend(node.raw, newnode.raw);
             break;
 
         case 'peer':
             // keep original type
-            node.rpc = node.rpc || newnode.rpc;
             node.reachable = node.reachable || newnode.reachable;
             node.raw = _.extend(node.raw, newnode.raw);
             break;
@@ -500,6 +496,15 @@ window.onload = function() {
         // FIXME: mobile flag + adjust width ?
         var g = new NetGraph('#canvas', false, 650);
 
+        var handlenode = function(node) {
+            if (node && node.type) {
+                g.addNode(node);
+                g.redraw();
+                return true;
+            }
+            return false;
+        };
+
         var done = function() {
             var elapsed = (window.performance.now() - startts); // ms
             $('#waitspin').hide();
@@ -531,61 +536,28 @@ window.onload = function() {
                 results : json
             }); // upload
 
-            setTimeout(function() { fathom.close(); }, 0);
+            setTimeout(function() {
+                fathom.close();
+            }, 0)
         };
 
         // local discovery
         fathom.tools.discovery(function(node) {
-            if (node && node.type) {
-                g.addNode(node);
-                g.redraw();
-                return;
-            }
+            // keep handling nodes until done
+            if (handlenode(node)) return;
 
             // local stuff done, do more discovery
             fathom.tools.discovery(function(node) {
-                if (node && node.type) {
-                    g.addNode(node);
-                    g.redraw();
-                    return;
-                }
+                // keep handling nodes until done
+                if (handlenode(node)) return;
 
-                // get ArpCache and resolve MACs to manufacturers
-                fathom.system.getArpCache(function(res) {
-                    if (!res.error) {
-                        var pending = res.result.length;                        
-                       _.each(res.result, function(neigh) {
-                            var node = _.find(g.nodes, function(n) {
-                                return (n.ipv4!==undefined && n.ipv4 === neigh.address);
-                            });
-
-                            if (node) {
-                                node.raw['arp'] = neigh;
-
-                                fathom.tools.lookupMAC(function(lookupres) {
-                                    console.log(lookupres);
-                                    if (lookupres && !lookupres.error) {
-                                        node.raw['devinfo'] = lookupres;
-                                    }
-
-                                    pending -= 1;
-                                    if (pending <= 0) {
-                                        done();
-                                    }
-                               }, neigh.mac);
-
-                            } else {
-                                pending -= 1;
-                                if (pending <= 0) {
-                                    done();
-                                }
-                            }
-                        });
-                    } else {
-                        done();
-                    }
-                });
-            }, 10, ['ping','mdns','upnp']);  // disc using networking protos
-        }, 5, ['local','internet','route']); // disc based on local info
+                // neigh protos done, get the arptable (should be well populated by now)
+                fathom.tools.discovery(function(node) {
+                    // keep handling nodes until done
+                    if (handlenode(node)) return;
+                    setTimeout(done, 0);
+                },3,['arptable']);
+            },7,['ping','mdns','upnp']);
+        },5,['local','internet','route']);
     }); // init
 }; // onload

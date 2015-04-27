@@ -7,6 +7,13 @@ var manifest = {
     neighbors : {}
 };
 
+exports["testisconnected"] = function(assert, done) {
+    tools.exec(function(res) {
+		assert.ok(res, 'connected');
+		done();
+    }, { method : 'isConnected'});
+};
+
 exports["testlookupmyip"] = function(assert, done) {
     tools.exec(function(res) {
 		console.log(res);
@@ -68,15 +75,6 @@ exports["testlookuphostname"] = function(assert, done) {
 		done();
     }, { method : 'lookupHostname',
 	 params : ['muse.inria.fr']});
-};
-
-exports["testgetdesc"] = function(assert, done) {
-    tools.exec(function(res) {
-		console.log(res);
-		assert.ok(res.error === undefined, "getDesc no error");	
-		done();
-    }, { method : 'getDesc',
-	 params : []});
 };
 
 exports["testdisclocal"] = function(assert, done) {
@@ -145,6 +143,17 @@ exports["testdiscupnp"] = function(assert, done) {
 	 params : [10,['upnp']]}, {neighbors : {}});
 };
 
+exports["testdiscarptable"] = function(assert, done) {
+    tools.exec(function(res,dflag) {
+		console.log(res);
+		if (!dflag)
+		    assert.ok(res.raw['arptable'], "correct raw results");	
+		else
+		    done();
+    }, { method : 'discovery',
+	 params : [10,['arptable']]}, {neighbors : {}});
+};
+
 exports["testdiscall"] = function(assert, done) {
     tools.exec(function(res,dflag) {
 		console.log(res);
@@ -155,6 +164,8 @@ exports["testdiscall"] = function(assert, done) {
     }, { method : 'discovery',
 	 params : [10, undefined]}, {neighbors : {}});
 };
+
+
 
 exports["teststartstop"] = function(assert, done) {
     tools.exec(function(res) {

@@ -8,18 +8,18 @@ exports["testWorker"] = function(assert, done) {
     uploadworker = new ChromeWorker(wscript);
 
     uploadworker.onerror = function(event) {
-	console.log("Uploadworker error: " + JSON.stringify(event));
-	uploadworker.terminate();
-	assert.ok(false, "upload fails");
-	done();
+		console.log("Uploadworker error: " + JSON.stringify(event));
+		uploadworker.terminate();
+		assert.ok(false, "upload fails");
+		done();
     };
 
     uploadworker.onmessage = function(event) {
-	console.log("msg: " + event.data);
-	var msg = JSON.parse(event.data);
-	uploadworker.terminate();
-	assert.ok(!msg.error, "uploaded");
-	done();
+		console.log("msg: " + event.data);
+		var msg = JSON.parse(event.data);
+		uploadworker.terminate();
+		assert.ok(!msg.error, "uploaded");
+		done();
     };
 
     var obj = { 'url' : 'http://localhost:3001',

@@ -17,7 +17,7 @@ exports["testxmlhttp1"] = function(assert, done) {
 	 	submodule : 'ping', 
 	 	method : 'start', 
 	 	params : ['62.210.73.169', { proto : 'xmlhttpreq', count : 5, reports : true}],
-	 	multiresponse : true
+	 	id : 1
     }, manifest);
 };
 
@@ -32,7 +32,7 @@ exports["testxmlhttp2"] = function(assert, done) {
 	 	submodule : 'ping', 
 	 	method : 'start', 
 	 	params : ['www.google.com', { proto : 'xmlhttpreq', count : 1}],
-	 	multiresponse : true
+	 	id : 1
     }, manifest);
 };
 
@@ -47,7 +47,7 @@ exports["testhttp1"] = function(assert, done) {
 	 	submodule : 'ping', 
 	 	method : 'start', 
 	 	params : ['62.210.73.169', { proto : 'http', count : 1}],
-	 	multiresponse : true
+	 	id : 1
     }, manifest);
 };
 
@@ -62,7 +62,7 @@ exports["testhttp2"] = function(assert, done) {
 	 	submodule : 'ping', 
 	 	method : 'start', 
 	 	params : ['62.210.73.169', { proto : 'http', count : 5, reports : true}],
-	 	multiresponse : true
+	 	id : 1
     }, manifest);
 };
 

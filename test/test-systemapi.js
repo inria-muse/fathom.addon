@@ -15,6 +15,16 @@ exports["testerror"] = function(assert, done) {
 	}, { method : 'foo'});
 };
 
+exports["testpingtr"] = function(assert, done) {
+	systemapi.exec(function(res, doneflag) {
+		console.log("test doPingTr",res);
+		assert.ok(!res.error, "doPingTr no error");
+		assert.ok(res.result.length > 0, "doPingTr hops");
+		if (doneflag)
+			done();
+	}, { method : 'doPingTr', params: ['muse.inria.fr']}, true);
+};
+
 exports["testpinglocal"] = function(assert, done) {
 	systemapi.exec(function(res, doneflag) {
 		console.log("test doPing",res);
