@@ -42,58 +42,48 @@ var getSize = function() {
     return [w,h];
 }
 
-/* Get the size of the element. */
-var getElemSize = function(e) {
-    var h = Math.max( e.clientHeight, 
-		      e.offsetHeight );
-    var w = Math.max( e.clientWidth, 
-		      e.offsetWidth );
-    return [w,h];
-}
-
 /** Addon requests the document size for re-sizing. */
 addon.port.on('resize', function() {
     var s = getSize();
     addon.port.emit('resize', {
-	width : s[0],
-	height : s[1]
+		width : s[0],
+		height : s[1]
     });
-});
-
-/** Fathom background measurements status, only used in the mainmenu.html. */
-addon.port.on('fathom', function(status) {
-    if (document.getElementById("fathomon") && !status) {
-	document.getElementById("fathomon").className = 
-	    "hidden";
-	document.getElementById("fathomoff").className = 
-	    "pure-menu-item pure-menu-selected";
-    } else if (document.getElementById("fathomon") && status) {
-	document.getElementById("fathomon").className = 
-	    "pure-menu-item";
-	document.getElementById("fathomoff").className = 
-	    "pure-menu-item hidden";
-    } // else just ignore
 });
 
 /** Render the template based on the received values. */
 addon.port.on("render", function(values) {
     if (typeof Mustache !== "undefined") {
-	var template = document.getElementById('rendertemplate').innerHTML;
-	Mustache.parse(template);
-	var rendered = Mustache.render(template, values);
+		var template = document.getElementById('rendertemplate').innerHTML;
+		Mustache.parse(template);
+		var rendered = Mustache.render(template, values);
 
-	var e = document.getElementById('rendertarget');
-	e.innerHTML = rendered;
+		var e = document.getElementById('rendertarget');
+		e.innerHTML = rendered;
 
-	// request resize the panel to fit the rendered content
-	var s = getSize();
-	addon.port.emit('resize', {
-	    width : s[0],
-	    height : s[1]
-	});
+		// request resize the panel to fit the rendered content
+		var s = getSize();
+		addon.port.emit('resize', {
+		    width : s[0],
+		    height : s[1]
+		});
     } else {
-	console.error("Did you forgot to include mustache.js?!");
+		console.error("Did you forgot to include mustache.js?!");
     }
+});
+
+/** Pageload stats for the current active tab (displayed in the menu). */
+addon.port.on("pageload", function(pl) {
+	var e = document.getElementById('pageload');
+	if (!pl.monitenabled) {
+		e.innerHTML = 'monitoring disabled';
+	} else if (pl.readyState === 'complete') {
+		e.innerHTML = pl.objects + ' objects in ' + pl.pageloadtime + ' ms';
+	} else if (pl.readyState === 'loading' || pl.readyState === 'interactive') {
+		e.innerHTML = 'page loading ...';
+	} else {
+		e.innerHTML = 'no page';
+	}
 });
 
 /** Request the panel to be closed. */
@@ -112,5 +102,3 @@ function emit(msg, noclose) {
     addon.port.emit('action', msg);
     if (!noclose) closeme();
 };
-
-

@@ -132,36 +132,32 @@
     </blockquote>
   </script>
 
-  <script id="envinfotemplate" type="x-tmpl-mustache">
-	<div id="userlabel-text">
-	  <span id="userlabel-s" class="envname">{{env}}</span>
-	  &nbsp;
-	  <a href="#void" id="userlabel-edit"><i class="fa fa-edit"></i></a>
-	</div>
-	<div id="userlabel-input">
-	  <div id="userlabel-input-error"></div>
-	  <form class="pure-form">
-	    <input id="userlabel-text-input" type="text" placeholder="{{env}}">
+  <script id="envtmpl" type="x-tmpl-mustache">
+	  <form id="env-input-{{env_id}}" class="pure-form">
+	    <input id="env-input-text-{{env_id}}" type="text" placeholder="{{env}}">
 	    &nbsp;
-	    <a href="#void" id="userlabel-save"><i class="fa fa-save"></i></a>
-	    &nbsp;
-	    <a href="#void" id="userlabel-cancel"><i class="fa fa-close"></i></a>
+	    <a href="#void" id="env-save-{{env_id}}"><i class="fa fa-save"></i></a>
+	    <a href="#void" id="env-cancel-{{env_id}}"><i class="fa fa-close"></i></a>
 	  </form>
+	  <span id="env-label-{{env_id}}">
+	    <a href="#void" class="env-popover" data-html="true" data-toggle="popover" data-trigger="click" 
+	       data-placement="top" title="{{env}}" 
+	       data-content="<ul>
+	  			{{#ssid}}<li>WiFi: {{ssid}}</li>{{/ssid}}
+	  			{{#gateway_ip}}<li>Gateway: {{gateway_ip}}</li>{{/gateway_ip}}
+	  			{{#isp}}<li>ISP: {{isp}}</li>{{/isp}}
+	  			{{#country}}<li>Location: {{#city}}{{city}},{{/city}} {{country}}</li>{{/country}}
+				</ul>">
+		   {{env}}&nbsp;<i class="fa fa-question-circle"></i>
+		</a><a href="#void" id="env-edit-{{env_id}}"><i class="fa fa-edit"></i></a> 
+	  </span>
 	</div>
-	<ul>
-	  <li><span class="envkey">Time</span> <span class="envvalue">{{datefmt}}</span></li>
-	  {{#ssid}}
-	  <li><span class="envkey">WiFi</span> <span class="envvalue"> {{ssid}}</span></li>
-	  {{/ssid}}
-	  <li><span class="envkey">Gateway</span> <span class="envvalue"> {{gateway_ip}}</span></li>
-	  <li><span class="envkey">ISP</span> <span class="envvalue"> {{isp}}</span></li>
-	  <li><span class="envkey">Location</span> <span class="envvalue"> {{#city}}{{city}},{{/city}} {{country}}</span></li>
-	</ul>
   </script>
     
   <!-- libs -->
   <script src="../extscripts/jquery.min.js"></script>
   <script src="../extscripts/underscore-min.js"></script>
+  <script src="../extscripts/bootstrap.plugins.min.js"></script>
   <script src="../extscripts/d3.v3.min.js"></script>
   <script src="../extscripts/metricsgraphics.min.js"></script>
   <script src="../extscripts/mustache.js"></script>

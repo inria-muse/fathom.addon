@@ -13,24 +13,27 @@
  *
  * @author Anna-Kaisa Pietilainen <anna-kaisa.pietilainen@inria.fr> 
  */
-if (typeof self !== "undefined" && self.options.enableperf) {
-    var ts = new Date();
-    setTimeout(function() {
-    	var obj = { 
-		    ts : ts.getTime(),
-		    timezoneoffset : ts.getTimezoneOffset(),
-		    performance: {
-		    	navigation : window.performance.navigation,
-		    	timing : window.performance.timing,		    
-		    	resourcetiming : window.performance.getEntries()
-		    },
-			protocol : window.location.protocol.replace(':',''),
-		    location: {
-				host : window.location.host,
-				origin : window.location.origin,
-				name : window.location.pathname
-		    }
-		}
-		self.port.emit('perf', obj);
-    }, 250);
-}
+ window.onload = function() {
+	if (typeof self !== "undefined" && self.options.enableperf) {
+	 	// delay slightly so we get the LoadEventEnd to the stats
+ 		setTimeout(function() {
+		    var ts = new Date();
+			var obj = { 
+			    ts : ts.getTime(),
+			    timezoneoffset : ts.getTimezoneOffset(),
+			    performance: {
+			    	navigation : window.performance.navigation,
+			    	timing : window.performance.timing,		    
+			    	resourcetiming : window.performance.getEntries()
+			    },
+				protocol : window.location.protocol.replace(':',''),
+			    location: {
+					host : window.location.host,
+					origin : window.location.origin,
+					name : window.location.pathname
+			    }
+			}
+			self.port.emit('perf', obj);
+		}, 10);
+ 	}
+};

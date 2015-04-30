@@ -207,16 +207,17 @@ var drawchart = function(metric, range, data) {
 
 /** environment timeline */
 var drawenvchart = function(range, data) {
+	// convert timestampts to date objects
+    data = _.map(data, function(d) {
+    	d.date = new Date(d.ts);
+    	return d;
+    });
     var xrange = getxrange(range);
     var datainrange = _.filter(data, function(d) {
-		var ts = new Date(d.ts);
-		return (ts>=xrange[0] && ts<=xrange[1]);
+		return (d.date>=xrange[0] && d.date<=xrange[1]);
     });
-    if (datainrange.length <= 0)
+    if (datainrange.length === 0)
 		return; // nothing to show
-
-    var idx = 0;
-    var envs = {};
 
     // add #num suffix to make labels unique
     var uniqlabel = function(label) {
@@ -236,12 +237,14 @@ var drawenvchart = function(range, data) {
 		return label;
     };
 
-    var ddata = _.map(datainrange, function(d) { 
+    var idx = 0;    // y-axis
+    var envs = {};  // env_id -> label+index
+    _.each(datainrange, function(d) { 
 		if (!envs[d.env_id]) {
 		    idx += 1;
 		    var e = { 
 				id : idx, 
-				l : 'Environment' + idx // name must be unique!
+				l : 'Environment ' + idx // name must be unique!
 		    };
 
 		    if (d.userlabel) {
@@ -255,45 +258,15 @@ var drawenvchart = function(range, data) {
 		    envs[d.env_id] = e;
 		}
 
-		// for the graphic
-		d.date = new Date(d.ts);
+		// update observation with y-axis coord + env label
 		d.y = envs[d.env_id].id;
 		d.env = envs[d.env_id].l;
+		envs[d.env_id].d = d;
 		return d;
     });
 
-    // info box template, set the default text visible
-    var infotemplate = document.getElementById('envinfotemplate').innerHTML;
-    Mustache.parse(infotemplate);
-    $('#info-env').hide();
-
+/*
     var formatter = d3.time.format('%Y-%m-%d %X');
-
-
-    MG.data_graphic({
-		data: datainrange,
-		chart_type: 'point',
-		width: $('#chart-env').width(),
-		height: 5*_.size(envs)+100,
-		left: 20,
-		right: 5,
-		top: 50,
-		bottom: (range==='year' ? 30 : 20),
-		target: '#chart-env',
-		min_y: 1,
-		max_y: _.size(envs),
-		min_x: xrange[0],
-		max_x: xrange[1],
-		color_range : ["#8a89a6", "#6b486b", "#d0743c", "#98abc5", "#7b6888", "#a05d56", "#ff8c00"],
-		x_accessor: 'date',
-		y_accessor: 'y',
-	        y_axis: false,
-		color_accessor:'env',
-		color_type:'category',
-		show_secondary_x_label : (range==='year'),
-		legend : _.uniq(_.pluck(envs, 'l')),
-		legend_target : '#legend-env',
-		show_rollover_text: false,
 		mouseclick: function(d, i) {
 		    if (i>0 && d && d.point) {
 		    	d.point.datefmt = formatter(d.point.date);
@@ -358,6 +331,113 @@ var drawenvchart = function(range, data) {
 
 		    $('#info-env').toggle();
 		}
+*/
+
+	var fmt;
+    switch(range) {
+        case 'day':
+            fmt = d3.time.format('%b %e, %Y  %H:%M:%S');
+            break;
+        case 'week':
+            fmt = d3.time.format('%b %e, %Y  %I:%M%p');
+            break;
+        default:
+            fmt = d3.time.format('%b %e, %Y');
+    }
+
+    MG.data_graphic({
+		data: datainrange,
+		chart_type: 'point',
+		width: $('#chart-env').width(),
+		height: 5*_.size(envs)+100,
+		left: 20,
+		right: 5,
+		top: 50,
+		bottom: (range==='year' ? 30 : 20),
+		target: '#chart-env',
+		min_y: 1,
+		max_y: _.size(envs),
+		min_x: xrange[0],
+		max_x: xrange[1],
+		color_range : ["#8a89a6", "#6b486b", "#d0743c", "#98abc5", "#7b6888", "#a05d56", "#ff8c00"],
+		x_accessor: 'date',
+		y_accessor: 'y',
+	    y_axis: false,
+		color_accessor:'env',
+		color_type:'category',
+		show_secondary_x_label : (range==='year'),
+		legend : _.pluck(envs, 'l'),
+		legend_target : '#legend-env',
+		mouseover: function(d, i) {
+            d3.select('svg .mg-active-datapoint')
+                .text(fmt(d.point.date)+ ' ' + d.point.env);
+		}
+    });
+
+    // add edit and infopopover to the legend
+    var envtmpl = document.getElementById('envtmpl').innerHTML;
+    Mustache.parse(envtmpl);
+
+    $('#legend-env > span').each(function() {
+    	var that = $(this);
+    	var name = that.text().substring(1).trim();
+    	var env = _.find(envs, function(e,env_id) {
+    		return (e.l === name);
+    	});
+
+    	that.html(Mustache.render(envtmpl,env.d));
+
+	    $('#env-input-'+env.d.env_id).hide();
+
+	    // make name editable
+    	$('#env-edit-'+env.d.env_id).click(function() {
+		    $('#env-label-'+env.d.env_id).hide();
+		    $('#env-input-'+env.d.env_id).show();
+    	});
+
+    	// return from edit without changes
+    	$('#env-cancel-'+env.d.env_id).click(function() {
+		    $('#env-input-'+env.d.env_id).hide();
+		    $('#env-label-'+env.d.env_id).show();
+    	});
+
+    	// save new name
+    	$('#env-save-'+env.d.env_id).click(function() {
+		    var newname = $('#env-input-text-'+env.d.env_id).val();
+		    if (newname)
+		    	newname = newname.trim();
+		    console.log('rename ' + name + ' ['+env.d.env_id+'] to ' + newname);
+
+		    if (newname && newname.length > 0 && name !== newname) {
+				// update in the baseline db, fails if not unique
+				fathom.internal(function(res) {
+				    if (res.error) {
+				    	alert('An environment with this name exits already!');
+					    $('#env-input-'+env.d.env_id).hide();
+					    $('#env-label-'+env.d.env_id).show();
+				    } else {
+				    	// update data points
+					    _.each(datainrange, function(dd) { 
+							if (dd.env_id === env.d.env_id) {
+							    dd.env = newname;
+							    dd.userlabel = newname;
+							}
+					    });
+					    env.l = newname;
+					    env.d.env = newname;
+					    env.d.userlabel = newname;
+					    // re-render
+				    	that.html(Mustache.render(envtmpl,env.d));
+					    $('#env-input-'+env.d.env_id).hide();
+					    $('#env-label-'+env.d.env_id).show();
+					}
+				},'setenvlabel',[env.d.env_id, newname]);
+		    } else {
+		    	// no change			       
+			    $('#env-input-'+env.d.env_id).hide();
+			    $('#env-label-'+env.d.env_id).show();
+		    }
+		});
     });
 };
 
@@ -517,6 +597,14 @@ $(window).load(function() {
     var fathom = fathom || window.fathom;
     if (!fathom)
 		throw "Fathom not found";
+
+	// init bootstrap popover plugin and dynamically added pop-overs
+	$(function () {
+	  $('[data-toggle="popover"]').popover()
+	});
+	$('body').popover({
+        selector: '.env-popover'
+    });
 
 	// time range button actions
     _.each(['day','month','week','year'], function(range) {

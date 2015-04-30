@@ -15,20 +15,6 @@
     },
     "dependencies": ["underscore","ipaddr","ieee754","base64-js","buffer","buffercursor","subprocess","addon-sdk"],
     "preferences": [
-        {
-            "type": "control",
-            "label": "Show",
-            "name": "welcome",
-            "title": "About Fathom",
-            "description" : "Show the 'Welcome to Fathom' page where you can find more information about Fathom and the various settings."
-        },
-        {
-            "name": "enablefathomapi",
-            "type": "bool",
-            "title": "Enable Fathom for Regular Web Pages",
-            "description" : "Enable Fathom APIs for any regular web page. Fathom will always ask your approval before a page can access any of the Fathom features. If you disable Fathom, web pages will not know that Fathom is installed. The built-in Fathom tools remain always available.",
-            "value": true
-	    },
 	    {
             "name": "debugtoolupload",
             "type": "radio",
@@ -96,14 +82,14 @@
             "type": "bool",
             "name": "enablepageload",
             "value": true,
-            "title": "Enable Performance Monitoring of Page Load Times",
-    	    "description" : "Allow Fathom to monitor the page load times of visited web pages."
+            "title": "Enable Performance Monitoring of Pageload Times",
+    	    "description" : "Allow Fathom to monitor the pageload times of visited web pages."
     	},
     	{
             "name": "pageloadupload",
             "type": "radio",
-            "title": "Share Page Load Performance Reports",
-            "description" : "Allow uploading of page load performance reports to our secure servers for network research. No data is shared with third parties.",
+            "title": "Share Pageload Performance Reports",
+            "description" : "Allow uploading of pageload performance reports to our secure servers for network research. No data is shared with third parties.",
             "value": "always",
             "options": [
     		{
@@ -121,6 +107,13 @@
             "name": "whitelist",
             "title": "Whitelisted Domains",
             "description" : "The identity of visited web pages is anonymized when uploading the page load performance reports excluding a small set of popular domains (e.g. google.com). You can review and edit the whitelisted domains here."
-        }
+        },
+        {
+            "name": "enablefathomapi",
+            "type": "bool",
+            "title": "Enable Fathom for Regular Web Pages",
+            "description" : "Enable Fathom APIs for any regular web page. Fathom will always ask your approval before a page can access any of the Fathom features. If you disable Fathom, web pages will not know that Fathom is installed. The built-in Fathom tools remain always available.",
+            "value": false
+        }        
     ]
 }

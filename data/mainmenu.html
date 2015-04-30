@@ -9,47 +9,37 @@
 
   <body style="overflow:hidden; background-color:white;">
     <div class="pure-menu">
+      <span class="pure-menu-heading pure-menu-pl"><i class="fa fa-tachometer"></i><span id="pageload"></span></span>
+      <hr class="menu-divider"/>
       <span class="pure-menu-heading">Tools</span>
-      <ul class="pure-menu-list">
-	<li class="pure-menu-item">
-	  <a class="pure-menu-link" href="#" onclick="opentab('tools/debugtool.html');">
-	    <i class="fa fa-wrench"></i>
-	    Debug My Connection
-	  </a>
-	</li>
-	<li class="pure-menu-item">
-	  <a class="pure-menu-link" href="#" onclick="opentab('tools/homenet.html');">
-	    <i class="fa fa-home"></i>
-	    Homenet Discovery
-	</a>
-	</li>
-	<li class="pure-menu-item">
-	  <a class="pure-menu-link" href="#" onclick="opentab('tools/monitoring.html');">
-	    <i class="fa fa-bar-chart"></i>
-	    Monitoring Graphs
-
-	</a>
-	</li>
+	  <ul class="pure-menu-list">
+		<li class="pure-menu-item">
+	  		<a class="pure-menu-link" href="#" onclick="opentab('tools/debugtool.html');">
+	   			<i class="fa fa-wrench"></i>Debug My Connection
+	  		</a>
+		</li>
+		<li class="pure-menu-item">
+		  <a class="pure-menu-link" href="#" onclick="opentab('tools/homenet.html');">
+		    <i class="fa fa-home"></i>Homenet Discovery
+			</a>
+		</li>
+		<li class="pure-menu-item">
+		  <a class="pure-menu-link" href="#" onclick="opentab('tools/monitoring.html');">
+		    <i class="fa fa-bar-chart"></i>Monitoring Graphs
+			</a>
+		</li>
         <li class="pure-menu-heading">Fathom</li>
-        <li class="pure-menu-item pure-menu-selected" id="fathomon">
-	  <a class="pure-menu-link" href="#" onclick="emit('fathom');">
-	    <i class="fa fa-check"></i>
-	    Monitoring Enabled
-	  </a>
-	</li>
-        <li class="pure-menu-item" id="fathomoff">
-	  <a class="pure-menu-link" href="#" onclick="emit('fathom');">
-	    <i class="fa fa-close"></i>
-	    Monitoring Disabled
-	  </a>
-	</li>
+        <li class="pure-menu-item" id="fathom">
+	  		<a class="pure-menu-link" href="#" onclick="emit('prefs');">
+		    	<i class="fa fa-cog"></i>Preferences		    
+	  		</a>
+		</li>
         <li class="pure-menu-item">
-	  <a class="pure-menu-link" href="#" onclick="emit('about');">
-	    <i class="fa fa-info"></i>
-	    About
-	</a>
-	</li>
-      </ul>
+		  <a class="pure-menu-link" href="#" onclick="emit('about');">
+	    	<i class="fa fa-info"></i>About
+		  </a>
+		</li>
+	  </ul>
     </div>
     <script src="panelhelp.js"></script>
   </body>

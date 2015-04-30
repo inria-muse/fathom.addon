@@ -784,6 +784,14 @@ window.onload = function() {
     if (!fathom)
         throw "Fathom not found";
 
+    // init bootstrap popover plugin and dynamically added pop-overs
+    $(function () {
+      $('[data-toggle="popover"]').popover()
+    });    
+    $('body').popover({
+        selector: '.help-popover'
+    });
+
     // note about data contribution status + link to raw data
     var utemplate = document.getElementById('uploadtemplate').innerHTML;
     Mustache.parse(utemplate);
