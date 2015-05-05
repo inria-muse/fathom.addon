@@ -33,9 +33,9 @@
 		    <div class="item active">
 		      <div class="carousel-slide">
  	 		    <h2 class="content-subhead">Fathom Tools</h2>
-				<p>Access network troubleshooting and monitoring tools via the Fathom menu <img src="icons/icon-16.png" /> at the toolbar (or via the Firefox menu on Android):
+				<p>Access network troubleshooting and monitoring tools via the Fathom Menu <img src="icons/icon-16.png" /> at the toolbar:
 				<ul class="fa-ul">
-				  <li><b><i class="fa-li fa fa-tachometer"></i> Pageload Performance</b> displays the pageload time of the active tab.</li>
+				  <li><b><i class="fa-li fa fa-tachometer"></i> Pageload Performance</b> displays the pageload time of the current active tab.</li>
 				  <li><b><i class="fa-li fa fa-wrench"></i> Debug My Connection</b> test your network configuration and connectivity if you are having problems with your network.</li>
 				  <li><b><i class="fa-li fa fa-home"></i> Home Network Discovery</b> discover devices and network connectivity in your home network.</li>
 				  <li><b><i class="fa-li fa fa-bar-chart"></i> Monitoring Graphs</b> explore browsing and network performance over time.</li>
@@ -44,14 +44,39 @@
 		 	  </div>
 	        </div>
 
+
+		    <div class="item">
+		      <div class="carousel-slide">
+				<h2 class="content-subhead">Data Collection and Privacy</h2>
+				<p>
+					Fathom is a research project at <a href="https://team.inria.fr/muse/" target="_blank">MUSE team of Inria Paris-Rocquencourt</a>. We do research on 
+					user experience and performance of home networks and internet applications. We use Fathom to collect data for this purpose. All data collection is 
+					optional and you can use the Fathom extension and tools without sharing any data.
+				</p>
+				<p>
+					Next two slides overview collected data and ask you for your data collection preferences. You can change these settings at anytime 
+					via the addon preferences page (Fathom Menu <img src="icons/icon-16.png" /> -> Preferences).
+				</p>
+				<p>
+					The collected data is stored on our secure servers and never shared with 3rd parties. In accordance with the French legislation you have the right .. b
+					lah balh TODO: add CNIL mention here.
+				</p>
+		 	  </div>
+		    </div>
+
+
 		    <div class="item">
 		      <div class="carousel-slide">
  	 		    <h2 class="content-subhead">Pageload Performance</h2>
  		    	<p>
- 		    		Fathom monitors the pageload times of the sites you visit (except when in private-browsing mode). 
- 		    		The monitoring is light-weight and does not impact your network browsing. You can see
- 		    		the performance of current tab in the Fathom menu and over time statistics in the Monitoring Graphs 
- 		    		tool. Optionally, you can contribute the collected data for our research. 
+ 		    		Fathom monitors on the background the pageload times of the sites you visit (except in private-browsing mode). 
+ 		    		The monitoring is light-weight and does not impact your network browsing. You can check the pageload performance of 
+ 		    		current active tab in the Fathom Menu <img src="icons/icon-16.png" />.
+ 		    	</p>
+ 		    	<p>
+ 		    		Optionally, you can contribute pageload data for our research. The names of the sites you visit are 
+ 		    		anonymized except for a small number of popular <a href="whitelist.html" target="_blank">whitelisted 
+ 		    		domains (such as google.com) that you can edit here</a>.  
   				</p>
 				<div class="highlight">
 				  <b>Enable pageload times monitoring ?</b>
@@ -64,13 +89,10 @@
 				  <b>Share pageload monitoring data ?</b>
 				  <form>
 				  <label for="pageloadupload" class="pure-checkbox">
-		            <input id="pageloadupload" type="checkbox" checked>&nbsp;&nbsp;Share anonymized<sup>*</sup> pageload monitoring data.
+		            <input id="pageloadupload" type="checkbox" checked>&nbsp;&nbsp;Share pageload monitoring data.
 		          </label>
 				  </form>
 			    </div>
-			    <p class="small">
-			    	* The shared data is anonymized except for a small number of popular whitelisted domains (such as google.com). <a href="whitelist.html" target="_blank">Review the complete whitelist here.</a>
-			    </p>
 		 	  </div>
 		    </div>
 
@@ -79,10 +101,10 @@
 
  	 		    <h2 class="content-subhead">Performance Monitoring</h2>
    		    	<p>
- 		    		In addition to pageload times, Fathom monitors the performance of your system (CPU, load, memory) and 
- 		    		network connectivity (signal quality on Wifi, cross-traffic and network delays) on the background. 
- 		    		The monitoring is light-weight and does not impact your network browsing. You can browse the performance 
- 		    		statistics using the Monitoring Graphs tool. Optionally, you can contribute the collected data for our research. 
+ 		    		Fathom monitors on the background the performance of your system (CPU, load, memory) and 
+ 		    		network connectivity (signal quality on Wifi, cross-traffic and network delays). 
+ 		    		The monitoring is light-weight and does not impact your network browsing. You can explore the performance 
+ 		    		statistics using the Monitoring Graphs tool.
   				</p>
 				<div class="highlight">
 				  <b>Enable background performance monitoring ?</b>
@@ -100,19 +122,6 @@
 				  </form>
 			    </div>
 
-		 	  </div>
-		    </div>
-
-		    <div class="item">
-		      <div class="carousel-slide">
-				<h2 class="content-subhead">Data Collection Policy</h2>
-				<p>
-					Fathom project is a research project and our goal is to collect data on real home networks configuration, performance characteristics and typical problems via this tool. The extension will ask you for your permission to upload the results of the various network measurements to our secure server when you first use each tool. You can change the settings at anytime via the addon preferences (go to Menu -> Addons -> Fathom). Your data is
-					stored on our secure servers and never shared with any 3rd parties.
-				</p>
-				<p class="small">
-					In accordance of the French law on « informatique et libertés » of 6 January 1978 modified in 2004, you have the right to access and correct any personal information concerning you. You can request this right by sending us an email to fathom@inria.fr.
-				</p>
 		 	  </div>
 		    </div>
 

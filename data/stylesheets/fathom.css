@@ -241,6 +241,11 @@
     font-size: 1.1em;
 }
 
+.carousel-slide a,a:visited {
+    color: #0A0545 !important;
+    text-decoration: underline;
+}
+
 .pure-button i {
     color: inherit;
     font-size: inherit;
