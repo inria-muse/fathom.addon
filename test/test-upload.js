@@ -42,7 +42,8 @@ exports["testadduploadbad"] = function(assert, done) {
 		upload.addUploadItem(
 		    'test',                                 // collection
 		    [{'val.ues' : [8,1,1,4], ts : Date.now()},
-		     {'val$ues' : [8,1,1,4], ts : Date.now()}], 
+		     {'val$ues' : [8,1,1,4], ts : Date.now()},
+		     {'values' : [{ 'asd$' : 1},1,1,4], ts : Date.now()}], 
 		    function(succ) {
 				// add done
 				assert.ok(succ, "add item(s) ok");

@@ -14,7 +14,7 @@
  * upload queue of the indexedDB in the worker (API will be available)
  *
  * @author Anna-Kaisa Pietilainen <anna-kaisa.pietilainen@inria.fr> 
- */
+*/
 
 // from: http://stackoverflow.com/questions/2219526/how-many-bytes-in-a-javascript-string
 function byteCount(s) {
@@ -23,7 +23,7 @@ function byteCount(s) {
 
 onerror = function(event) { 
     dump("error: fathom: ChromeWorker [uploadworker]: " + 
-	 JSON.stringify(event) + "\n");
+		 JSON.stringify(event) + "\n");
     postMessage(JSON.stringify({error : event}));
 };
 
@@ -33,41 +33,44 @@ onmessage = function(event) {
     var evdata = (event.data ? event.data : "");
 
     try {
-	msg = JSON.parse(evdata);
-	if (!msg || !msg.url || !msg.data) {
-	    postMessage(JSON.stringify({error : "invalid msg: " + data}));
-	    return;
-	}
-	msgdata = JSON.stringify(msg.data);
+		msg = JSON.parse(evdata);
+		if (!msg || !msg.url || !msg.data) {
+		    postMessage(JSON.stringify({error : "invalid msg: " + data}));
+		    return;
+		}
+		msgdata = JSON.stringify(msg.data);
     } catch (e) {
-	postMessage(JSON.stringify({error : "invalid msg: " + e}));
-	return;
+		postMessage(JSON.stringify({error : "invalid msg: " + e}));
+		return;
     }
 
     var req = new XMLHttpRequest();
     var starttime = performance.now();
     req.open("POST", msg.url);
     req.onreadystatechange = function() {
-	var endtime = performance.now();
+		var endtime = performance.now();
         if (req.readyState === 4) {
-	    var elapsed = (endtime - starttime);
+		    var elapsed = (endtime - starttime);
 
-	    if (req.status === 200) {
-		var bcount = byteCount(msgdata);
-		postMessage(JSON.stringify({
-		    elapsed : elapsed,
-		    bytes : bcount,
-		    rate : (elapsed > 0 ?
-			    (bcount * 8.0) / (elapsed/1000.0) : // bits / s
-			    undefined)
-		}));
-	    } else {
-		postMessage(JSON.stringify({
-		    elapsed : elapsed,
-		    error: req.status + '/' + req.statusText,
-		}));
-	    }
-	}
+		    if (req.status === 200) {
+				var bcount = byteCount(msgdata);
+				postMessage(JSON.stringify({
+				    elapsed : elapsed,
+				    bytes : bcount,
+				    rate : (elapsed > 0 ?
+					    (bcount * 8.0) / (elapsed/1000.0) : // bits / s
+					    undefined)
+				}));
+		    } else {
+				postMessage(JSON.stringify({
+				    elapsed : elapsed,
+				    error: {
+				    	code : req.status,
+				    	message : req.statusText
+				    }
+				}));
+	    	}
+		}
     };
     req.setRequestHeader("Content-Type", "application/json");
     req.send(msgdata);
