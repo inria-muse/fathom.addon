@@ -249,33 +249,24 @@ exports["testgetwifi"] = function(assert, done) {
 
 exports["testmem"] = function(assert, done) {
     systemapi.exec(function(res, doneflag) {
-	console.log(res);
-	if (system.platform !== 'darwin' && system.platform !== 'winnt') {
-	    assert.ok(!res.error && res.result.memfree > 0, "getMemInfo");
-	} else {
-	    assert.ok(res.error, "getMemInfo not avail (expected)");
-	}
-	done();
+		console.log(res);
+		if (system.platform !== 'darwin') {
+		    assert.ok(!res.error && res.result.memfree > 0, "getMemInfo");
+		} else {
+		    assert.ok(res.error, "getMemInfo not avail (expected)");
+		}
+		done();
     }, { method : 'getMemInfo'});
-};
-
-exports["testsysinfo"] = function(assert, done) {
-    systemapi.exec(function(res, doneflag) {
-	console.log(res);
-	if (system.platform === 'winnt') {
-	    assert.ok(!res.error && res.result.memfree > 0, "getSysInfo");
-	} else {
-		// not available
-	    assert.ok(res.error, "getSysInfo not available (expected)");
-	}
-	done();
-    }, { method : 'getSysInfo'});
 };
 
 exports["testload"] = function(assert, done) {
     systemapi.exec(function(res, doneflag) {
 		console.log(res);
-		assert.ok(!res.error, "getLoad no error");
+		if (system.platform !== 'winnt') 
+			assert.ok(!res.error, "getLoad no error");
+		else
+			assert.ok(res.error, "getLoad not avail on winnt error");
+
 		if (system.platform !== 'winnt') 
 			assert.ok(res.result.tasks.total > 0, "getLoad found tasks");
 		if (system.platform !== 'winnt') 
