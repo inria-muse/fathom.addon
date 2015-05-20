@@ -226,20 +226,20 @@ exports["testgetwifi"] = function(assert, done) {
 		    assert.ok(res.result.bssid,"getWifiInterface bssid " + res.result.bssid);
 		    
 		    systemapi.exec(function(res2, doneflag) {
-			console.log(res2);
-			assert.ok(!res2.error, "getWifiSignal no error");
-			assert.ok(res2.result.signal,"getWifiSignal " + res2.result.signal);
+				console.log(res2);
+				assert.ok(!res2.error, "getWifiSignal no error");
+				if (system.platform !== 'winnt')
+					assert.ok(res2.result.signal,"getWifiSignal " + res2.result.signal);
+				else
+					assert.ok(res2.result.quality,"getWifiSignal " + res2.result.quality);
 
-			systemapi.exec(function(res3, doneflag) {
-			    console.log(res3);
-			    assert.ok(!res3.error, "getWifiNetworks no error");
-			    assert.ok(res3.result.length > 0,"getWifiNetworks found networks");
-			    done();
-			    
-			}, { method : 'getWifiNetworks'});
-			
-		    }, { method : 'getWifiSignal'});
-		    
+				systemapi.exec(function(res3, doneflag) {
+				    console.log(res3);
+				    assert.ok(!res3.error, "getWifiNetworks no error");
+				    assert.ok(res3.result.length > 0,"getWifiNetworks found networks");
+				    done();				    
+				}, { method : 'getWifiNetworks'});			
+		    }, { method : 'getWifiSignal'});		    
 		} else {
 		    assert.ok(res!==undefined, "getWifiInterface no wifi or offline");
 		    done();

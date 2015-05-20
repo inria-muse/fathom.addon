@@ -137,7 +137,6 @@ exports["test3"] = function(assert, done) {
 						console.log(res);
 						assert.ok(!res.error, 'get agg2 no error');
 						assert.ok(res.data.length === 0, 'got correct number of agg2 rows: ' + res.data.length);
-
 						timers.setTimeout(function() {
 							db.close();
 							done();
