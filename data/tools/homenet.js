@@ -307,6 +307,7 @@ var NetGraph = function(elem, clickevents, width) {
             case 'gw':
                 return 'node gw-node';
                 break;      
+
             default:
                 return 'node';
             }
@@ -556,8 +557,8 @@ window.onload = function() {
                     // keep handling nodes until done
                     if (handlenode(node)) return;
                     setTimeout(done, 0);
-                },3,['arptable']);
+                },5,['arptable']);
             },7,['ping','mdns','upnp']);
-        },5,['local','internet','route']);
+        },10,['local','internet','route']);
     }); // init
 }; // onload
