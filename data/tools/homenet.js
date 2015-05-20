@@ -112,7 +112,7 @@ var NetGraph = function(elem, clickevents, width) {
             if (n.raw['arptable'] && n.raw['arptable'].mac)
                 res += "<li>Interface MAC: "+n.raw['arptable'].mac+"</li>";
             
-            else if (n.raw['local'] && n.raw['local'].networkenv)
+            else if (n.raw['local'] && n.raw['local'].networkenv && n.raw['local'].networkenv.default_iface_mac)
                 res += "<li>Interface MAC: "+n.raw['local'].networkenv.default_iface_mac+"</li>";
 
             if (n.raw['arptable'] && n.raw['arptable'].devinfo && n.raw['arptable'].devinfo.company)
