@@ -14,6 +14,39 @@ exports["testisconnected"] = function(assert, done) {
     }, { method : 'isConnected'});
 };
 
+exports["testdnslookup1"] = function(assert, done) {
+    tools.exec(function(res) {
+		console.log(res);
+		assert.ok(!res.error, "dnsLookup no error");
+		assert.ok(res.answers && res.answers.length == 1 &&
+				  res.answers[0] === '128.93.165.1', 
+				  "dnsLookup found correct ip");		
+		done();
+    }, { method : 'dnsLookup', params : ['muse.inria.fr']});
+};
+
+exports["testdnslookup2"] = function(assert, done) {
+    tools.exec(function(res) {
+		console.log(res);
+		assert.ok(!res.error, "dnsLookup no error");
+		assert.ok(res.answers && res.answers.length == 1 &&
+				  res.answers[0] === '128.93.165.1', 
+				  "dnsLookup found correct ip");		
+		done();
+    }, { method : 'dnsLookup', params : ['muse.inria.fr', '192.168.1.1']});
+};
+
+exports["testdnslookup3"] = function(assert, done) {
+    tools.exec(function(res) {
+		console.log(res);
+		assert.ok(!res.error, "dnsLookup no error");
+		assert.ok(res.answers && res.answers.length == 1 &&
+				  res.answers[0] === '128.93.165.1', 
+				  "dnsLookup found correct ip");		
+		done();
+    }, { method : 'dnsLookup', params : ['muse.inria.fr', '8.8.8.8']});
+};
+
 exports["testlookupmyip"] = function(assert, done) {
     tools.exec(function(res) {
 		console.log(res);
@@ -30,51 +63,6 @@ exports["testlookupmac"] = function(assert, done) {
 		assert.ok(res.company === "Apple", "lookupMAC ok");
 		done();
     }, { method : 'lookupMAC', params: ['54:26:96:ce:3d:89']});
-};
-
-exports["testgetcerterror"] = function(assert, done) {
-    tools.exec(function(res) {
-		assert.ok(res.error !== undefined, "getcert error missing uri");
-		console.log(res);
-		done();
-    }, { method : 'getCertChain',
-	 params : [undefined]});
-};
-
-exports["testgetcert"] = function(assert, done) {
-    tools.exec(function(res) {
-		assert.ok(res.error === undefined, "getcert no error");
-		console.log(res);
-		done();
-    }, { 
-    	method : 'getCertChain',
-	 	params : ["https://muse.inria.fr"]
-	});
-};
-
-exports["testlookupurl"] = function(assert, done) {
-    tools.exec(function(res) {
-		console.log(res);
-		assert.ok(res.error === undefined, "lookupUrl no error");
-		assert.ok(res.answers && res.answers.length >= 1, 
-			  "lookupUrl found ip(s)");
-		done();
-    }, { 
-    	method : 'lookupUrl',
-	 	params : ['http://www.google.com']
-	});
-};
-
-exports["testlookuphostname"] = function(assert, done) {
-    tools.exec(function(res) {
-		console.log(res);
-		assert.ok(res.error === undefined, "lookupHostname no error");	
-		assert.ok(res.answers && res.answers.length == 1 &&
-			  res.answers[0] === '128.93.165.1', 
-			  "lookupHostname found correct ip");
-		done();
-    }, { method : 'lookupHostname',
-	 params : ['muse.inria.fr']});
 };
 
 exports["testdisclocal"] = function(assert, done) {
@@ -164,8 +152,6 @@ exports["testdiscall"] = function(assert, done) {
     }, { method : 'discovery',
 	 params : [10, undefined]}, {neighbors : {}});
 };
-
-
 
 exports["teststartstop"] = function(assert, done) {
     tools.exec(function(res) {

@@ -27,7 +27,8 @@ var fathomapi = {};
 
 /** 
  * @description fathom.system.* namespace. Methods for obtaining various 
- * system information and for running system tools such as ping and iperf.
+ * system and browser information and for running system commands such 
+ * as nslookup, ping or iperf.
  *
  * @exports fathom/system
  */
@@ -269,14 +270,15 @@ sys.getMemInfo = function(callback) {
 };
 
 /**
- * Get the browser's proxy configuration for a particular URL.
+ * Get the browser's proxy configuration for a particular URL using XPCOM APIs (see 
+ * <a href='https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIProtocolProxyService'>MDN</a> for more info).
  *
  * @param {function} callback - The callback Fathom invokes once the
  * call completes. On error contains "error" member.
  * @param {string} url - The URL for which the function looks up the
  * applicable proxy configuration.
  *
- * @return {dictionary} The result describes the proxy.  For
+ * @return {dictionary} The result describes the proxy. For
  * explanation of the dictionary keys, see
  * <a href='https://developer.mozilla.org/en/XPCOM_Interface_Reference/nsIProxyInfo'>MDN</a>.
  */
@@ -285,14 +287,55 @@ sys.getProxyInfo = function(callback, url) {
 };
 
 /**
- * Get the browser's memory use. Currently disabled on OS X due to a bug #1122322
- * in Firefox that causes the browser to crash erratically.
+ * Get the browser's memory use using XPCOM APIs (see 
+ * <a href='https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIMemoryReporterManager'>MDN</a> for more info).
+ *
+ * Currently disabled on OS X due to a bug #1122322 that causes the browser to crash erratically.
  *
  * @param {function} callback - The callback Fathom invokes once the
  * call completes. On error contains "error" member.
  */
 sys.getBrowserMemoryUsage = function(callback) {
     makereq(callback, "system", "getBrowserMemoryUsage");
+};
+
+/**
+ * @description Get the certificate chain information for the specified uri using XPCOM APIs (see 
+ * <a href='https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsITransportSecurityInfo'>MDN</a> for more info).
+ *
+ * @param {function} callback The return callback. Returns the response or 
+ * an object with error field in case of failure. 
+ * @param {string} uri The complete uri for which the certificate chain should be
+ * resolved.
+ */     
+sys.getCertificateChain = function(callback, uri) {
+    makereq(callback, "system", "getCertChain", [uri]);
+};
+
+/**
+ * @description  This function uses XPCOM APIs to resolve the IP address of the URL's hostname (see 
+ * <a href='https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIDNSService'>MDN</a> for more info).
+ *
+ * @param {function} callback Fathom invokes this callback upon
+ * arrival of the DNS response. If successful, the callback
+ * receives a dictionary whose members convey the DNS response.
+ * @param {string} url  URL containing the name to look up.
+ */
+sys.resolveUrl = function(callback, url) {
+    makereq(callback, "system", "resolveUrl", [url]);
+};
+
+/**
+ * @description  This function uses XPCOM APIs to resolve the IP address of the hostname (see 
+ * <a href='https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIDNSService'>MDN</a> for more info).
+ *
+ * @param {function} callback Fathom invokes this callback upon
+ * arrival of the DNS response. If successful, the callback
+ * receives a dictionary whose members convey the DNS response.
+ * @param {string} url  URL containing the name to look up.
+ */
+sys.resolveHostname = function(callback, hostname) {
+    makereq(callback, "system", "resolveHostname", [hostname]);
 };
 
 //--------------------- FATHOM.SOCKET --------------------------
@@ -1205,7 +1248,7 @@ http.close = function(callback, httpid) {
 /**
  * @description DNS protocol implementation using fathom sockets.
  *
- * NOTE, for regular IP lookups the tools.lookup* methods are preferred. 
+ * NOTE, for regular IP lookups the system.resolve* methods are preferred. 
  * This implementation is basic and should be used for troubleshooting 
  * only.
  *
@@ -1399,8 +1442,11 @@ jsonrpc.close = function(callback, id) {
 //--------------------- FATHOM.TOOLS --------------------------
 
 /** 
- * @description fathom.tools.* namespace. Includes measurement tools
- * and other misc utility functions.
+ * @description fathom.tools.* namespace. Provides higher level
+ * utility functions and measurement tools implemented on top of lower
+ * level (e.g. socket and proto) APIs. 
+ * 
+ * Private methods are available to internal addon pages only.
  *
  * @exports fathom/tools
  */
@@ -1469,6 +1515,7 @@ ping.server_stop = function(callback, id) {
 /**
  * @description iperf (client/server) implementation using nspr API
  * directly.
+ *
  * @exports fathom/tools/iperf
  */
 var iperf = tools.iperf = {};
@@ -1502,47 +1549,20 @@ tools.isConnected = function(callback) {
 };
 
 /**
- * @description  This function gets a certificate chain information for 
- * the specified uri.
- *
- * @param {function} callback The return callback. Returns the response or 
- * an object with error field in case of failure. 
- * @param {string} uri The complete uri for which the certificate should be
- * resolved.
- */ 	
-tools.getCertificateChain = function(callback, uri) {
-    makereq(callback, "tools", "getCertChain", [uri]);
-};
-
-/**
- * @description  This function uses Firefox's DNS service to resolve
- * url host's IP address.
- *
- * @param {function} callback Fathom invokes this callback upon
- * arrival of the DNS response.  If successful, the callback
- * receives a dictionary whose members convey the DNS response.
- * @param {string} url  URL containing the name to look up.
+ * @description Resolve the IP address of the given hostname using Fathom DNS 
+ * and sockets implementations. 
+ * 
+ * @param {string} hostname The hostname to resolve.
+ * @param {string} server   The DNS server to use (optinal, default is to lookup the system DNS server(s)).
+ * @param {number} port     The server port (optional, defaults to 53)
  */
-tools.lookupUrl = function(callback, url) {
-    makereq(callback, "tools", "lookupUrl", [url]);
+tools.dnsLookup = function(callback, hostname, server, port) {
+    makereq(callback, "tools", "dnsLookup", [hostname, server, port]);
 };
-
-/**
- * @description  This function uses Firefox's DNS service to resolve
- * host's IP address.
- *
- * @param {function} callback Fathom invokes this callback upon
- * arrival of the DNS response.  If successful, the callback
- * receives a dictionary whose members convey the DNS response.
- * @param {string} url  URL containing the name to look up.
- */
-tools.lookupHostname = function(callback, hostname) {
-    makereq(callback, "tools", "lookupHostname", [hostname]);
-};
-
 
 /**
  * @description Device manufacturer lookup based on the MAC address. 
+ *
  * @param {string} mac The mac addres.
  * @access private
  */
@@ -1553,6 +1573,7 @@ tools.lookupMAC.addononly = true;
 
 /**
  * @description get my current public IP.
+ *
  * @access private
  */
 tools.lookupIP = function(callback) {
@@ -1562,6 +1583,7 @@ tools.lookupIP.addononly = true;
 
 /**
  * @description Do network neighbour discovery.
+ *
  * @access private
  * @param {number} timeout - Time to wait devices (in seconds).
  * @param {Array} protocols - List of discovery protocols, valid values: 'local', 'route', 'internet', 'upnp', 'mdns', 'ping', 'arptable'.
@@ -1570,8 +1592,6 @@ tools.discovery = function(callback, timeout, protocols) {
     makereq(callback, "tools", "discovery", [timeout, protocols]);
 };
 tools.discovery.addononly = true;
-
-
 
 /**
  * @description Fathom remote API implementation. Includes discovery and

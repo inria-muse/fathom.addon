@@ -300,6 +300,52 @@ exports["testproxy"] = function(assert, done) {
     }, { method : 'getProxyInfo', params : [config.API_URL]});
 };
 
+exports["testgetcerterror"] = function(assert, done) {
+    systemapi.exec(function(res) {
+		console.log(res);
+		assert.ok(res.error !== undefined, "getcert error missing uri");
+		done();
+    }, { method : 'getCertChain',
+	 params : []});
+};
+
+exports["testgetcertsucc"] = function(assert, done) {
+    systemapi.exec(function(res) {
+		console.log(res);
+		assert.ok(res.error === undefined, "getcert no error");
+		assert.ok(res.result !== undefined, "getcert got results");
+		done();
+    }, { 
+    	method : 'getCertChain',
+	 	params : ["https://muse.inria.fr"]
+	});
+};
+
+exports["testresolveurl"] = function(assert, done) {
+    systemapi.exec(function(res) {
+		console.log(res);
+		assert.ok(res.error === undefined, "resolveUrl no error");
+		assert.ok(res.result.answers && res.result.answers.length >= 1, 
+			  "resolveUrl found ip(s)");
+		done();
+    }, { 
+    	method : 'resolveUrl',
+	 	params : ['http://www.google.com']
+	});
+};
+
+exports["testresolvehostname"] = function(assert, done) {
+    systemapi.exec(function(res) {
+		console.log(res);
+		assert.ok(res.error === undefined, "resolveHostname no error");	
+		assert.ok(res.result.answers && res.result.answers.length == 1 &&
+			  res.result.answers[0] === '128.93.165.1', 
+			  "resolveHostname found correct ip");
+		done();
+    }, { method : 'resolveHostname',
+	 params : ['muse.inria.fr']});
+};
+
 exports["testpromise"] = function(assert, done) {
     const { all } = require('sdk/core/promise');
     all([

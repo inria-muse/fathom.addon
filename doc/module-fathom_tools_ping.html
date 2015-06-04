@@ -88,7 +88,7 @@ using nspr API directly</div>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line1382">line 1382</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line1461">line 1461</a>
     </li></ul></dd>
     
 
@@ -138,14 +138,14 @@ using nspr API directly</div>
 
     
 
-    <h4 class="name" id=".start"><span class="type-signature">(static) </span>start<span class="signature">(func, args)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id=".server_start"><span class="type-signature">(static) </span>server_start<span class="signature">(func, opt, incrementaloutput)</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Start ping.
+    Start ping server.
 </div>
 
 
@@ -198,14 +198,14 @@ using nspr API directly</div>
             
 
             <td class="description last">The callback function to invoke when
-results are available.</td>
+results are available. First callback returns the server id.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>args</code></td>
+                <td class="name"><code>opt</code></td>
             
 
             <td class="type">
@@ -221,9 +221,32 @@ results are available.</td>
 
             
 
-            <td class="description last">command line arguments, these match more or less
-the arguments (naming and values) that you can give to commandline
-ping. At minimum { client : <ip> } else runs as server.</td>
+            <td class="description last">The command line arguments. Valid keys include:
+proto (default udp), port (default 5790).</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>incrementaloutput</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Send incremental output (optional - 
+default false).</td>
         </tr>
 
     
@@ -264,7 +287,7 @@ ping. At minimum { client : <ip> } else runs as server.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line1393">line 1393</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line1503">line 1503</a>
     </li></ul></dd>
     
 
@@ -295,7 +318,7 @@ ping. At minimum { client : <ip> } else runs as server.</td>
 
     
 
-    <h4 class="name" id=".stop"><span class="type-signature">(static) </span>stop<span class="signature">(id)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id=".server_stop"><span class="type-signature">(static) </span>server_stop<span class="signature">(id)</span><span class="type-signature"></span></h4>
 
     
 
@@ -395,7 +418,225 @@ ping. At minimum { client : <ip> } else runs as server.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line1401">line 1401</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line1511">line 1511</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".start"><span class="type-signature">(static) </span>start<span class="signature">(callback, dst, opt, incrementaloutput)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Start a ping client. The implementation runs a ping client
+in a ChromeWorker thread and reports results either incrementally or
+at completion. The implementation supports the following methods:
+
+   - xmlhttpreq : Browser XmlHttpRequest HEAD request, no other payload. 
+                  Works with any destination.
+   - http       : HTTP HEAD using Fathom tcp socket, no payload. Works
+                  with any destination.
+   - ws         : WebSocket based ping. Works only with the measurement 
+                  server(s).
+   - udp        : UDP ping using Fathom sockets. Works between Fathom
+                  nodes and with the measurement server(s).
+   - tcp        : TCP ping using Fathom sockets. Works between Fathom
+                  nodes and with the measurement server(s).
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The callback function to invoke when
+                             results are available.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>dst</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The host to ping.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>opt</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The command line arguments. Valid keys include:
+count (default 3), interval (default 1000ms), packetsize (default 56B), 
+proto (xmlhttpreq, ws, http, udp - default), port (default 5790), 
+timeout (default 10s).</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>incrementaloutput</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Send incremental output (optional - 
+default false).</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line1489">line 1489</a>
     </li></ul></dd>
     
 
@@ -443,7 +684,7 @@ ping. At minimum { client : <ip> } else runs as server.</td>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta1</a> on Tue Feb 10 2015 14:30:10 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta1</a> on Thu Jun 04 2015 17:40:26 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>

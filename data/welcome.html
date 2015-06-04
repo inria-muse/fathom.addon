@@ -26,6 +26,7 @@
 	    	<li data-target="#carousel-welcome" data-slide-to="1"></li>
 	    	<li data-target="#carousel-welcome" data-slide-to="2"></li>
 	    	<li data-target="#carousel-welcome" data-slide-to="4"></li>
+	    	<li data-target="#carousel-welcome" data-slide-to="5"></li>
 	  	  </ol>
 
 		  <div class="carousel-inner" role="listbox">
@@ -33,12 +34,12 @@
 		    <div class="item active">
 		      <div class="carousel-slide">
  	 		    <h2 class="content-subhead">Fathom Tools</h2>
-				<p>Access network troubleshooting and monitoring tools via the Fathom Menu <img src="icons/icon-16.png" /> at the toolbar:
+				<p>Fathom has a number of built-in tools for network monitoring and troubleshooting available via the <b>Fathom Menu</b> <img src="icons/icon-16.png" />:
 				<ul class="fa-ul">
 				  <li><b><i class="fa-li fa fa-tachometer"></i> Pageload Performance</b> displays the pageload time of the current active tab.</li>
 				  <li><b><i class="fa-li fa fa-wrench"></i> Debug My Connection</b> test your network configuration and connectivity if you are having problems with your network.</li>
 				  <li><b><i class="fa-li fa fa-home"></i> Home Network Discovery</b> discover devices and network connectivity in your home network.</li>
-				  <li><b><i class="fa-li fa fa-bar-chart"></i> Monitoring Graphs</b> explore browsing and network performance over time.</li>
+				  <li><b><i class="fa-li fa fa-bar-chart"></i> Monitoring Graphs</b> explore web browsing, network and system performance over time.</li>
 				</ul>
 				</p>
 		 	  </div>
@@ -47,36 +48,55 @@
 
 		    <div class="item">
 		      <div class="carousel-slide">
-				<h2 class="content-subhead">Data Collection and Privacy</h2>
+				<h2 class="content-subhead">Data Sharing</h2>
 				<p>
 					Fathom is a research project at <a href="https://team.inria.fr/muse/" target="_blank">MUSE team of Inria Paris-Rocquencourt</a>. We do research on 
-					user experience and performance of home networks and internet applications. We use Fathom to collect data for this purpose. All data collection is 
-					optional and you can use the Fathom extension and tools without sharing any data.
+					on network quality of experience and root cause detection of performance degradations. We use Fathom to collect data for this purpose. 
 				</p>
 				<p>
-					Next two slides overview collected data and ask you for your data collection preferences. You can change these settings at anytime 
-					via the addon preferences page (Fathom Menu <img src="icons/icon-16.png" /> -> Preferences).
+					Data sharing is optional and you can use the Fathom extension and tools without contributing any data.
 				</p>
 				<p>
-					The collected data is stored on our secure servers and never shared with 3rd parties. In accordance with the French legislation you have the right .. b
-					lah balh TODO: add CNIL mention here.
+					Next three slides present the privacy policy and collected data, and ask you for your data sharing preferences. You can change these settings at anytime 
+					at the addon preferences page (Fathom Menu <img src="icons/icon-16.png" /> -> Preferences).
 				</p>
 		 	  </div>
 		    </div>
 
+		    <div class="item">
+		      <div class="carousel-slide">
+				<h2 class="content-subhead">Data Protection</h2>
+				<p>
+					The collected data is stored on our secure servers and never shared with 3rd parties. In accordance with the French legislation (see the full data 
+					protection notice in french below) you have the right to access and correct, or for legitimate reasons, deny processing of any data conserning 
+					you by contacting <a href="mailto:muse.fathom_AT_inria.fr">us</a>.
+				</p>
+
+				  <p class="small">
+					Les informations recueillies font l’objet d’un traitement informatique destiné à l'etude de la qualité d’experience Internet et le diagnostique des "root causes" des degradations de performance. Les destinataires des données sont : l'équipe MUSE / Inria Paris-Rocquencourt.
+				  </p>
+				  <p class="small">
+					Conformément à la loi « informatique et libertés » du 6 janvier 1978 modifiée en 2004, vous bénéficiez d’un droit d’accès et de rectification aux informations qui vous concernent, que vous pouvez exercer en vous adressant à <a href="mailto:muse.fathom_AT_inria.fr">Fathom Team</a>.
+				  </p>
+				  <p class="small">
+					Vous pouvez également, pour des motifs légitimes, vous opposer au traitement des données vous concernant.	  	
+				  </p>
+		 	  </div>
+		    </div>
 
 		    <div class="item">
 		      <div class="carousel-slide">
  	 		    <h2 class="content-subhead">Pageload Performance</h2>
  		    	<p>
  		    		Fathom monitors on the background the pageload times of the sites you visit (except in private-browsing mode). 
- 		    		The monitoring is light-weight and does not impact your network browsing. You can check the pageload performance of 
- 		    		current active tab in the Fathom Menu <img src="icons/icon-16.png" />.
+ 		    		The monitoring is light-weight and does not impact your internet browsing. You can check the pageload performance of the current active 
+ 		    		tab in the <b>Fathom Menu</b> <img src="icons/icon-16.png" /> and historical data using the <b>Monitoring Graphs</b> tool. 
  		    	</p>
  		    	<p>
  		    		Optionally, you can contribute pageload data for our research. The names of the sites you visit are 
  		    		anonymized except for a small number of popular <a href="whitelist.html" target="_blank">whitelisted 
- 		    		domains (such as google.com) that you can edit here</a>.  
+ 		    		domains (such as google.com) that you can edit here</a>. Any personally identifiable information 
+ 		    		(such as URL request parameters) are always removed.  
   				</p>
 				<div class="highlight">
 				  <b>Enable pageload times monitoring ?</b>
@@ -102,9 +122,8 @@
  	 		    <h2 class="content-subhead">System Performance</h2>
    		    	<p>
  		    		Fathom monitors on the background the performance of your system (CPU, load, memory) and 
- 		    		network connectivity (signal quality on Wifi, cross-traffic and network delays). 
- 		    		The monitoring is light-weight and does not impact your network browsing. You can explore the performance 
- 		    		statistics using the Monitoring Graphs tool.
+ 		    		network connectivity (signal quality on Wifi, cross-traffic and network delays). The monitoring is light-weight and does not impact your internet browsing.
+ 		    		You can explore the performance statistics using the <b>Monitoring Graphs</b> tool. 
   				</p>
 				<div class="highlight">
 				  <b>Enable background performance monitoring ?</b>

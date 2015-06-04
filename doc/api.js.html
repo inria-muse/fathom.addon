@@ -55,7 +55,8 @@ var fathomapi = {};
 
 /** 
  * @description fathom.system.* namespace. Methods for obtaining various 
- * system information and for running system tools such as ping and iperf.
+ * system and browser information and for running system commands such 
+ * as nslookup, ping or iperf.
  *
  * @exports fathom/system
  */
@@ -71,11 +72,11 @@ sys.getOS = function(callback) {
 
 /** 
  * @description This function runs a traceroute to the given
- * destination and, upon completion, returns the textual results.
+ * destination and, upon completion, returns the results as JSON.
  *
  * @param {function} callback - The callback Fathom invokes once the
  * call completes. On error contains "error" member.
- * @param {string} host  - The host (name or IP address) to run a
+ * @param {string} host  - The host (name or IP/IPv6 address) to run a
  * traceroute to.
  * @param {object} opt - Optional parameters (count, iface, waittime).
  * @param {boolean} incrementaloutput - Incremental output (optional - default false).
@@ -86,12 +87,11 @@ sys.doTraceroute = function(callback, host, opt, incrementaloutput) {
 
 /** 
  * @description This function runs an ICMP ping to the given
- * destination and, upon completion, returns the textual results.
+ * destination and, upon completion, returns the results as JSON.
  *
  * @param {function} callback - The callback Fathom invokes once the
  * call completes. On error contains "error" member.
- *
- * @param {string} host - The host (name or IP address) to ping.
+ * @param {string} host - The host (name or IPv4/IPv6 address) to ping.
  * @param {object} opt - Optional parameters (count, iface, interval, bcast).
  * @param {boolean} incrementaloutput - Send incremental output (optional - default false).
  */
@@ -100,22 +100,57 @@ sys.doPing = function(callback, host, opt, incrementaloutput) {
 };
 
 /** 
- * @description This function runs iperf client to the given
- * destination and, upon completion, returns the textual results.
+ * @description This function runs an ICMP ping to a host at given
+ * number of hops away and, upon completion, returns the results as JSON.
+ *
+ * The implementation uses a ping with TTL=hop to figure out the IP address
+ * to ping. May fail if the host does not reply with 'time to live exceeded'.
+ * If hop=0, pings the loopback interface.
  *
  * @param {function} callback - The callback Fathom invokes once the
  * call completes. On error contains "error" member.
- * @param {object} opt  Optional parameters (client, proto, bandwidth,
+ * @param {string} hop - The hop (0 == localhost, 1 == default gateway, etc) to ping.
+ * @param {object} opt - Optional parameters (count, iface, interval, bcast).
+ * @param {string} dst - The destination towards which the route is resolved (optional).
+ * @param {boolean} incrementaloutput - Send incremental output (optional - default false).
+ */
+sys.doPingToHop = function(callback, hop, opt, dst, incrementaloutput) {
+    makereq(callback, "system","doPingToHop", [hop,opt,dst], incrementaloutput);
+};
+
+/** 
+ * @description This function emulates traceroute using ping (for platforms that do
+ * not have traceroute or when UDP is blocked).
+ *
+ * @param {function} callback - The callback Fathom invokes once the
+ * call completes. On error contains "error" member.
+ * @param {string} host  - The host (name or IP/IPv6 address) to run a
+ * ping traceroute to.
+ * @param {object} opt - Optional parameters (count, iface, interval, timeout).
+ * @param {boolean} incrementaloutput - Send incremental output (optional - default false).
+ */
+sys.doPingTr = function(callback, host, opt, incrementaloutput) {
+    makereq(callback, "system","doPingTr", [host,opt], incrementaloutput);
+};
+
+/** 
+ * @description This function runs system iperf (client mode) to the given
+ * destination and, upon completion, returns the results as JSON.
+ *
+ * @param {function} callback - The callback Fathom invokes once the
+ * call completes. On error contains "error" member.
+ * @param {string} host - The host (name or IPv4 address) of the server.
+ * @param {object} opt  Optional parameters (proto, bandwidth,
  *                      time, num, port, len, window).
  * @param {boolean} incrementaloutput Send incremental output.
  */
-sys.doIperf = function(callback, opt, incrementaloutput) {
-    makereq(callback, "system", "doIperf", [opt], inc);
+sys.doIperf = function(callback, host, opt, incrementaloutput) {
+    makereq(callback, "system", "doIperf", [host, opt], inc);
 };
 
 /** 
  * @description This function retrieves information about the
- * client's DNS resolver configuration.
+ * DNS resolver configuration.
  *
  * @param {function} callback - The callback Fathom invokes once the
  * call completes. On error contains "error" member.
@@ -125,7 +160,7 @@ sys.getNameservers = function(callback) {
 };
 
 /** 
- * @description Get hostname
+ * @description Get the hostname.
  *
  * @param {function} callback - The callback Fathom invokes once the
  * call completes. On error contains "error" member.
@@ -135,39 +170,50 @@ sys.getHostname = function(callback) {
 };
 
 /** 
- * @description call nslookup
+ * @description Call nslookup to resolve host names.
  *
  * @param {function} callback - The callback Fathom invokes once the
  * call completes. On error contains "error" member.
  * @param {string} arg - The name to lookup.
  */
 sys.nslookup = function(callback, arg) {
-    if (arg)
-	makereq(callback, "system", "nslookup", [arg]);
-    else
-	makereq(callback, "system", "nslookup");
+    makereq(callback, "system", "nslookup", [arg]);
 };
 
 /**
- * @description This function retrieves the current status of the
- * clients' network interfaces.
+ * @description This function retrieves the list of all available network 
+ * interfaces and their configuration.
+ *
+ * @param {function} callback - The callback Fathom invokes once the
+ * call completes. On error contains "error" member.
+ */       
+sys.getInterfaces = function(callback) {
+    makereq(callback, "system", "getInterfaces");
+};
+
+/**
+ * @description This function retrieves the list of active network interfaces
+ * and their configuration. 
+ *
+ * An interface is considered active if the OS has explicitely flagged it as 
+ * active or if the interface has a configured IP address.
  *
  * @param {function} callback - The callback Fathom invokes once the
  * call completes. On error contains "error" member.
  */       
 sys.getActiveInterfaces = function(callback) {
-    makereq(callback, "system", "getActiveInterfaces");
+    makereq(callback, "system", "getInterfaces", [true]);
 };
 
 /**
- * @description This function retrieves the current status of the
- * clients' wireless network interface (iwconfig and friends).
+ * @description This function retrieves the wireless network
+ * interface and its configuration (if available).  
  *
  * @param {function} callback - The callback Fathom invokes once the
  * call completes. On error contains "error" member.
  */       
-sys.getActiveWifiInterface = function(callback) {
-    makereq(callback, "system","getActiveWifiInterface");
+sys.getWifiInterface = function(callback) {
+    makereq(callback, "system","getWifiInterface");
 };
 
 /*
@@ -177,17 +223,15 @@ sys.getActiveWifiInterface = function(callback) {
  * @param {function} callback - The callback Fathom invokes once the
  * call completes. On error contains "error" member.
  * @param {string} hostname - Get the arp cache info only for the specified
- * host (optional, default is all).
+ *                            host (optional, default is all).
  */       
 sys.getArpCache = function(callback, hostname) {
-    if (hostname)
-	makereq(callback, "system", "getArpCache", [hostname]);
-    else
-	makereq(callback, "system", "getArpCache");
+    makereq(callback, "system", "getArpCache", [hostname]);
 };
 
 /**
- * @description This function retrieves the client's current routing table.
+ * @description This function retrieves the client's current routing table
+ * and the default gateway.
  *
  * @param {function} callback - The callback Fathom invokes once the
  * call completes. On error contains "error" member.
@@ -202,10 +246,8 @@ sys.getRoutingTable = function(callback) {
  *
  * @param {function} callback - The callback Fathom invokes once the
  * call completes. On error contains "error" member.
- * @param {integer} timeout - The delay between scan start and second call
- * to fetch the results (on most OSs the first scan cmd invocation does 
- * not return the full list of nearby cells or as on android we need 
- * two separate calls in anycase).
+ * @param {integer} timeout - The delay in milliseconds between scan 
+ * start and second call to fetch the results. Default 5000ms (5 sec).
  */
 sys.getWifiNetworks = function(callback, timeout) {
     makereq(callback, "system", "getWifiNetworks", [timeout]);
@@ -217,10 +259,9 @@ sys.getWifiNetworks = function(callback, timeout) {
  *
  * @param {function} callback - The callback Fathom invokes once the
  * call completes. On error contains "error" member.
- * @param {string} iface - Name of the interface.
- */       
-sys.getIfaceStats = function(callback, iface) {
-    makereq(callback, "system", "getIfaceStats", [iface]);
+ */
+sys.getIfaceStats = function(callback) {
+    makereq(callback, "system", "getIfaceStats", []);
 };
 
 /**
@@ -229,16 +270,14 @@ sys.getIfaceStats = function(callback, iface) {
  *
  * @param {function} callback - The callback Fathom invokes once the
  * call completes. On error contains "error" member.
- * @param {string} name - Optional wireless inteface name if the system
- * has multiple wireless interfaces.
- */   
-sys.getWifiSignal = function(callback, name) {
-    makereq(callback, "system", "getIfaceSignal", [name]);
+ */
+sys.getWifiSignal = function(callback) {
+    makereq(callback, "system", "getWifiSignal", []);
 };
 
 /**
  * @description This function retrieves the client's current system 
- * load via "top".
+ * load using "top". Not available on windows platform.
  *
  * @param {function} callback - The callback Fathom invokes once the
  * call completes. On error contains "error" member.
@@ -249,7 +288,7 @@ sys.getLoad = function(callback) {
 
 /**
  * @description This function retrieves the client's current memory 
- * load via "proc" (non-WIN).
+ * use. Not available on darwin platform.
  *
  * @param {function} callback - The callback Fathom invokes once the
  * call completes. On error contains "error" member.
@@ -258,24 +297,16 @@ sys.getMemInfo = function(callback) {
     makereq(callback, "system", "getMemInfo");
 };
 
-
 /**
- * @description This function retrieves system info (WIN only).
+ * Get the browser's proxy configuration for a particular URL using XPCOM APIs (see 
+ * &lt;a href='https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIProtocolProxyService'>MDN&lt;/a> for more info).
  *
- * @param {function} callback - The callback Fathom invokes once the
- * call completes. On error contains "error" member.
- */
-sys.getSysInfo = function(callback) {
-    makereq(callback, "system", "getSysInfo");
-};
-
-/**
  * @param {function} callback - The callback Fathom invokes once the
  * call completes. On error contains "error" member.
  * @param {string} url - The URL for which the function looks up the
  * applicable proxy configuration.
  *
- * @return {dictionary} The result describes the proxy.  For
+ * @return {dictionary} The result describes the proxy. For
  * explanation of the dictionary keys, see
  * &lt;a href='https://developer.mozilla.org/en/XPCOM_Interface_Reference/nsIProxyInfo'>MDN&lt;/a>.
  */
@@ -284,6 +315,11 @@ sys.getProxyInfo = function(callback, url) {
 };
 
 /**
+ * Get the browser's memory use using XPCOM APIs (see 
+ * &lt;a href='https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIMemoryReporterManager'>MDN&lt;/a> for more info).
+ *
+ * Currently disabled on OS X due to a bug #1122322 that causes the browser to crash erratically.
+ *
  * @param {function} callback - The callback Fathom invokes once the
  * call completes. On error contains "error" member.
  */
@@ -291,10 +327,50 @@ sys.getBrowserMemoryUsage = function(callback) {
     makereq(callback, "system", "getBrowserMemoryUsage");
 };
 
+/**
+ * @description Get the certificate chain information for the specified uri using XPCOM APIs (see 
+ * &lt;a href='https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsITransportSecurityInfo'>MDN&lt;/a> for more info).
+ *
+ * @param {function} callback The return callback. Returns the response or 
+ * an object with error field in case of failure. 
+ * @param {string} uri The complete uri for which the certificate chain should be
+ * resolved.
+ */     
+sys.getCertificateChain = function(callback, uri) {
+    makereq(callback, "system", "getCertChain", [uri]);
+};
+
+/**
+ * @description  This function uses XPCOM APIs to resolve the IP address of the URL's hostname (see 
+ * &lt;a href='https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIDNSService'>MDN&lt;/a> for more info).
+ *
+ * @param {function} callback Fathom invokes this callback upon
+ * arrival of the DNS response. If successful, the callback
+ * receives a dictionary whose members convey the DNS response.
+ * @param {string} url  URL containing the name to look up.
+ */
+sys.resolveUrl = function(callback, url) {
+    makereq(callback, "system", "resolveUrl", [url]);
+};
+
+/**
+ * @description  This function uses XPCOM APIs to resolve the IP address of the hostname (see 
+ * &lt;a href='https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIDNSService'>MDN&lt;/a> for more info).
+ *
+ * @param {function} callback Fathom invokes this callback upon
+ * arrival of the DNS response. If successful, the callback
+ * receives a dictionary whose members convey the DNS response.
+ * @param {string} url  URL containing the name to look up.
+ */
+sys.resolveHostname = function(callback, hostname) {
+    makereq(callback, "system", "resolveHostname", [hostname]);
+};
+
 //--------------------- FATHOM.SOCKET --------------------------
 
 /** 
  * @description fathom.socket.* namespace. Low level TCP/UDP sockets.
+ * Works with IPv4 only for now.
  *
  * @exports fathom/socket
  */
@@ -1200,7 +1276,7 @@ http.close = function(callback, httpid) {
 /**
  * @description DNS protocol implementation using fathom sockets.
  *
- * NOTE, for regular IP lookups the tools.lookup* methods are preferred. 
+ * NOTE, for regular IP lookups the system.resolve* methods are preferred. 
  * This implementation is basic and should be used for troubleshooting 
  * only.
  *
@@ -1394,8 +1470,11 @@ jsonrpc.close = function(callback, id) {
 //--------------------- FATHOM.TOOLS --------------------------
 
 /** 
- * @description fathom.tools.* namespace. Includes measurement tools
- * and other misc utility functions.
+ * @description fathom.tools.* namespace. Provides higher level
+ * utility functions and measurement tools implemented on top of lower
+ * level (e.g. socket and proto) APIs. 
+ * 
+ * Private methods are available to internal addon pages only.
  *
  * @exports fathom/tools
  */
@@ -1410,29 +1489,61 @@ var tools = fathomapi.tools = {};
 var ping = tools.ping = {};
 
 /**
- * @description Start ping.
+ * @description Start a ping client. The implementation runs a ping client
+ * in a ChromeWorker thread and reports results either incrementally or
+ * at completion. The implementation supports the following methods:
+ * 
+ *    - xmlhttpreq : Browser XmlHttpRequest HEAD request, no other payload. 
+ *                   Works with any destination.
+ *    - http       : HTTP HEAD using Fathom tcp socket, no payload. Works
+ *                   with any destination.
+ *    - ws         : WebSocket based ping. Works only with the measurement 
+ *                   server(s).
+ *    - udp        : UDP ping using Fathom sockets. Works between Fathom
+ *                   nodes and with the measurement server(s).
+ *    - tcp        : TCP ping using Fathom sockets. Works between Fathom
+ *                   nodes and with the measurement server(s).
+ *
+ * @param {function} callback - The callback function to invoke when
+ *                              results are available.
+ * @param {string} dst - The host to ping.
+ * @param {object} opt - The command line arguments. Valid keys include:
+ * count (default 3), interval (default 1000ms), packetsize (default 56B), 
+ * proto (xmlhttpreq, ws, http, udp - default), port (default 5790), 
+ * timeout (default 10s).
+ * @param {boolean} incrementaloutput - Send incremental output (optional - 
+ * default false).
+ */
+ping.start = function(callback, dst, opt, incrementaloutput) {
+    makereq(callback, "tools.ping", "start", [dst, opt], incrementaloutput);
+};
+
+/**
+ * @description Start ping server.
  *
  * @param {function} func The callback function to invoke when
- * results are available.
- * @param {object} args command line arguments, these match more or less
- * the arguments (naming and values) that you can give to commandline
- * ping. At minimum { client : &lt;ip> } else runs as server.
+ * results are available. First callback returns the server id.
+ * @param {object} opt The command line arguments. Valid keys include:
+ * proto (default udp), port (default 5790).
+ * @param {boolean} incrementaloutput - Send incremental output (optional - 
+ * default false).
  */
-ping.start = function(callback, args) {
-    makereq(callback, "tools", "ping.start", [args], true);
+ping.server_start = function(callback, opt, incrementaloutput) {
+    makereq(callback, "tools.ping", "start", [opt], incrementaloutput);
 };
 
 /**
  * @description stop running ping server.
  * @param {number} id The id returned by the start call.
  */
-ping.stop = function(callback, id) {
-    makereq(callback, "tools", "ping.stop", [id]);
+ping.server_stop = function(callback, id) {
+    makereq(callback, "tools.ping", "stop", [id]);
 };
 
 /**
  * @description iperf (client/server) implementation using nspr API
  * directly.
+ *
  * @exports fathom/tools/iperf
  */
 var iperf = tools.iperf = {};
@@ -1447,7 +1558,7 @@ var iperf = tools.iperf = {};
  * iperf.
  */
 iperf.start = function(callback, args) {
-    makereq(callback, "tools", "iperf.start", [args], true);
+    makereq(callback, "tools.iperf", "start", [args], true);
 };
 
 /**
@@ -1455,50 +1566,31 @@ iperf.start = function(callback, args) {
  * @param {number} id The id returned by the start call.
  */
 iperf.stop = function(callback, id) {
-    makereq(callback, "tools", "iperf.stop", [id]);
+    makereq(callback, "tools.iperf", "stop", [id]);
 };
 
 /**
- * @description  This function gets a certificate chain information for 
- * the specified uri.
- *
- * @param {function} callback The return callback. Returns the response or 
- * an object with error field in case of failure. 
- * @param {string} uri The complete uri for which the certificate should be
- * resolved.
- */ 	
-tools.getCertificateChain = function(callback, uri) {
-    makereq(callback, "tools", "getCertChain", [uri]);
-};
-
-/**
- * @description  This function uses Firefox's DNS service to resolve
- * url host's IP address.
- *
- * @param {function} callback Fathom invokes this callback upon
- * arrival of the DNS response.  If successful, the callback
- * receives a dictionary whose members convey the DNS response.
- * @param {string} url  URL containing the name to look up.
+ * @description Do we have Internet connectivity ?
  */
-tools.lookupUrl = function(callback, url) {
-    makereq(callback, "tools", "lookupUrl", [url]);
+tools.isConnected = function(callback) {
+    makereq(callback, "tools", "isConnected", []);
 };
 
 /**
- * @description  This function uses Firefox's DNS service to resolve
- * host's IP address.
- *
- * @param {function} callback Fathom invokes this callback upon
- * arrival of the DNS response.  If successful, the callback
- * receives a dictionary whose members convey the DNS response.
- * @param {string} url  URL containing the name to look up.
+ * @description Resolve the IP address of the given hostname using Fathom DNS 
+ * and sockets implementations. 
+ * 
+ * @param {string} hostname The hostname to resolve.
+ * @param {string} server   The DNS server to use (optinal, default is to lookup the system DNS server(s)).
+ * @param {number} port     The server port (optional, defaults to 53)
  */
-tools.lookupHostname = function(callback, hostname) {
-    makereq(callback, "tools", "lookupHostname", [hostname]);
+tools.dnsLookup = function(callback, hostname, server, port) {
+    makereq(callback, "tools", "dnsLookup", [hostname, server, port]);
 };
 
 /**
- * @description device manufacturer lookup based on the MAC address. 
+ * @description Device manufacturer lookup based on the MAC address. 
+ *
  * @param {string} mac The mac addres.
  * @access private
  */
@@ -1509,6 +1601,7 @@ tools.lookupMAC.addononly = true;
 
 /**
  * @description get my current public IP.
+ *
  * @access private
  */
 tools.lookupIP = function(callback) {
@@ -1517,33 +1610,14 @@ tools.lookupIP = function(callback) {
 tools.lookupIP.addononly = true;
 
 /**
- * @description Get this node description (as send out in response to
- *              Fathom discovery queries). Static node info + current
- *              active interfaces + network env.
+ * @description Do network neighbour discovery.
+ *
  * @access private
+ * @param {number} timeout - Time to wait devices (in seconds).
+ * @param {Array} protocols - List of discovery protocols, valid values: 'local', 'route', 'internet', 'upnp', 'mdns', 'ping', 'arptable'.
  */
-tools.getDesc = function(callback) {
-    makereq(callback, "tools", "getDesc", []);
-};
-tools.getDesc.addononly = true;
-
-/**
- * @description Get this node current network environment.
- * @access private
- */
-tools.getNetworkEnv = function(callback) {
-    makereq(callback, "tools", "getNetworkEnv", []);
-};
-tools.getNetworkEnv.addononly = true;
-
-/**
- * @description Do full network neighbour search (uses any available
- *              means to discover devices in the local network).
- * @access private
- * @param {number} timeout Time to wait devices (in seconds).
- */
-tools.discovery = function(callback, timeout) {
-    makereq(callback, "tools", "discovery", [timeout]);
+tools.discovery = function(callback, timeout, protocols) {
+    makereq(callback, "tools", "discovery", [timeout, protocols]);
 };
 tools.discovery.addononly = true;
 
@@ -1569,7 +1643,7 @@ var remoteapi = tools.remoteapi = { addononly : true };
  * @access private
  */
 remoteapi.start = function(callback) {
-    makereq(callback, "tools", "remoteapi.start", []);
+    makereq(callback, "tools.remoteapi", "start", []);
 };
 remoteapi.start.addononly = true;
 
@@ -1578,7 +1652,7 @@ remoteapi.start.addononly = true;
  * @access private
  */
 remoteapi.stop = function(callback) {
-    makereq(callback, "tools", "remoteapi.stop", []);
+    makereq(callback, "tools.remoteapi", "stop", []);
 };
 remoteapi.stop.addononly = true;
 
@@ -1591,7 +1665,7 @@ remoteapi.stop.addononly = true;
  * @param {int} timeout Timeout (seconds).
  */
 remoteapi.discovery = function(callback, timeout) {
-    makereq(callback, "tools", "remoteapi.discovery", [timeout]);
+    makereq(callback, "tools.remoteapi", "discovery", [timeout]);
 };
 remoteapi.discovery.addononly = true;
 
@@ -1606,7 +1680,7 @@ remoteapi.discovery.addononly = true;
  * @param {Array} params    The parameters for the API call.
  */
 remoteapi.makereq = function(callback, node, method, params) {
-    makereq(callback, "tools", "remoteapi.makereq", [node,method,params]);
+    makereq(callback, "tools.remoteapi", "makereq", [node,method,params]);
 };
 remoteapi.makereq.addononly = true;
 
@@ -1626,15 +1700,13 @@ var base = fathomapi.baseline = {};
  * To fetch a single metric, you can use the helper methods.
  *
  * @param {string} range One of 'day' (default), 'week', 'month', 'year'.
- * @param {Array}  what  List of 'cpu', 'load', 'tasks', 'mem', 'traffic',
- *                       'wifi' and 'rtt'. Undefined or empty list
- *                       defaults to all metrics (execpt 'env' which has
- *                       to be requested separately always -- see getEnv).
+ * @param {Array}  what  List of metrics. Valid metrics are 'cpu', 'load', 
+ *                       'tasks', 'mem', 'traffic', 'wifi' and 'rtt'. 
+ *                       Undefined defaults to all metrics.
  */
 base.get = function(callback, range, what) {
     if (!range) range = 'day';
-    if (!what || what.length == 0) 
-	what = ['cpu','load','tasks','mem','traffic','wifi','rtt'];
+    if (!what) what = ['cpu','load','tasks','mem','traffic','wifi','rtt'];
     makereq(callback, "baseline", "get", [what,range]);    
 };
 
@@ -1745,7 +1817,7 @@ base.getEnv = function(callback, range) {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta1</a> on Tue Feb 10 2015 14:30:10 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta1</a> on Thu Jun 04 2015 17:40:26 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>

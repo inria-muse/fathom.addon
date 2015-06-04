@@ -316,9 +316,9 @@ var TestSuites = Backbone.Collection.extend({
 
     var localdns = undefined;
     var dnstest2 = new Test({
-        name: "DNS lookup with local resolver",
+        name: "Lookup with local resolver",
         shortname: 'dns2',
-        help: "Resolves '"+HOST+"' IP address with your local DNS resolver using Fathom DNS implementation over UDP. If the test fails, your local DNS resolver may not be working correctly or UDP is blocked in your network.",
+        help: "Resolves '"+HOST+"' IP address with your configured DNS resolver using Fathom DNS implementation. If the test fails, your local DNS resolver may not be working correctly.",
         'test-running-txt' : 'resolving ' + HOST + '...',
         'test-skip-txt' : 'skipped - no local DNS resolvers found',
         'test-success-txt' : 'resolution completed succesfully',
@@ -328,25 +328,18 @@ var TestSuites = Backbone.Collection.extend({
     dnstest2.exec = function(next, res) {
         var that = this;
         if (res && res.length>0) {
-            localdns = res[0];
             that.start();
-            fathom.proto.dns.create(function(res2) {
-                if (!res2.error) {
-                    fathom.proto.dns.lookup(function(res3) {
-                        if (!res3 || res3.error) {
-                            that.end(TESTSTATUS.ERRORS,res3);
-                        } else if (!res3.answers || _.isEmpty(res3.answers)) {
-                            that.end(TESTSTATUS.FAILURE,res3);
-                        } else {
-                            that.end(TESTSTATUS.SUCCESS,res3);
-                        }
-                        next(false,undefined); // continue to next in anycase
-                    }, res2, HOST);
-                } else {
+            fathom.tools.dnsLookup(function(res2) {
+                console.log(res2);
+                if (!res2 || res2.error) {
                     that.end(TESTSTATUS.ERRORS,res2);
-                    next(false,undefined); // continue to next
+                } else if (!res2.answers || _.isEmpty(res2.answers)) {
+                    that.end(TESTSTATUS.FAILURE,res2);
+                } else {
+                    that.end(TESTSTATUS.SUCCESS,res2);
                 }
-            }, localdns, 'udp', 53);
+                next(false,undefined); // continue to next in anycase
+            }, HOST);
         } else {
             that.end(TESTSTATUS.SKIP,undefined);
             next(false,undefined); // continue to next
@@ -354,9 +347,9 @@ var TestSuites = Backbone.Collection.extend({
     };
 
     var dnstest3 = new Test({
-        name: "DNS lookup with public DNS resolver",
+        name: "Lookup with public resolver",
         shortname: 'dns3',
-        help: "Tries to resolve '"+HOST+"' IP address with a public DNS resolver '"+DNSSERVER+"' using Fathom DNS implementation over UDP. If the test fails, the public DNS service may not be reachable or UDP is blocked in your network.",
+        help: "Tries to resolve '"+HOST+"' IP address with a public DNS resolver '"+DNSSERVER+"' using Fathom DNS implementation. If the test fails, the public DNS service may not be reachable.",
         'test-running-txt' : 'resolving "' + HOST + '" with public DNS ...',
         'test-success-txt' : 'resolution completed succesfully',
         'test-failure-txt' : '"' + HOST + '" not found',
@@ -365,27 +358,21 @@ var TestSuites = Backbone.Collection.extend({
     dnstest3.exec = function(next, res) {
         var that = this;
         that.start();
-        fathom.proto.dns.create(function(res2) {
-            if (!res2.error) {
-                fathom.proto.dns.lookup(function(res3) {
-                    if (!res3 || res3.error) {
-                        that.end(TESTSTATUS.ERRORS,res3);
-                    } else if (!res3.answers || _.isEmpty(res3.answers)) {
-                        that.end(TESTSTATUS.FAILURE,res3);
-                    } else {
-                        that.end(TESTSTATUS.SUCCESS,res3);
-                    }
-                    next(false,undefined); // continue
-                }, res2, HOST, 5);
-            } else {
+        fathom.tools.dnsLookup(function(res2) {
+                console.log(res2);
+            if (!res2 || res2.error) {
                 that.end(TESTSTATUS.ERRORS,res2);
-                next(false,undefined);
+            } else if (!res2.answers || _.isEmpty(res2.answers)) {
+                that.end(TESTSTATUS.FAILURE,res2);
+            } else {
+                that.end(TESTSTATUS.SUCCESS,res2);
             }
-        }, DNSSERVER, 'udp', 53);
+            next(false,undefined); // continue to next in anycase
+        }, HOST, DNSSERVER);
     };
 
     var dnstest4 = new Test({
-        name: "DNS lookup with Firefox name lookup",
+        name: "Lookup with Firefox",
         shortname: 'dns4',
         help: "Resolves '"+HOST+"' IP address with Firefox name lookup. If the test fails, your local DNS configuration is not correct.",
         'test-running-txt' : 'resolving "' + HOST + '" with Firefox...',
@@ -395,17 +382,15 @@ var TestSuites = Backbone.Collection.extend({
     dnstest4.exec = function(next, res) {
         var that = this;
         that.start();
-        fathom.tools.lookupHostname(function(res2) {
-            if (!res2.error && res2.answers && !_.isEmpty(res2.answers)) {
+        fathom.system.resolveHostname(function(res2) {
+            if (!res2.error && res2.result && res2.result.answers && !_.isEmpty(res2.result.answers)) {
                 that.end(TESTSTATUS.SUCCESS,res2);
-                next(false,undefined);
             } else {
                 that.end(TESTSTATUS.FAILURE,res2);
-                next(false,undefined);
             }
+            next(false,undefined);
         }, HOST);
     };
-
 
     addtest(testsuite2, dnstest1);
     addtest(testsuite2, dnstest2);
