@@ -101,7 +101,7 @@ var TestSuite = Backbone.Model.extend({
 
             if (skip) {
                 that.tests.at(i).end(TESTSTATUS.SKIP, undefined);
-                setTimeout(loop,0,i+1,undefined,skip);
+                setTimeout(loop,0,i+1,skip,undefined);
             } else {
                 that.tests.at(i).exec(function(skiprest, res) {
                     // propagate res and skip flag
@@ -314,7 +314,6 @@ var TestSuites = Backbone.Collection.extend({
         });
     };
 
-    var localdns = undefined;
     var dnstest2 = new Test({
         name: "Lookup with local resolver",
         shortname: 'dns2',
@@ -330,7 +329,6 @@ var TestSuites = Backbone.Collection.extend({
         if (res && res.length>0) {
             that.start();
             fathom.tools.dnsLookup(function(res2) {
-                console.log(res2);
                 if (!res2 || res2.error) {
                     that.end(TESTSTATUS.ERRORS,res2);
                 } else if (!res2.answers || _.isEmpty(res2.answers)) {
@@ -359,7 +357,6 @@ var TestSuites = Backbone.Collection.extend({
         var that = this;
         that.start();
         fathom.tools.dnsLookup(function(res2) {
-                console.log(res2);
             if (!res2 || res2.error) {
                 that.end(TESTSTATUS.ERRORS,res2);
             } else if (!res2.answers || _.isEmpty(res2.answers)) {
@@ -574,7 +571,6 @@ var TestSuites = Backbone.Collection.extend({
         var url = decodeURIComponent(req.u).replace('%3A',':');
         var l = document.createElement("a");
         l.href = url;
-        console.log('debugging',JSON.stringify(l));
 
         var testsuite5 = new TestSuite({
             name:"Test Access to '"+url+"'",
@@ -596,38 +592,27 @@ var TestSuites = Backbone.Collection.extend({
         test1.exec = function(next,res) {
             var that = this;
             that.start();
-            if (localdns) {
-                fathom.proto.dns.create(function(res2) {
-                    if (!res2.error) {
-                        fathom.proto.dns.lookup(function(res3) {
-                            if (!res3 || res3.error) {
-                                that.end(TESTSTATUS.ERRORS,res3);
-                                next(false,undefined);                                
-                            } else if (!res3.answers || _.isEmpty(res3.answers)) {
-                                that.end(TESTSTATUS.FAILURE,res3);
-                                next(true,undefined);
-                            } else {
-                                that.end(TESTSTATUS.SUCCESS,res3);
-                                next(false,res3.answers);
-                            }
-                        }, res2, l.hostname);
-                    } else {
-                        that.end(TESTSTATUS.ERRORS,res2);
-                        next(false,undefined);
-                    }
-                }, localdns, 'udp', 53);
-            } else {
-                // try with firefox
-                fathom.tools.lookupHostname(function(res2) {
-                    if (!res2.error) {
-                        that.end(TESTSTATUS.SUCCESS,res2);
-                        next(false,res2.answers);
-                    } else {
-                        that.end(TESTSTATUS.FAILURE,res2);
-                        next(false,undefined);
-                    }
-                }, l.hostname);                
-            }
+            // try with firefox first
+            fathom.system.resolveHostname(function(res2) {
+                if (!res2.error && res2.result && res2.result.answers && !_.isEmpty(res2.result.answers)) {
+                    that.end(TESTSTATUS.SUCCESS,res2);
+                    next(false,res2.result.answers);
+                } else {
+                    // try with fathom
+                    fathom.tools.dnsLookup(function(res3) {
+                        if (!res3 || res3.error) {
+                            that.end(TESTSTATUS.ERRORS,res3);
+                            next(false, undefined);
+                        } else if (!res3.answers || _.isEmpty(res3.answers)) {
+                            that.end(TESTSTATUS.FAILURE,res3);
+                            next(true, undefined);
+                        } else {
+                            that.end(TESTSTATUS.SUCCESS,res3);
+                            next(false,res3.answers);
+                        }
+                    }, l.hostname);                        
+               }
+            }, l.hostname);             
         };
 
         // is it reachable ?
@@ -637,7 +622,8 @@ var TestSuites = Backbone.Collection.extend({
             help: "Checks if we can reach (ping) the server. If the test has errors, the server may be temporarily down or does not respond to pings.",
             'test-running-txt' : "trying to reach \""+l.hostname+"\" ...",
             'test-success-txt' : 'got a response from "'+l.hostname+'"',
-            'test-errors-txt' : 'no response from "'+l.hostname+'"'                
+            'test-errors-txt' : 'no response from "'+l.hostname+'"',
+            'test-skip-txt' : 'skipped - could not resolve "'+l.hostname+'"'
         });
 
         test2.exec = function(next,res) {
@@ -670,10 +656,11 @@ var TestSuites = Backbone.Collection.extend({
             name: "Download page",
             shortname: 'http',
             help: "Checks if we can download the page.",
-            'test-running-txt' : 'retrieving http://'+url+'/ ...',
+            'test-running-txt' : 'retrieving "'+url+'/"" ...',
             'test-success-txt' : 'HTTP download from "'+url+'" succeeded',
             'test-errors-txt' : 'connection problem while trying to download from "'+url+'"', 
-            'test-failure-txt' : 'HTTP download from "'+url+'" failed'
+            'test-failure-txt' : 'HTTP download from "'+url+'" failed',
+            'test-skip-txt' : 'skipped - could not resolve "'+l.hostname+'"'       
         });
         test3.exec = function(next,res) {
             var that = this;

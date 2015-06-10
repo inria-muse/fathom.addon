@@ -26,17 +26,16 @@ var getQuery = function() {
 };
 
 if (document.baseURI.indexOf('neterror')>0) {
-    console.log('neterror: ' + document.baseURI);
-    var b = document.getElementById('errorTryAgain');
-    if (b) {	    
-	var fb = document.createElement("button"); 
-	fb.id = "errorRunFathom";
-	fb.style = "margin-left:15px;";
-	fb.onclick = function() { 
-	    self.port.emit('fathom', getQuery());
-	};
-	fb.innerHTML = "Debug My Connection with Fathom";
-	b.parentNode.insertBefore(fb, b.nextSibling);
-    }
+  console.log('neterror: ' + document.baseURI);
+  var b = document.getElementById('errorTryAgain');
+  if (b) {	    
+  	var fb = document.createElement("button"); 
+  	fb.id = "errorRunFathom";
+  	fb.style = "margin-left:15px;";
+  	fb.onclick = function() { 
+  	    self.port.emit('fathom', getQuery());
+  	};
+  	fb.innerHTML = "Debug My Connection with Fathom";
+  	b.parentNode.insertBefore(fb, b.nextSibling);
+  }
 } // else some other error
-
