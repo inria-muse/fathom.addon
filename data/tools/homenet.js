@@ -501,9 +501,7 @@ window.onload = function() {
             if (node && node.type) {
                 g.addNode(node);
                 g.redraw();
-                return true;
             }
-            return false;
         };
 
         var done = function() {
@@ -543,22 +541,25 @@ window.onload = function() {
         };
 
         // local discovery
-        fathom.tools.discovery(function(node) {
+        fathom.tools.discovery(function(node, dflag) {
             // keep handling nodes until done
-            if (handlenode(node)) return;
+            handlenode(node);
+            if (!dflag) return;
 
             // local stuff done, do more discovery
-            fathom.tools.discovery(function(node) {
+            fathom.tools.discovery(function(node, dflag) {
                 // keep handling nodes until done
-                if (handlenode(node)) return;
+                handlenode(node);
+                if (!dflag) return;
 
                 // neigh protos done, get the arptable (should be well populated by now)
-                fathom.tools.discovery(function(node) {
+                fathom.tools.discovery(function(node, dflag) {
                     // keep handling nodes until done
-                    if (handlenode(node)) return;
-                    setTimeout(done, 0);
-                },5,['arptable']);
-            },7,['ping','mdns','upnp']);
-        },10,['local','internet','route']);
+                    handlenode(node);
+                    if (dflag) 
+                        setTimeout(done, 0);
+                },['arptable']);
+            },['ping','mdns','upnp'],10);
+        },['local','internet','route']);
     }); // init
 }; // onload

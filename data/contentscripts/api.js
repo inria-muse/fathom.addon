@@ -1585,11 +1585,11 @@ tools.lookupIP.addononly = true;
  * @description Do network neighbour discovery.
  *
  * @access private
- * @param {number} timeout - Time to wait devices (in seconds).
  * @param {Array} protocols - List of discovery protocols, valid values: 'local', 'route', 'internet', 'upnp', 'mdns', 'ping', 'arptable'.
+ * @param {number} timeout - Discovery timeout (in seconds). Applies to upnp, mdns and ping.
  */
-tools.discovery = function(callback, timeout, protocols) {
-    makereq(callback, "tools", "discovery", [timeout, protocols]);
+tools.discovery = function(callback, protocols, timeout) {
+    makereq(callback, "tools", "discovery", [protocols, timeout]);
 };
 tools.discovery.addononly = true;
 

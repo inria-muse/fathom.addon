@@ -47,6 +47,15 @@ exports["testdnslookup3"] = function(assert, done) {
     }, { method : 'dnsLookup', params : ['muse.inria.fr', '8.8.8.8']});
 };
 
+
+exports["testdnslookup4"] = function(assert, done) {
+    tools.exec(function(res) {
+		console.log(res);
+		assert.ok(res.error, "dnsLookup error");
+		done();
+    }, { method : 'dnsLookup', params : ['muse.inria.fr', '1.2.3.4']});
+};
+
 exports["testlookupmyip"] = function(assert, done) {
     tools.exec(function(res) {
 		console.log(res);
@@ -68,78 +77,77 @@ exports["testlookupmac"] = function(assert, done) {
 exports["testdisclocal"] = function(assert, done) {
     tools.exec(function(res,dflag) {
 		console.log(res);
-		if (!dflag)
-		    assert.ok(res.type === 'local', "got correct node type");	
-		else
-		    done();
+	    assert.ok(res.type === 'local', "got correct node type");	
+		if (dflag) done();
     }, { method : 'discovery',
-	 params : [5,['local']]});
+	 params : [['local']]});
 };
 
 exports["testdiscinternet"] = function(assert, done) {
     tools.exec(function(res,dflag) {
 		console.log(res);
-		if (!dflag)
-		    assert.ok(res.type === 'internet', "got correct node type");	
-		else
-		    done();
+	    assert.ok(res.type === 'internet', "got correct node type");	
+		if (dflag) done();
     }, { method : 'discovery',
-	 params : [5,['internet']]});
+	 params : [['internet']]});
 };
 
 exports["testdiscroute"] = function(assert, done) {
     tools.exec(function(res,dflag) {
 		console.log(res);
-		if (!dflag)
-		    assert.ok(res.type === 'gw', "got correct node type");	
-		else
-		    done();
+	    assert.ok(res.type === 'gw', "got correct node type");	
+		if (dflag) done();
     }, { method : 'discovery',
-	 params : [5,['route']]}, {neighbors : {}});
+	 params : [['route']]}, {neighbors : {}});
 };
 
 exports["testdiscmdns"] = function(assert, done) {
     tools.exec(function(res,dflag) {
 		console.log(res);
-		if (!dflag)
+		if (res)
 		    assert.ok(res.raw['mdns'], "correct raw results");	
 		else
-		    done();
-    }, { method : 'discovery',
-	 params : [10,['mdns']]}, {neighbors : {}});
-};
+		    assert.ok(dflag, "last node is null");	
 
-exports["testdiscping"] = function(assert, done) {
-    tools.exec(function(res,dflag) {
-		console.log(res);
-		if (!dflag)
-		    assert.ok(res.raw['ping'], "correct raw results");	
-		else
-		    done();
+		if (dflag) done();
     }, { method : 'discovery',
-	 params : [5,['ping']]}, {neighbors : {}});
+	 params : [['mdns']]}, {neighbors : {}});
 };
 
 exports["testdiscupnp"] = function(assert, done) {
     tools.exec(function(res,dflag) {
 		console.log(res);
-		if (!dflag)
+		if (res)
 		    assert.ok(res.raw['upnp'], "correct raw results");	
 		else
-		    done();
+		    assert.ok(dflag, "last node is null");	
+
+		if (dflag) done();
     }, { method : 'discovery',
-	 params : [10,['upnp']]}, {neighbors : {}});
+	 params : [['upnp']]}, {neighbors : {}});
+};
+
+exports["testdiscping"] = function(assert, done) {
+    tools.exec(function(res,dflag) {
+		console.log(res);
+		if (res)
+		    assert.ok(res.raw['ping'], "correct raw results");	
+		else
+		    assert.ok(dflag, "last node is null");	
+
+		if (dflag) done();
+    }, { method : 'discovery',
+	 params : [['ping'],5]}, {neighbors : {}});
 };
 
 exports["testdiscarptable"] = function(assert, done) {
     tools.exec(function(res,dflag) {
 		console.log(res);
-		if (!dflag)
+		if (res)
 		    assert.ok(res.raw['arptable'], "correct raw results");	
-		else
-		    done();
+		if (dflag) done();
     }, { method : 'discovery',
-	 params : [10,['arptable']]}, {neighbors : {}});
+	 params : [['arptable']]}, {neighbors : {}});
 };
 
 exports["testdiscall"] = function(assert, done) {
