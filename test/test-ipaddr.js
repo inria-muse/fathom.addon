@@ -32,4 +32,12 @@ exports["testParsing"] = function(assert) {
 
 };
 
+exports["teststuff"] = function(assert) {
+    var addr1 = ipaddr.parse("192.168.1.255");
+    console.log(addr1.range());
+    var addr2 = ipaddr.parse("127.0.0.1");
+    console.log(addr2.range());
+    assert.ok(ipaddr.parse("192.168.1.255").range() === 'broadcast', "bcast " + ipaddr.parse("192.168.1.255").range());
+}
+
 require("sdk/test").run(exports);

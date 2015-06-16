@@ -64,10 +64,6 @@ var NetGraph = function(elem, clickevents, width) {
                     name = "Mac Device";
             }
 
-            if (!name && n.raw['ping'] && n.raw['ping'].arp && n.raw['ping'].arp.hostname) {
-                name = n.raw['ping'].arp.hostname;
-            }
-
             if (!name && n.raw['arptable'] && n.raw['arptable'].hostname)
                 name = n.raw['arptable'].hostname;
 
@@ -320,6 +316,10 @@ var NetGraph = function(elem, clickevents, width) {
     redraw();
 }; // NetGraph
 
+NetGraph.prototype.getNumNodes = function() {
+    return this.nodes.length;
+};
+
 NetGraph.prototype.addNode = function(newnode) {
     var that = this;
 
@@ -497,14 +497,20 @@ window.onload = function() {
         // FIXME: mobile flag + adjust width ?
         var g = new NetGraph('#canvas', false, 650);
 
+        var doneflag = false; // make sure 'done' is called only once
+
         var handlenode = function(node) {
-            if (node && node.type) {
+            if (!doneflag && node && node.type) {
                 g.addNode(node);
                 g.redraw();
             }
         };
 
         var done = function() {
+            if (doneflag)
+                return;
+            doneflag = true;
+
             var elapsed = (window.performance.now() - startts); // ms
             $('#waitspin').hide();
 
@@ -548,7 +554,11 @@ window.onload = function() {
 
             // local stuff done, do more discovery
             fathom.tools.discovery(function(node, dflag) {
-                // keep handling nodes until done
+                if (g.getNumNodes() > 25) {
+                    // stop here, the graph is getting a mess
+                    setTimeout(done, 0);
+                    return;
+                }
                 handlenode(node);
                 if (!dflag) return;
 
@@ -558,8 +568,9 @@ window.onload = function() {
                     handlenode(node);
                     if (dflag) 
                         setTimeout(done, 0);
-                },['arptable']);
-            },['ping','mdns','upnp'],10);
+
+                },['arptable'],5);
+            },['ping','mdns','upnp'],7);
         },['local','internet','route']);
     }); // init
 }; // onload
