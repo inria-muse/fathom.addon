@@ -1,5 +1,5 @@
 {
-  "name": "ipaddr.js",
+  "name": "ipaddr",
   "description": "A library for manipulating IPv4 and IPv6 addresses in JavaScript.",
   "version": "1.0.1",
   "author": {
