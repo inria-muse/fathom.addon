@@ -17,12 +17,15 @@
 
 socket.multicastOpenSocket = function(ttl, loopback) {
     var s = NSPR.sockets.PR_OpenUDPSocket(NSPR.sockets.PR_AF_INET);
+    if (!s || s === -1)
+        return {error: "Error creating socket: " + NSPR.errors.PR_GetError()};
 
     // Set the TTL for the send. Default 1 (local network).
     if (ttl!==undefined && ttl>0) {
         var res = socket.setSocketOption(s,'mcast_ttl',ttl); 
         if (res.error) {
-            NSPR.sockets.PR_Close(s);
+            if (s !== -1)
+                NSPR.sockets.PR_Close(s);
             return res;
         }
     }
@@ -31,7 +34,8 @@ socket.multicastOpenSocket = function(ttl, loopback) {
     if (loopback!==undefined) {
         var res = socket.setSocketOption(s,'mcast_loopback',loopback); 
         if (res.error) {
-            NSPR.sockets.PR_Close(s);
+            if (s !== -1)
+                NSPR.sockets.PR_Close(s);
             return res;
         }
     }
@@ -76,9 +80,7 @@ socket.multicastJoin = function(s, ip, port, reuse) {
     opt.value = maddr;
 
     if (NSPR.sockets.PR_SetMulticastSocketOption(s, opt.address()) === NSPR.sockets.PR_FAILURE) {
-        return {error : "Failed to set option ["+
-        opt.option+"="+ip+"]: " + 
-        NSPR.errors.PR_GetError()};
+        return {error : "Failed to set option ["+opt.option+"="+ip+"]: "+NSPR.errors.PR_GetError()};
     }
 
     // ok

@@ -18,6 +18,8 @@
 
  socket.tcpOpenSendSocket = function(ip, port) {
     var s = NSPR.sockets.PR_OpenTCPSocket(NSPR.sockets.PR_AF_INET);
+    if (!s)
+        return {error: "Error creating socket: " + NSPR.errors.PR_GetError()};
 
     var timeout = NSPR.util.PR_MillisecondsToInterval(1000);
     var addr = new NSPR.types.PRNetAddr();
@@ -28,8 +30,10 @@
         port, 
         addr.address());
 
-    if (NSPR.sockets.PR_Connect(s, addr.address(), timeout) < 0)
+    if (NSPR.sockets.PR_Connect(s, addr.address(), timeout) < 0) {
+        NSPR.sockets.PR_Close(s);
         return {error : "Error connecting: " + NSPR.errors.PR_GetError()};
+    }
 
     // ok
     return s;
@@ -37,27 +41,35 @@
 
 socket.tcpOpenReceiveSocket = function(port, reuse) {
     var s = NSPR.sockets.PR_OpenTCPSocket(NSPR.sockets.PR_AF_INET);
+    if (!s)
+        return {error: "Error creating socket: " + NSPR.errors.PR_GetError()};
+
     reuse = (reuse!==undefined ? reuse : false);
     if (reuse) {
         var res = socket.setSocketOption(s,'reuseaddr',true); 
         if (res.error) {
+            NSPR.sockets.PR_Close(s);
             return res;
         }
-    }   
+    }
 
     var addr = new NSPR.types.PRNetAddr();
     NSPR.sockets.PR_SetNetAddr(NSPR.sockets.PR_IpAddrAny, 
      NSPR.sockets.PR_AF_INET,
      port, addr.address());
 
-    if (NSPR.sockets.PR_Bind(s, addr.address()) != 0)
+    if (NSPR.sockets.PR_Bind(s, addr.address()) != 0) {
+        NSPR.sockets.PR_Close(s);        
         return {error: "Error binding: " + NSPR.errors.PR_GetError()};
+    }
 
-    if (NSPR.sockets.PR_Listen(s, 1) != 0)
+    if (NSPR.sockets.PR_Listen(s, 1) != 0) {
+        NSPR.sockets.PR_Close(s);
         return {error: "Error listening: " + NSPR.errors.PR_GetError()};
+    }
 
     // ok
-    return {};
+    return s;
 };
 
 // FIXME: how could we pass the new socket back to the 
@@ -82,7 +94,8 @@ socket.tcpAccept = function(s, timeout) {
     if (!sin.isNull()) {
         // close the listening socket and replace the current listening socket
         // with the incoming client socket
-        NSPR.sockets.PR_Close(s); 
+        if (s !== -1)
+            NSPR.sockets.PR_Close(s); 
         worker.socket = sin;
 
         var port = NSPR.util.PR_ntohs(addr.port);

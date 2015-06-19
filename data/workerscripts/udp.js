@@ -17,6 +17,8 @@
 
 socket.udpOpen = function() {
     var s = NSPR.sockets.PR_OpenUDPSocket(NSPR.sockets.PR_AF_INET);
+    if (!s)
+        return {error: "Error creating socket: " + NSPR.errors.PR_GetError()};
     return s;
 };
 

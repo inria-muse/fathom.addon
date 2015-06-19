@@ -17,9 +17,13 @@
 
 socket.broadcastOpenSendSocket = function() {
   var s = NSPR.sockets.PR_OpenUDPSocket(NSPR.sockets.PR_AF_INET);
+  if (!s || s === -1)
+    return {error: "Error creating socket: " + NSPR.errors.PR_GetError()};
+
   var res = socket.setSocketOption(s,'bcast',true); 
   if (res.error) {
-    NSPR.sockets.PR_Close(s);
+    if (s !== -1)
+      NSPR.sockets.PR_Close(s);
     return res;
   }
   return s;
@@ -27,6 +31,8 @@ socket.broadcastOpenSendSocket = function() {
 
 socket.broadcastOpenReceiveSocket = function(port) {
   var s = NSPR.sockets.PR_OpenUDPSocket(NSPR.sockets.PR_AF_INET);
+  if (!s || s === -1)
+    return {error: "Error creating socket: " + NSPR.errors.PR_GetError()};
 
   var res = socket.setSocketOptionRet(s,'reuseaddr',true); 
   if (res.error) {
@@ -40,7 +46,8 @@ socket.broadcastOpenReceiveSocket = function(port) {
     NSPR.sockets.PR_AF_INET, port, addr.address());
 
   if (NSPR.sockets.PR_Bind(s, addr.address()) != 0) {
-    NSPR.sockets.PR_Close(s);
+    if (s !== -1)
+      NSPR.sockets.PR_Close(s);
     return {error: "Error binding: " + NSPR.errors.PR_GetError()};
   }
   return s;

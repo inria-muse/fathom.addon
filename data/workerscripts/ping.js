@@ -419,8 +419,9 @@
         };
 
         // create and connect the socket
-        settings.socket = 
-        NSPR.sockets.PR_OpenTCPSocket(NSPR.sockets.PR_AF_INET);
+        settings.socket = NSPR.sockets.PR_OpenTCPSocket(NSPR.sockets.PR_AF_INET);
+        if (!settings.socket || settings.socket === -1)
+            return {error : "Error creating socket : code = " + NSPR.errors.PR_GetError()};
 
         var addr = new NSPR.types.PRNetAddr();
         addr.ip = NSPR.util.StringToNetAddr(settings.client);
@@ -436,9 +437,10 @@
             settings.timeout);
 
         if (rc < 0) {
-            NSPR.sockets.PR_Close(settings.socket);
-            return {error : "Error connecting : code = " + 
-            NSPR.errors.PR_GetError()};
+            if (settings.socket !== -1)
+                NSPR.sockets.PR_Close(settings.socket);            
+            settings.socket = undefined;            
+            return {error : "Error connecting : code = " + NSPR.errors.PR_GetError()};
         }
 
         pstats.rr = tr.getts();
@@ -822,8 +824,9 @@
         }; // rcv
 
         // create and connect the socket
-        settings.socket = 
-        NSPR.sockets.PR_OpenUDPSocket(NSPR.sockets.PR_AF_INET);
+        settings.socket = NSPR.sockets.PR_OpenUDPSocket(NSPR.sockets.PR_AF_INET);
+        if (!settings.socket || settings.socket === -1)            
+            return {error : "Error creating socket : code = " + NSPR.errors.PR_GetError()};
 
         var addr = new NSPR.types.PRNetAddr();
         addr.ip = NSPR.util.StringToNetAddr(settings.client);
@@ -839,9 +842,10 @@
             settings.timeout);
 
         if (rc < 0) {
-            NSPR.sockets.PR_Close(settings.socket);
-            return {error : "Error connecting : code = " + 
-            NSPR.errors.PR_GetError()};
+            if (settings.socket !== -1)
+                NSPR.sockets.PR_Close(settings.socket);
+            settings.socket = undefined;
+            return {error : "Error connecting : code = " + NSPR.errors.PR_GetError()};
         }
 
         setTimeout(snd,0);
@@ -921,6 +925,8 @@
 
         // create and connect the socket
         settings.socket = NSPR.sockets.PR_OpenUDPSocket(NSPR.sockets.PR_AF_INET);
+        if (!settings.socket || settings.socket === -1)
+            return {error : "Error creating socket : code = " + NSPR.errors.PR_GetError()};
 
         var addr = new NSPR.types.PRNetAddr();
 
@@ -931,7 +937,9 @@
             addr.address());
 
         if (NSPR.sockets.PR_Bind(settings.socket, addr.address()) < 0) {
-            NSPR.sockets.PR_Close(settings.socket);
+            if (settings.socket !== -1)
+                NSPR.sockets.PR_Close(settings.socket);
+            settings.socket = undefined;            
             return {error : "Error binding : code = " + NSPR.errors.PR_GetError()};
         } 
 
