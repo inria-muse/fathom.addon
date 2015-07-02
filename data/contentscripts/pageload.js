@@ -13,7 +13,7 @@
  *
  * @author Anna-Kaisa Pietilainen <anna-kaisa.pietilainen@inria.fr> 
  */
- window.onload = function() {
+(function() {
 	if (typeof self !== "undefined" && self.options.enableperf) {
 	 	// delay slightly so we get the LoadEventEnd to the stats
  		setTimeout(function() {
@@ -34,6 +34,6 @@
 			    }
 			}
 			self.port.emit('perf', obj);
-		}, 10);
+		}, 5);
  	}
-};
+}());
