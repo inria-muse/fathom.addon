@@ -24,10 +24,30 @@
  * @author Anna-Kaisa Pietilainen <anna-kaisa.pietilainen@inria.fr> 
  */
 
-// fathom API stuff
-if (typeof addon !== "undefined" || 
-    (typeof self !== "undefined" && self.options.enableapi)) 
-{
+if (document.baseURI.indexOf('about:neterror')>=0) {
+    // this is a FF error page
+    console.log('content-script::neterror: ' + document.baseURI);
+
+    var fb = document.createElement("button"); 
+    fb.id = "errorRunFathom";
+    fb.style = "margin-left:15px;";
+    fb.onclick = function() { 
+        var req = {
+            module : 'internal',
+            method : 'debugtool',
+            params : document.baseURI,
+            id : 0
+        };
+        self.port.emit('req', req);
+    };
+    fb.innerHTML = "Debug My Connection with Fathom";
+
+    var b = document.getElementById('errorTryAgain');
+    b.parentNode.insertBefore(fb, b.nextSibling);
+
+} else if (typeof addon !== "undefined" || (typeof self !== "undefined" && self.options.enableapi)) {
+    // setup Fathom API
+
     // The global Fathom object clone in page script context or 
     // the actual object if trusted (this script is loaded in page context)
     var fathom = undefined; 
@@ -337,4 +357,5 @@ if (typeof addon !== "undefined" ||
             window.fathom = fathom = dummyfathom;
         }
     }()); // init closure
-} // disabled
+
+} // else Fathom API is disabled

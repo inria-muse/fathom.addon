@@ -565,12 +565,8 @@ var TestSuites = Backbone.Collection.extend({
     addtest(testsuite4, httptest2);
     testsuites.add(testsuite4);
 
-    if (req && req.u) {
-        // debug access to a specific url
-        // TODO: why doesn't the decode work here ?!?
-        var url = decodeURIComponent(req.u).replace('%3A',':');
-        var l = document.createElement("a");
-        l.href = url;
+    if (req && req.hostname) {
+        var url = req.protocol + '://' + req.hostname + req.pathname;
 
         var testsuite5 = new TestSuite({
             name:"Test Access to '"+url+"'",
@@ -583,9 +579,9 @@ var TestSuites = Backbone.Collection.extend({
             name: "Hostname lookup",
             shortname: 'dns',
             help: "Checks if we can resolve IP address of the host. If this test fails, you don't see the page because its IP address could not be found.",
-            'test-running-txt' : 'resolving ' + l.hostname + '...',
+            'test-running-txt' : 'resolving ' + req.hostname + '...',
             'test-success-txt' : 'resolution completed succesfully',
-            'test-failure-txt' : '"' + l.hostname + '" not found',
+            'test-failure-txt' : '"' + req.hostname + '" not found',
             'test-errors-txt' : 'connection problem while trying to resolve the name'
         });
 
@@ -610,9 +606,9 @@ var TestSuites = Backbone.Collection.extend({
                             that.end(TESTSTATUS.SUCCESS,res3);
                             next(false,res3.answers);
                         }
-                    }, l.hostname);                        
+                    }, req.hostname);                        
                }
-            }, l.hostname);             
+            }, req.hostname);             
         };
 
         // is it reachable ?
@@ -620,10 +616,10 @@ var TestSuites = Backbone.Collection.extend({
             name: "Server reachability",
             shortname: 'network',
             help: "Checks if we can reach (ping) the server. If the test has errors, the server may be temporarily down or does not respond to pings.",
-            'test-running-txt' : "trying to reach \""+l.hostname+"\" ...",
-            'test-success-txt' : 'got a response from "'+l.hostname+'"',
-            'test-errors-txt' : 'no response from "'+l.hostname+'"',
-            'test-skip-txt' : 'skipped - could not resolve "'+l.hostname+'"'
+            'test-running-txt' : "trying to reach \""+req.hostname+"\" ...",
+            'test-success-txt' : 'got a response from "'+req.hostname+'"',
+            'test-errors-txt' : 'no response from "'+req.hostname+'"',
+            'test-skip-txt' : 'skipped - could not resolve "'+req.hostname+'"'
         });
 
         test2.exec = function(next,res) {
@@ -647,7 +643,7 @@ var TestSuites = Backbone.Collection.extend({
                         that.end(TESTSTATUS.ERRORS,res1);
                     }
                     next(false,res);
-                }, l.hostname, { count : 2, interval : 0.5, timeout : 5 });
+                }, req.hostname, { count : 2, interval : 0.5, timeout : 5 });
             }
         };
 
@@ -660,7 +656,7 @@ var TestSuites = Backbone.Collection.extend({
             'test-success-txt' : 'HTTP download from "'+url+'" succeeded',
             'test-errors-txt' : 'connection problem while trying to download from "'+url+'"', 
             'test-failure-txt' : 'HTTP download from "'+url+'" failed',
-            'test-skip-txt' : 'skipped - could not resolve "'+l.hostname+'"'       
+            'test-skip-txt' : 'skipped - could not resolve "'+req.hostname+'"'       
         });
         test3.exec = function(next,res) {
             var that = this;

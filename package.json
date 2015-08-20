@@ -3,13 +3,12 @@
     "title": "Fathom",
     "id": "jid1-o49GgyEaRRmXPA",
     "description": "A Browser-based Network Measurement Platform",
-    "author": "MUSE Inria Paris-Rocquencourt <muse.fathom@inria.fr> (https://team.inria.fr/muse/)",
+    "author": "Anna-Kaisa Pietilainen",
     "license": "MIT",
-    "version": "2.0.34",
-    "contributors": "Anna-Kaisa Pietilainen, Stéphane Archer, Renata Teixeira, Christian Kreibich, Mohan Dhawan, Justin Samuel, Nick Weaver, Mark Allman, Vern Paxson",
+    "version": "2.0.35-dev",
+    "contributors": "Stéphane Archer, Renata Teixeira, Christian Kreibich, Mohan Dhawan, Justin Samuel, Nick Weaver, Mark Allman, Vern Paxson",
     "homepage": "https://muse.inria.fr/fathom",
     "icon": "data/icons/icon-80.png",
-    "icon64": "data/icons/icon-64.png",
     "permissions": {
         "private-browsing": false	
     },
