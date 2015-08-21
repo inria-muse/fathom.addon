@@ -189,16 +189,16 @@ var TestSuites = Backbone.Collection.extend({
     var testsuite1 = new TestSuite({
         name: "General Connectivity Tests",
         shortname: 'connectivity',
-        help: "Set of tests to verify if your network interfaces are available and correctly configured."
+        help: "Set of tests to verify if your device has a network interface available and configured."
     });
 
     var conntest1 = new Test({
         name: "Network interface availability",
         shortname: 'conn1',
-        help: "Checks if you have active network interfaces. If the test fails, make sure your network interface is enabled, cables are connected and that you network router/gateway/modem/wifi access point is switched on.",
-        'test-running-txt' : 'retrieving available network interfaces ...',
+        help: "Checks if your device has active network interfaces. If the test fails, make sure your device's network interface is enabled, cables are connected and that your network's router/gateway/modem/wifi access point is switched on.",
+        'test-running-txt' : 'looking for network interfaces ...',
         'test-success-txt' : 'found network interface(s)',
-        'test-failure-txt' : 'bo network interfaces found',
+        'test-failure-txt' : 'no network interfaces found',
     });
 
     conntest1.exec = function(next) {
@@ -218,7 +218,7 @@ var TestSuites = Backbone.Collection.extend({
     var conntest2 = new Test({
         name: "Network interface type",
         shortname: 'conn2',
-        help: "Checks if other than loopback interface is available. If the test fails, make sure your network interface is enabled, cables are connected and that you network router/gateway/modem/wifi access point is switched on.",
+        help: "Checks if other than loopback interface is available. If the test fails, make sure your device's network interface is enabled, cables are connected and that you network's router/gateway/modem/wifi access point is switched on.",
         'test-running-txt' : 'checking network interfaces ...',
         'test-success-txt' : 'found network interface(s) with non-loopback IP address',
         'test-failure-txt' : 'only the loopback interface is available',
@@ -249,7 +249,7 @@ var TestSuites = Backbone.Collection.extend({
     var conntest3 = new Test({
         name: "Network interface configuration",
         shortname: 'conn3',
-        help: "Checks if there are interfaces with valid IP address available. If the test fails, most likely your gateway/router/modem/wifi access point does not provide you an IP address. Check both your local and the gateway's configurations.",
+        help: "Checks if there are interfaces with a valid IP address available. If the test fails, most likely your gateway/router/modem/wifi access point did not provide an IP address. Check both your device's and the gateway's configurations.",
         'test-running-txt' : 'checking network interface(s) configuration ...',
         'test-success-txt' : 'found network interface(s) with valid address',
         'test-failure-txt' : 'all interface(s) have link-local address',
@@ -287,16 +287,16 @@ var TestSuites = Backbone.Collection.extend({
     var testsuite2 = new TestSuite({
         name:"Name Resolution Tests",
         shortname: 'dns',
-        help: "Set of tests to check your DNS (name to IP address resolution) configuration and correct operation."
+        help: "Set of tests to check your device's DNS (name to IP address resolution) configuration and correct operation."
     });
 
     var dnstest1 = new Test({
         name: "DNS resolver configuration",
         shortname: 'dns1',
-        help: "Checks if there are configured DNS resolvers. If this test has erros, most likely your gateway/router/modem/wifi access point does not provide you a valid DNS configuration. Check both your local and the gateway's configurations.",
+        help: "Checks if there are configured DNS resolvers. If this test has erros, most likely your gateway/router/modem/wifi access point does not provide a valid DNS configuration. Check both your device's and the gateway's configurations.",
         'test-running-txt' : 'retrieving DNS configuration ...',
-        'test-success-txt' : 'found local DNS resolver(s)',
-        'test-errors-txt' : 'no local DNS resolver(s) found',        
+        'test-success-txt' : 'DNS resolver(s) configured',
+        'test-errors-txt' : 'no DNS resolver(s) configured',        
     });
     dnstest1.exec = function(next, res) {
         var that = this;
@@ -315,11 +315,11 @@ var TestSuites = Backbone.Collection.extend({
     };
 
     var dnstest2 = new Test({
-        name: "Lookup with local resolver",
+        name: "DNS lookup with resolver",
         shortname: 'dns2',
         help: "Resolves '"+HOST+"' IP address with your configured DNS resolver using Fathom DNS implementation. If the test fails, your local DNS resolver may not be working correctly.",
-        'test-running-txt' : 'resolving ' + HOST + '...',
-        'test-skip-txt' : 'skipped - no local DNS resolvers found',
+        'test-running-txt' : 'resolving ' + HOST + ' ...',
+        'test-skip-txt' : 'skipped - no DNS resolvers configured',
         'test-success-txt' : 'resolution completed succesfully',
         'test-failure-txt' : '"' + HOST + '" not found',
         'test-errors-txt' : 'fathom had a problem while trying to resolve the name',                
@@ -345,10 +345,10 @@ var TestSuites = Backbone.Collection.extend({
     };
 
     var dnstest3 = new Test({
-        name: "Lookup with public resolver",
+        name: "Lookup with public DNS resolver",
         shortname: 'dns3',
-        help: "Tries to resolve '"+HOST+"' IP address with a public DNS resolver '"+DNSSERVER+"' using Fathom DNS implementation. If the test fails, the public DNS service may not be reachable.",
-        'test-running-txt' : 'resolving "' + HOST + '" with public DNS ...',
+        help: "Tries to resolve '"+HOST+"' IP address with a public DNS resolver ['"+DNSSERVER+"'] using Fathom DNS implementation. If the test fails, the public DNS service may not be reachable.",
+        'test-running-txt' : 'resolving "' + HOST + ' ...',
         'test-success-txt' : 'resolution completed succesfully',
         'test-failure-txt' : '"' + HOST + '" not found',
         'test-errors-txt' : 'fathom had a problem while trying to resolve the name', 
@@ -372,7 +372,7 @@ var TestSuites = Backbone.Collection.extend({
         name: "Lookup with Firefox",
         shortname: 'dns4',
         help: "Resolves '"+HOST+"' IP address with Firefox name lookup. If the test fails, your local DNS configuration is not correct.",
-        'test-running-txt' : 'resolving "' + HOST + '" with Firefox...',
+        'test-running-txt' : 'resolving "' + HOST + ' ...',
         'test-success-txt' : 'resolution completed succesfully',
         'test-failure-txt' : '"' + HOST + '" not found'
     });
@@ -399,13 +399,13 @@ var TestSuites = Backbone.Collection.extend({
     var testsuite3 = new TestSuite({
         name:"Network Level Tests",
         shortname:'network',
-        help: "Set of tests to check your network level configuration and internet reachability."
+        help: "Set of tests to check your device's network configuration and internet reachability."
     });
 
     var nettest1 = new Test({
         name: "Default gateway and routes",
         shortname: 'net1',
-        help: "Checks your network route configuration. If this test fails, check your network configuration. If it has errors, some of the network traffic may not be routed correctly.",
+        help: "Checks your device's network route configuration. If this test fails, check the device's network configuration. If it has errors, some of the network traffic may not be routed correctly.",
         'test-running-txt' : "retrieving the route configuration ...",
         'test-success-txt' : 'found default gateway and route(s)',
         'test-errors-txt' : 'no default gateway or route(s) found',
@@ -431,7 +431,7 @@ var TestSuites = Backbone.Collection.extend({
     var nettest2 = new Test({
         name: "Default gateway reachability",
         shortname: 'net2',
-        help: "Checks if we can reach (ping) the default gateway. If the test has errors, this may just be a problem with ping (e.g. the gateway does not support pinging).",
+        help: "Checks if we can reach (ping) the default gateway. If the test has errors, this may just be a problem with ping (e.g. the gateway does not support ping).",
         'test-running-txt' : "trying to reach the default gateway ...",
         'test-success-txt' : 'got a response from the default gateway',
         'test-errors-txt' : 'no response from the default gateway',
@@ -461,10 +461,10 @@ var TestSuites = Backbone.Collection.extend({
     var nettest3 = new Test({
         name: "Internet reachability",
         shortname: 'net3',
-        help: "Checks if we can reach (ping) a test server in the internet. If the test has errors, this may just be a problem with ping (e.g. the network blocks ping traffic or the server is temporarily down).",
-        'test-running-txt' : "trying to reach the test server ...",
-        'test-success-txt' : 'got a response from the test server',
-        'test-errors-txt' : 'no response from the test server'
+        help: "Checks if we can reach (ping) a Fathom test server in the internet. If the test has errors, this may just be a problem with ping (e.g. the network blocks ping or the Fathom server is temporarily down).",
+        'test-running-txt' : "trying to reach the Fathom test server ...",
+        'test-success-txt' : 'got a response from the Fathom test server',
+        'test-errors-txt' : 'no response from the Fathom test server'
     });
     nettest3.exec = function(next, res) {
         var that = this;
@@ -482,7 +482,7 @@ var TestSuites = Backbone.Collection.extend({
     var nettest4 = new Test({
         name: "Internet reachability ("+HOST+")",
         shortname: 'net4',
-        help: "Check if we can reach (ping) \""+HOST+"\". If the test has errors, this may just be a problem with ping (e.g. the network blocks ping traffic or the server is temporarily down).",
+        help: "Check if we can reach (ping) \""+HOST+"\". If the test has errors, this may just be a problem with ping (e.g. the network blocks ping or \""+HOST+"\" is temporarily down).",
         'test-running-txt' : "trying to reach \""+HOST+"\" ...",
         'test-success-txt' : 'got a response from "'+HOST+'"',
         'test-errors-txt' : 'no response from "'+HOST+'"'
@@ -514,13 +514,13 @@ var TestSuites = Backbone.Collection.extend({
     });
 
     var httptest1 = new Test({
-        name: "HTTP page load from the test server",
+        name: "HTTP page load from the Fathom test server",
         shortname: 'http1',
-        help: "Checks if we can retrieve a web page from a test server. If the test has errors, this may indicate a problem with your network connection. If it fails, the test server may be temporarily down.",
-        'test-running-txt' : 'retrieving a web page from the test server ...',
-        'test-success-txt' : 'HTTP download from test server succeeded',
-        'test-errors-txt' : 'connection problem while trying to download from the test server', 
-        'test-failure-txt' : 'HTTP download from test server failed'
+        help: "Checks if we can retrieve a web page from a Fathom test server. If the test has errors, this may indicate a problem with your network connection. If it fails, the Fathom test server may be temporarily down.",
+        'test-running-txt' : 'retrieving a web page from the Fathom test server ...',
+        'test-success-txt' : 'HTTP download from the Fathom test server succeeded',
+        'test-errors-txt' : 'connection problem while trying to download from the Fathom test server', 
+        'test-failure-txt' : 'HTTP download from the Fathom test server failed'
     });
     httptest1.exec = function(next,res) {
         var that = this;
@@ -565,11 +565,12 @@ var TestSuites = Backbone.Collection.extend({
     addtest(testsuite4, httptest2);
     testsuites.add(testsuite4);
 
+    // Additional testing if we came here from about:neterror (try to debug the URL that caused the neterror)
     if (req && req.hostname) {
         var url = req.protocol + '://' + req.hostname + req.pathname;
 
         var testsuite5 = new TestSuite({
-            name:"Test Access to '"+url+"'",
+            name:'Test Access to "'+url+'"',
             shortname:'debugurl',
             help: 'Set of tests to troubleshoot access problem with "'+url+'".'
         });
@@ -578,11 +579,11 @@ var TestSuites = Backbone.Collection.extend({
         var test1 = new Test({
             name: "Hostname lookup",
             shortname: 'dns',
-            help: "Checks if we can resolve IP address of the host. If this test fails, you don't see the page because its IP address could not be found.",
-            'test-running-txt' : 'resolving ' + req.hostname + '...',
+            help: 'Checks if we can resolve IP address of "'req.hostname+'". If this test fails, check that the URL (hostname) is correct.',
+            'test-running-txt' : 'resolving "'req.hostname+'" ...',
             'test-success-txt' : 'resolution completed succesfully',
             'test-failure-txt' : '"' + req.hostname + '" not found',
-            'test-errors-txt' : 'connection problem while trying to resolve the name'
+            'test-errors-txt' : 'connection problem while trying to resolve "'req.hostname+'"'
         });
 
         test1.exec = function(next,res) {
@@ -615,8 +616,8 @@ var TestSuites = Backbone.Collection.extend({
         var test2 = new Test({
             name: "Server reachability",
             shortname: 'network',
-            help: "Checks if we can reach (ping) the server. If the test has errors, the server may be temporarily down or does not respond to pings.",
-            'test-running-txt' : "trying to reach \""+req.hostname+"\" ...",
+            help: 'Checks if we can reach (ping) "'+req.hostname+'". If the test has errors, the server may be temporarily down or does not respond to pings.',
+            'test-running-txt' : 'trying to reach "'+req.hostname+'" ...',
             'test-success-txt' : 'got a response from "'+req.hostname+'"',
             'test-errors-txt' : 'no response from "'+req.hostname+'"',
             'test-skip-txt' : 'skipped - could not resolve "'+req.hostname+'"'
@@ -651,8 +652,8 @@ var TestSuites = Backbone.Collection.extend({
         var test3 = new Test({
             name: "Download page",
             shortname: 'http',
-            help: "Checks if we can download the page.",
-            'test-running-txt' : 'retrieving "'+url+'/"" ...',
+            help: 'Checks if we can download "'+url+'". If the test has errors, the server may be temporarily down or the URL is incorrect.',
+            'test-running-txt' : 'retrieving "'+url+'" ...',
             'test-success-txt' : 'HTTP download from "'+url+'" succeeded',
             'test-errors-txt' : 'connection problem while trying to download from "'+url+'"', 
             'test-failure-txt' : 'HTTP download from "'+url+'" failed',
