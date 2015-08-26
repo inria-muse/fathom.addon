@@ -1,5 +1,5 @@
-const config = require("config");
-const systemapi = require("systemapi");
+const config = require("../lib/config");
+const systemapi = require("../lib/systemapi");
 const system = require("sdk/system");
 const _ = require('underscore');
 

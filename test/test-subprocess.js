@@ -87,7 +87,7 @@ exports['test4'] = function(assert, done) {
     var p = child_process.spawn(prog,['ping']);
 
     p.stdout.on('data', function(data) {
-        assert.ok((data.indexOf("ping")>0), "sdk found ping");
+        assert.ok((data.indexOf("ping")>0), "sdk found ping at " + data);
     });
 
     p.stderr.on('data', function(data) {
@@ -102,13 +102,14 @@ exports['test4'] = function(assert, done) {
 
 exports['test5'] = function(assert, done) {
     const child_process = require("sdk/system/child_process");
-	const utils = require('utils');
+	const utils = require('../lib/utils');
 	var prog = (os === 'winnt' ? 'C:\\Windows\\System32\\ping.exe' : '/bin/ping');
     var p = child_process.spawn(prog,['-c 1','www.google.com']);
 
 	assert.ok(utils.isExecFile(prog), "is executable");
 	
     p.stdout.on('data', function(data) {
+        console.log(data);
         assert.ok(data && data.length>0, "ping ok");
     });
 

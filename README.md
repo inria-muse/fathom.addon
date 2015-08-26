@@ -10,27 +10,23 @@ License: MIT
 
 Fathom v2.0 is written on top of the Firefox Add-on SDK (https://developer.mozilla.org/en/Add-ons/SDK). To develop add-on extensions, you need:
 
-- Python 2.5, 2.6 or 2.7.
-- Firefox.
-- The SDK: you can obtain the latest stable version of the SDK from [Mozilla](https://developer.mozilla.org/en-US/Add-ons/SDK/Tutorials/Installation).
+- Firefox (38.0 or later)
+- NPM (npm install jpm -g)
 
-Once you have downloaded the SDK:
+To run a firefox with temporary profile and the addon installed:
 
 ```
-$ tar -xf addon-sdk.tar.gz
-$ cd addon-sdk
-$ source bin/activate
 $ cd <path-to>/fathom.git
-$ cfx run
+$ jpm run
 ```
 
 To run the unit tests:
 
 ```
-$ cfx test
+$ jpm test
 ```
 
-More info on cfx: https://developer.mozilla.org/en-US/Add-ons/SDK/Tools/cfx
+More info on jpm: https://developer.mozilla.org/en-US/Add-ons/SDK/Tools/jpm
 
 ## Download and Use Fathom
 

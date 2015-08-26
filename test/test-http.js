@@ -1,4 +1,4 @@
-var protoapi = require("./protoapi");
+var protoapi = require("../lib/protoapi");
 var server = "62.210.73.169";
 
 var manifest = {

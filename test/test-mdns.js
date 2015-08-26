@@ -1,4 +1,4 @@
-var protoapi = require("./protoapi");
+var protoapi = require("../lib/protoapi");
 
 var manifest = {
     api : ["proto.*"],

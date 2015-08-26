@@ -1,5 +1,5 @@
 var _ = require('underscore');
-var sec = require("./security");
+var sec = require("../lib/security");
 
 exports["testerrors"] = function(assert) {
     var m = {

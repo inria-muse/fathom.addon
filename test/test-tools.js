@@ -1,5 +1,5 @@
-var tools = require("./toolsapi");
-require('./systemapi').setup();
+var tools = require("../lib/toolsapi");
+require('../lib/systemapi').setup();
 
 var manifest = {
     isaddon : true,

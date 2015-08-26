@@ -1,4 +1,4 @@
-var tools = require("./toolsapi");
+var tools = require("../lib/toolsapi");
 
 var manifest = {
     isaddon : true,

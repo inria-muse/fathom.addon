@@ -1,7 +1,7 @@
-var baseline = require("./baselineapi");
+var baseline = require("../lib/baselineapi");
 var timers = require("sdk/timers");
 
-require('./systemapi').setup();
+require('../lib/systemapi').setup();
 baseline.setup();
 
 exports["testnetworkbasic"] = function(assert, done) {

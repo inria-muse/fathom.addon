@@ -1,4 +1,4 @@
-var protoapi = require("./protoapi");
+var protoapi = require("../lib/protoapi");
 
 var manifest = {
     neighbors : {},
@@ -117,7 +117,7 @@ exports["testudp"] = function(assert, done) {
 };
 
 exports["testmulticast"] = function(assert, done) {
-    var config = require("./config");
+    var config = require("../lib/config");
 
     var docli = function() {
 	protoapi.exec(function(id) {

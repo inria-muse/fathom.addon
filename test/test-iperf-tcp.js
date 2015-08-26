@@ -1,7 +1,7 @@
 const subprocess = require("subprocess");
 var timers = require('sdk/timers');
 
-var socketapi = require("./socketapi");
+var socketapi = require("../lib/socketapi");
 socketapi.start();
 
 var manifest = {
