@@ -6,6 +6,10 @@ Homepage: https://muse.inria.fr/fathom
 
 License: MIT
 
+## CFX Branch
+
+This branch is compatible with the now deprecated CFX tool (compatible add-on sdk available at https://muse.inria.fr/~apietila/addon-sdk-1.17.tar.gz).
+
 ## Extension Development
 
 Fathom v2.0 is written on top of the Firefox Add-on SDK (https://developer.mozilla.org/en/Add-ons/SDK). To develop add-on extensions, you need:
