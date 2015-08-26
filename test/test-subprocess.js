@@ -1,66 +1,69 @@
+const child_process = require("sdk/system/child_process");
 const os = require('sdk/system').platform;
+
+const subprocess = require("../lib/subprocess/subprocess");
+const utils = require('../lib/utils');
+
 console.log(os);
 
 exports['test1'] = function(assert, done) {
-    const subprocess = require("subprocess");
     subprocess.registerDebugHandler(console.log);
     subprocess.registerLogHandler(console.log);
     var p = subprocess.call({
-	command:     (os === 'winnt' ? 'echo' : '/bin/echo'),
-      
-	arguments:   ['foo'],
-      
-	stdout: function(data) {
-      	    console.log(data);
-	    assert.ok((data.trim() === "foo"), "can read from stdout");
-	},
+    	command:     (os === 'winnt' ? 'echo' : '/bin/echo'),
+          
+    	arguments:   ['foo'],
+          
+    	stdout: function(data) {
+          	    console.log(data);
+    	    assert.ok((data.trim() === "foo"), "can read from stdout");
+    	},
 
-	stderr: function(data) {
-	    console.log(data);
-            assert.ok(false, "got data on standard error " + data);
-	},
+    	stderr: function(data) {
+    	    console.log(data);
+                assert.ok(false, "got data on standard error " + data);
+    	},
 
-	done: function(res) {
-            assert.ok(res.exitCode === 0, "return 0 exit code");
-            done();
-	},
+    	done: function(res) {
+                assert.ok(res.exitCode === 0, "return 0 exit code");
+                done();
+    	},
 
-	mergeStderr: false
+    	mergeStderr: false
     });
 };
 
 exports['test2'] = function(assert, done) {
-    const subprocess = require("subprocess");
     subprocess.registerDebugHandler(console.log);
     subprocess.registerLogHandler(console.log);
+
     var p = subprocess.call({
-	command:     (os === 'winnt' ? 'C:\\Windows\\System32\\where.exe' : '/usr/bin/which'),
-      
-	arguments:   ['ping'],
-      
-	stdout: function(data) {
-	    console.log(data);
-            assert.ok((data.indexOf("ping")>0), "found ping");
-	},
+    	command:     (os === 'winnt' ? 'C:\\Windows\\System32\\where.exe' : '/usr/bin/which'),
+          
+    	arguments:   ['ping'],
+          
+    	stdout: function(data) {
+    	    console.log(data);
+                assert.ok((data.indexOf("ping")>0), "found ping");
+    	},
 
-	stderr: function(data) {
-	    console.log(data);
-            assert.ok(false, "got data on standard error " + data);
-	},
+    	stderr: function(data) {
+    	    console.log(data);
+                assert.ok(false, "got data on standard error " + data);
+    	},
 
-	done: function(res) {
-	    console.log(res);
-            assert.ok(res.exitCode === 0, "return 0 exit code");
-            done();
-	},
+    	done: function(res) {
+    	    console.log(res);
+                assert.ok(res.exitCode === 0, "return 0 exit code");
+                done();
+    	},
 
-	mergeStderr: false
+    	mergeStderr: false
     });
 };
 
 
 exports['test3'] = function(assert, done) {
-    const child_process = require("sdk/system/child_process");
     const prog = (os === 'winnt' ? 'echo' : '/bin/echo');
 
     var p = child_process.spawn(prog,['foo']);
@@ -82,7 +85,6 @@ exports['test3'] = function(assert, done) {
 };
 
 exports['test4'] = function(assert, done) {
-    const child_process = require("sdk/system/child_process");
 	var prog = (os === 'winnt' ? 'C:\\Windows\\System32\\where.exe' : '/usr/bin/which');
     var p = child_process.spawn(prog,['ping']);
 
@@ -101,9 +103,10 @@ exports['test4'] = function(assert, done) {
 };
 
 exports['test5'] = function(assert, done) {
-    const child_process = require("sdk/system/child_process");
-	const utils = require('../lib/utils');
 	var prog = (os === 'winnt' ? 'C:\\Windows\\System32\\ping.exe' : '/bin/ping');
+    if (os === 'darwin')
+        prog = '/sbin/ping';
+
     var p = child_process.spawn(prog,['-c 1','www.google.com']);
 
 	assert.ok(utils.isExecFile(prog), "is executable");
@@ -124,29 +127,33 @@ exports['test5'] = function(assert, done) {
 };
 
 exports['test6'] = function(assert, done) {
-    const subprocess = require("subprocess");
     subprocess.registerDebugHandler(console.log);
     subprocess.registerLogHandler(console.log);
+
+    var prog = (os === 'winnt' ? 'C:\\Windows\\System32\\ping.exe' : '/bin/ping');
+    if (os === 'darwin')
+        prog = '/sbin/ping';
+
     var p = subprocess.call({
-	command:     (os === 'winnt' ? 'C:\\Windows\\System32\\ping.exe' : '/bin/ping'),
-      
-	arguments:   ['-c 1','www.google.com'],
-      
-	stdout: function(data) {
-        assert.ok(data && data.length>0, "ping ok");
-	},
+    	command:     prog,
+          
+    	arguments:   ['-c 1','www.google.com'],
+          
+    	stdout: function(data) {
+            assert.ok(data && data.length>0, "ping ok");
+    	},
 
-	stderr: function(data) {
-            assert.ok(false, "got data on standard error " + data);
-	},
+    	stderr: function(data) {
+                assert.ok(false, "got data on standard error " + data);
+    	},
 
-	done: function(res) {
-	    console.log(res);
-            assert.ok(res.exitCode === 0, "return 0 exit code");
-            done();
-	},
+    	done: function(res) {
+    	    console.log(res);
+                assert.ok(res.exitCode === 0, "return 0 exit code");
+                done();
+    	},
 
-	mergeStderr: false
+    	mergeStderr: false
     });
 };
 
