@@ -579,11 +579,11 @@ var TestSuites = Backbone.Collection.extend({
         var test1 = new Test({
             name: "Hostname lookup",
             shortname: 'dns',
-            help: 'Checks if we can resolve IP address of "'req.hostname+'". If this test fails, check that the URL (hostname) is correct.',
-            'test-running-txt' : 'resolving "'req.hostname+'" ...',
+            help: 'Checks if we can resolve IP address of "'+req.hostname+'". If this test fails, check that the URL (hostname) is correct.',
+            'test-running-txt' : 'resolving "'+req.hostname+'" ...',
             'test-success-txt' : 'resolution completed succesfully',
-            'test-failure-txt' : '"' + req.hostname + '" not found',
-            'test-errors-txt' : 'connection problem while trying to resolve "'req.hostname+'"'
+            'test-failure-txt' : '"'+req.hostname+'" not found',
+            'test-errors-txt' : 'connection problem while trying to resolve "'+req.hostname+'"'
         });
 
         test1.exec = function(next,res) {
