@@ -4,7 +4,7 @@ var server = "62.210.73.169";
 var manifest = {
     api : ["proto.*"],
     allowdst : {
-	"tcp" : {"62.210.73.169" : { 80 : true }},
+		"tcp" : {"62.210.73.169" : { 80 : true }},
     },
     neighbors : {},
     isaddonpage : false,
@@ -13,23 +13,23 @@ var manifest = {
 
 exports["testunknown"] = function(assert, done) {
     protoapi.exec(function(res) {
-	assert.ok(res.error !== undefined, "unknown method returns error");
-	done();
+		assert.ok(res.error !== undefined, "unknown method returns error");
+		done();
     }, { module : "proto", submodule: "http", method : 'asd'}, manifest);
 };
 
 exports["testconnect"] = function(assert, done) {
     protoapi.exec(function(id) {
-	assert.ok(id.error === undefined, "http.create no error, id="+id);
+		assert.ok(id.error === undefined, "http.create no error, id="+id);
 
-	protoapi.exec(function(res) {
-	    assert.ok(res.error === undefined, "http.close no error");
-	    done();
-	    
-	}, { module : "proto", 
-	     submodule: "http", 
-	     method : 'close', 
-	     params : [id]}, manifest);
+		protoapi.exec(function(res) {
+		    assert.ok(res.error === undefined, "http.close no error");
+		    done();
+		    
+		}, { module : "proto", 
+		     submodule: "http", 
+		     method : 'close', 
+		     params : [id]}, manifest);
 
     }, { module : "proto", 
 	 submodule: "http", 
@@ -45,17 +45,17 @@ exports["testgetmethod"] = function(assert, done) {
 	    assert.ok(res.error === undefined, "http.send no error");
 
 	    protoapi.exec(function(res) {
-		assert.ok(res.error === undefined, 
-			  "http.receive no error");
-		
-		if (res && !res.error)
-		    assert.ok(res.indexOf("<html>")>=0, 
-			      "http.receive got html document");
-		
-		protoapi.exec(function(res) {
-		    assert.ok(res.error === undefined, 
-			      "http.close no error");
-		    done();
+			assert.ok(res.error === undefined, 
+				  "http.receive no error");
+			
+			if (res && !res.error)
+			    assert.ok(res.indexOf("<html>")>=0, 
+				      "http.receive got html document");
+			
+			protoapi.exec(function(res) {
+			    assert.ok(res.error === undefined, 
+				      "http.close no error");
+			    done();
 		    
 		}, { module : "proto", 
 		     submodule: "http", 

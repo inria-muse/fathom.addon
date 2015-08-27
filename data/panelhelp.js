@@ -42,12 +42,19 @@ var getSize = function() {
     return [w,h];
 }
 
+var emit = function(what, arg) {        
+    addon.port.emit('action', {
+        what : what,
+        arg : arg
+    });
+};
+
 /** Addon requests the document size for re-sizing. */
 addon.port.on('resize', function() {
     var s = getSize();
-    addon.port.emit('resize', {
-		width : s[0],
-		height : s[1]
+    emit('resize', {
+		  width : s[0],
+		  height : s[1]
     });
 });
 
@@ -63,10 +70,10 @@ addon.port.on("render", function(values) {
 
 		// request resize the panel to fit the rendered content
 		var s = getSize();
-		addon.port.emit('resize', {
-		    width : s[0],
-		    height : s[1]
-		});
+        emit('resize', {
+            width : s[0],
+            height : s[1]
+        });
     } else {
 		console.error("Did you forgot to include mustache.js?!");
     }
@@ -85,20 +92,3 @@ addon.port.on("pageload", function(pl) {
 		e.innerHTML = 'no page';
 	}
 });
-
-/** Request the panel to be closed. */
-function closeme() {
-    addon.port.emit('close');
-};
-
-/** Open url in new tab/window and close the dialog unless asked not to. */
-function opentab(url, noclose) {
-    window.open(url,'_blank');
-    if (!noclose) closeme();
-};
-
-/** Send msg to the addon and close the dialog unless asked not to. */
-function emit(msg, noclose) {
-    addon.port.emit('action', msg);
-    if (!noclose) closeme();
-};

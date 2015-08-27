@@ -10,17 +10,17 @@
     <div class="splash-container">
       <div class="splash">
         <h1 class="splash-head">
-	  <img src="icons/icon-32.png" alt="fathomlogo" />&nbsp;Fathom
-	</h1>	
-	<p class="splash-subhead">
-	  <i class="fa fa-warning fa-lg"></i>&nbsp;&nbsp;Share Measurement Data from this tool for research purposes ?
-	</p>	
-	<p class="splash-button">
-	  <button onclick="emit('always');" class="pure-button">Always</button>
-	  <button onclick="emit('yes');" class="pure-button">Yes</button>
-	  <button onclick="emit('no');" class="pure-button">No</button>
-	  <button onclick="emit('never');" class="pure-button">Never</button>
-	</p>
+    	    <img src="icons/icon-32.png" alt="fathomlogo" />&nbsp;Fathom
+	      </h1>	
+      	<p class="splash-subhead">
+	        <i class="fa fa-warning fa-lg"></i>&nbsp;&nbsp;Share Measurement Data from this tool for research purposes ?
+	      </p>	
+        <p class="splash-button">
+          <button onclick="emit('allow',always');" class="pure-button">Always</button>
+          <button onclick="emit('allow','yes');" class="pure-button">Yes</button>
+          <button onclick="emit('allow','no');" class="pure-button">No</button>
+          <button onclick="emit('allow','never');" class="pure-button">Never</button>
+        </p>
       </div>
     </div>     
     <script src="panelhelp.js"></script>
