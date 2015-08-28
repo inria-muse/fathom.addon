@@ -95,23 +95,23 @@ var TestSuite = Backbone.Model.extend({
         
         var loop = function(i, skip, obj) {
             if (i == that.tests.length) {
-                setTimeout(next,0,skip);
+                setTimeout(function() { next(skip); },0);
                 return;
             }
 
             if (skip) {
                 that.tests.at(i).end(TESTSTATUS.SKIP, undefined);
-                setTimeout(loop,0,i+1,skip,undefined);
+                setTimeout(function() { loop(i+1,skip,undefined); },0);
             } else {
                 that.tests.at(i).exec(function(skiprest, res) {
                     // propagate res and skip flag
-                    setTimeout(loop,0,i+1,skiprest,res);
+                    setTimeout(function() { loop(i+1,skiprest,res); },0);
                 }, obj);
             }
         };
 
         console.log("start testsuite " + this.get('name') + " skip="+skipall);
-        setTimeout(loop,0,0,skipall,undefined);
+        setTimeout(function() { loop(0,skipall,undefined); },0);
     },
     toJSON: function(options) {
         var json = { name : this.get('name'), help : this.get('help') };
@@ -149,10 +149,10 @@ var TestSuites = Backbone.Collection.extend({
             }
 
             that.at(i).exec(function(skiprest) {
-                setTimeout(loop,0,i+1,skiprest);
+                setTimeout(function() { loop(i+1,skiprest); },0);
             }, skip);
         };
-        setTimeout(loop,0,0,false);
+        setTimeout(function() { loop(0,false); },0);
     },
     toJSON: function(options) {
         return {

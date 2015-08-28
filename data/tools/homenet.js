@@ -555,7 +555,7 @@ window.onload = function() {
             fathom.tools.discovery(function(node, dflag) {
                 if (g.getNumNodes() > 25) {
                     // stop here, the graph is getting a mess
-                    setTimeout(done, 0);
+                    setTimeout(function() { done(); }, 0);
                     return;
                 }
                 handlenode(node);
@@ -566,7 +566,7 @@ window.onload = function() {
                     // keep handling nodes until done
                     handlenode(node);
                     if (dflag) 
-                        setTimeout(done, 0);
+                        setTimeout(function() { done(); }, 0);
 
                 },['arptable'],5);
             },['ping','mdns','upnp'],7);
