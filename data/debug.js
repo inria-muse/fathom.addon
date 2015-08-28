@@ -40,11 +40,9 @@
             })
         };
 
-        var template = document.getElementById('rendertemplate').innerHTML;
+        var template = $('#rendertemplate').html();
         Mustache.parse(template);
         var rendered = Mustache.render(template, robj);
-
-        var e = document.getElementById('rendertarget');
-        e.innerHTML = rendered;
+        $('#rendertarget').html(rendered);
     }, 'getstats');
 };

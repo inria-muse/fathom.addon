@@ -158,7 +158,7 @@ onmessage = function(event) {
                     "Failed to open socket: " + s.error,
                     undefined,
                     true);
-                setTimeout(cleanup,0); // kill the worker too
+                setTimeout(function() { cleanup(); },0); // kill the worker too
 
             } else {
                 // ok
@@ -176,7 +176,7 @@ onmessage = function(event) {
                     "Failed to start: " + s.error,
                     undefined,
                     true);
-                setTimeout(cleanup,0); // kill the worker too
+                setTimeout(function() { cleanup(); },0); // kill the worker too
             } else {
                 // started ok
                 worker.socket = s;

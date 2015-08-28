@@ -475,13 +475,12 @@ window.onload = function() {
     $('#canvas').empty();
     $('#waitspin').show();
 
-    var utemplate = document.getElementById('uploadtemplate').innerHTML;
+    var utemplate = $('#uploadtemplate').html();
     Mustache.parse(utemplate);
     var renderu = function(params) {
         var rendered = Mustache.render(utemplate, params);
-        var e = document.getElementById('upload');
-        e.innerHTML = rendered;        
-    };    
+        $('#upload').html(rendered);
+    };
 
     // check the upload prefs
     fathom.internal(function(pref) {

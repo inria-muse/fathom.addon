@@ -63,10 +63,9 @@ addon.port.on("render", function(values) {
     if (typeof Mustache !== "undefined") {
 		var template = document.getElementById('rendertemplate').innerHTML;
 		Mustache.parse(template);
-		var rendered = Mustache.render(template, values);
 
-		var e = document.getElementById('rendertarget');
-		e.innerHTML = rendered;
+		var rendered = Mustache.render(template, values);
+		document.getElementById('rendertarget').appendChild(rendered);
 
 		// request resize the panel to fit the rendered content
 		var s = getSize();
@@ -80,15 +79,20 @@ addon.port.on("render", function(values) {
 });
 
 /** Pageload stats for the current active tab (displayed in the menu). */
+var child = undefined;
 addon.port.on("pageload", function(pl) {
 	var e = document.getElementById('pageload');
+    if (child) {
+        e.removeChild(child);
+    }
+    
 	if (!pl.monitenabled) {
-		e.innerHTML = 'monitoring disabled';
+		child = e.appendChild(document.createTextNode('monitoring disabled'));
 	} else if (pl.readyState === 'complete') {
-		e.innerHTML = pl.objects + ' objects in ' + pl.pageloadtime + ' ms';
+		child = e.appendChild(document.createTextNode(pl.objects + ' objects in ' + pl.pageloadtime + ' ms'));
 	} else if (pl.readyState === 'loading' || pl.readyState === 'interactive') {
-		e.innerHTML = 'page loading ...';
+		child = e.appendChild(document.createTextNode('page loading ...'));
 	} else {
-		e.innerHTML = 'no page';
+		child = e.appendChild(document.createTextNode('no page'));
 	}
 });

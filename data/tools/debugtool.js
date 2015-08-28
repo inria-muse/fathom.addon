@@ -514,7 +514,7 @@ var TestSuites = Backbone.Collection.extend({
     });
 
     var httptest1 = new Test({
-        name: "HTTP page load from the Fathom test server",
+        name: "HTTP page load",
         shortname: 'http1',
         help: "Checks if we can retrieve a web page from a Fathom test server. If the test has errors, this may indicate a problem with your network connection. If it fails, the Fathom test server may be temporarily down.",
         'test-running-txt' : 'retrieving a web page from the Fathom test server ...',
@@ -762,12 +762,11 @@ window.onload = function() {
     });
 
     // note about data contribution status + link to raw data
-    var utemplate = document.getElementById('uploadtemplate').innerHTML;
+    var utemplate = $('#uploadtemplate').html();
     Mustache.parse(utemplate);
     var renderu = function(params) {
         var rendered = Mustache.render(utemplate, params);
-        var e = document.getElementById('upload');
-        e.innerHTML = rendered;        
+        $('#upload').html(rendered);
     };
 
     // check the upload prefs

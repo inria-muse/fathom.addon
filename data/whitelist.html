@@ -44,19 +44,22 @@
     </div>
 
     <script id="template" type="x-tmpl-mustache">
-      <fieldset class="whitelistgroup"> 
-      <legend>Uncheck to Anonymize</legend> 
-      <ul class="whitelist">
-        {{#whitelist}}
-          <li><label for="{{host}}" class="pure-checkbox">
-            <input id="{{host}}" type="checkbox" value="" {{^disabled}}checked{{/disabled}}>
-           {{host}}
-          </label></li>
-        {{/whitelist}}
-      </ul>
-      </fieldset>
-    </script>
-    
+      <div>
+        <fieldset class="whitelistgroup"> 
+          <legend>Uncheck to Anonymize</legend> 
+          <ul class="whitelist">
+            {{#whitelist}}
+              <li>
+                <label for="{{host}}" class="pure-checkbox">
+                  <input id="{{host}}" type="checkbox" value="" {{^disabled}}checked{{/disabled}}>
+                 {{host}}
+                </label>
+              </li>
+            {{/whitelist}}
+          </ul>
+        </fieldset>
+      </div>
+    </script>    
     <script src="extscripts/jquery.min.js"></script>
     <script src="extscripts/mustache.js"></script>
     <script src="whitelist.js"></script>
