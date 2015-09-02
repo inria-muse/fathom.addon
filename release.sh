@@ -8,13 +8,10 @@ fi
 TAG=v$REL
 echo "prepare release " $TAG " ..."
 
-# do not release from this branch
-echo "you should be in the master branch for release! aborting"
-exit 1
-
 # update package.json + update.rdf
-cp package.json package.json.save
-sed 's/"version": ".*"/"version": "'$REL'"/' <package.json.save >package.json
+PKG=package.json
+cp $PKG $PKG.save
+sed 's/"version": ".*"/"version": "'$REL'"/' <$PKG.save >$PKG
 
 # build xpi
 XPI=fathom.xpi
@@ -22,7 +19,7 @@ XPI=fathom.xpi
 cfx xpi --update-link https://muse.inria.fr/fathom/fathom.xpi --update-url https://muse.inria.fr/fathom/fathom.update.rdf
 if [ ! -f "$XPI" ]; then
     echo "failed to build the xpi file $XPI ! aborting ..."
-    mv package.json.save package.json
+    mv $PKG.save $PKG
     exit 1
 fi
 
@@ -31,7 +28,7 @@ git tag $TAG
 git push
 
 # keep a copy
-cp $XPI dist/fathom-$TAG.xpi
+cp $XPI dist/fathom-$REL.xpi
 
 # web release
 
