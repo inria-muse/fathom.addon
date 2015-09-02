@@ -21,6 +21,7 @@
     "type": "git",
     "url": "https://github.com/inria-muse/fathom.addon.git"
   },
+  "updateURL": "https://muse.inria.fr/fathom/fathom.update.rdf",
   "icon": "data/icons/icon-80.png",
   "permissions": {
     "private-browsing": false

@@ -5,23 +5,44 @@ if [ -z "$REL" ]; then
     exit 1
 fi
 
-echo "prepare release=" $REL " ..."
+TAG=v$REL
+echo "prepare release " $TAG " ..."
 
-# new xpi
+# FIXME: remove once final
+echo "do not release from this branch yet!! aborting ..."
+exit 0
 
-cfx xpi --update-link https://muse.inria.fr/fathom/fathom.xpi --update-url https://muse.inria.fr/fathom/fathom.update.rdf
+# update package.json + update.rdf
+cp package.json package.json.save
+cp fathom.update.rdf fathom.update.rdf.save
 
-git commit -a -m "xpi release "$REL
-git tag $REL
+sed 's/"version": ".*"/"version": "'$REL'"/' <package.json.save >package.json
+sed 's/<em:version>.*<\/em:version>/<em:version>'$REL'<\/em:version>/' <fathom.update.rdf.save >fathom.update.rdf
+
+# build xpi
+XPI=jid1-o49GgyEaRRmXPA@jetpack-$REL.xpi
+jpm xpi
+if [ ! -f "$XPI" ] then
+    echo "failed to build the xpi file $XPI ! aborting ..."
+    mv package.json.save package.json
+    mv fathom.update.save fathom.update.rdf
+    exit 1
+fi
+
+git commit -a -m "xpi release "$TAG
+git tag $TAG
 git push
+
+# keep a copy
+cp $XPI dist/
 
 # web release
 
-cp -f fathom.xpi ../fathom.web/
+cp -f $XPI ../fathom.web/fathom.xpi
 cp -f fathom.update.rdf ../fathom.web/
 
 pushd ../fathom.web
-git commit -a -m "xpi release "$REL
+git commit -a -m "xpi release "$TAG
 git push
 popd
 
