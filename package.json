@@ -5,7 +5,7 @@
     "description": "A Browser-based Network Measurement Platform",
     "author": "Anna-Kaisa Pietilainen",
     "license": "MIT",
-    "version": "2.0.37",
+    "version": "2.0.38",
     "contributors": "Stéphane Archer, Renata Teixeira, Christian Kreibich, Mohan Dhawan, Justin Samuel, Nick Weaver, Mark Allman, Vern Paxson",
     "homepage": "https://muse.inria.fr/fathom",
     "icon": "data/icons/icon-80.png",
