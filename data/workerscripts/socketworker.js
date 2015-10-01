@@ -18,6 +18,7 @@
 
 //--------- GLOBAL FUNCS ---------
 
+// debugging helper
 importScripts("./debug.js");
 var tag = 'socket';
 
@@ -62,7 +63,6 @@ var worker = {
 
 var getBuffer = function(len) {
     if (!worker.buf || worker.buflen < len) {
-        dump('create buffer size='+len+'B\n');
         worker.buf = newBuffer(len);
         worker.buflen = len;
     }
@@ -245,8 +245,7 @@ onmessage = function(event) {
 
 // fatal errors
 onerror = function(event) { 
-    dump("error: fathom: ChromeWorker [socketworker]: " + 
-       JSON.stringify(event) + "\n");
+    error(tag,JSON.stringify(event));
     postMessage(JSON.stringify({error : event, done : true}));
     cleanup();
 };

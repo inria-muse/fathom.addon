@@ -64,11 +64,11 @@ addon.port.on('resize', function() {
 /** Render the template based on the received values. */
 addon.port.on("render", function(values) {
     if (typeof Mustache !== "undefined") {
-		var template = document.getElementById('rendertemplate').innerHTML;
+		var template = $('#rendertemplate').html();
 		Mustache.parse(template);
 
 		var rendered = Mustache.render(template, values);
-		document.getElementById('rendertarget').appendChild(rendered);
+        $('#rendertarget').html(rendered);
 
 		// request resize the panel to fit the rendered content
 		var s = getSize();

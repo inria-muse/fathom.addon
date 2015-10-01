@@ -12,7 +12,7 @@
  * @author Anna-Kaisa Pietilainen <anna-kaisa.pietilainen@inria.fr> 
  */
 
-var debugoff = false;
+var debugoff = true;
 
 var debug = function(tag, msg) {
     if (debugoff) return;

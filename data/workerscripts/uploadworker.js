@@ -16,14 +16,17 @@
  * @author Anna-Kaisa Pietilainen <anna-kaisa.pietilainen@inria.fr> 
 */
 
+// debugging helper
+importScripts("./debug.js");
+var tag = 'upload';
+
 // from: http://stackoverflow.com/questions/2219526/how-many-bytes-in-a-javascript-string
 function byteCount(s) {
     return encodeURI(s).split(/%(?:u[0-9A-F]{2})?[0-9A-F]{2}|./).length - 1;
 }
 
 onerror = function(event) { 
-    dump("error: fathom: ChromeWorker [uploadworker]: " + 
-		 JSON.stringify(event) + "\n");
+    error(tag, JSON.stringify(event));
     postMessage(JSON.stringify({error : event}));
 };
 
