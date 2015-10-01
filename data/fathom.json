@@ -1,0 +1,116 @@
+{
+    "config" : {
+        "version" : 0,
+        "url" : "https://muse.inria.fr/fathom/fathom.json",
+        "update_freq_days" : 3
+    },
+
+    "api" : {
+        "url" : "https://muse.inria.fr/fathomapi"
+    },
+
+    "mserver" : {
+        "hostname" : "62-210-73-169.rev.poneytelecom.eu",
+        "ipv4" : "62.210.73.169"
+    },
+
+    "baseline" : {
+        "intervals" : [120, 600, 3600, 21600],
+        "rand" : 30,
+        "max_rows" : [1000, 1600, 1000, 1600],
+        "ping_opts" : { 
+            "count" : 10, 
+            "timeout" : 1,
+            "interval" : 0.5 
+        },
+        "tr_freq" : 10,
+        "tr_opts" : {
+            "count" : 3, 
+            "timeout" : 3,
+            "maxttl" : 20
+        }
+    },
+
+    "environment" : {
+        "ttl" : 300,
+        "activity_ttl" : 10,
+        "max_ttl" : 86400
+    },
+
+    "pageload" : {
+        "perf" : {
+            "enable" : true,
+            "p_ping" : 0.33,
+            "ping_opts" : { 
+                "count" : 10, 
+                "timeout" : 1,
+                "interval" : 0.5 
+            },            
+            "p_traceroute" : 0.5,
+            "tr_opts" : {
+                "count" : 3, 
+                "timeout" : 3,
+                "maxttl" : 20
+            }            
+        },
+        "whitelist" : [
+            "google.*",
+            "amazon.*",
+            "yahoo.*",
+            "facebook.com",
+            "youtube.com",
+            "baidu.com",
+            "wikipedia.org",
+            "twitter.com",
+            "qq.com",
+            "taobao.com",
+            "live.com",
+            "linkedin.com",
+            "sina.com.cn",
+            "weibo.com",
+            "tmall.com",
+            "blogspot.com",
+            "ebay.com",
+            "hao123.com",
+            "reddit.com",
+            "bing.com",
+            "instagram.com",
+            "yandex.ru",
+            "sohu.com",
+            "tumblr.com",
+            "wordpress.com",
+            "imgur.com",
+            "pinterest.com",
+            "msn.com",
+            "vk.com",
+            "paypal.com",
+            "microsoft.com",
+            "t.co",
+            "aliexpress.com",
+            "apple.com",
+            "imdb.com",
+            "fc2.com",
+            "ask.com",
+            "alibaba.com",
+            "360.cn",
+            "stackoverflow.com",
+            "adcash.com",
+            "mail.ru",
+            "netflix.com",
+            "dailymotion.com",
+            "doubleclick.net",
+            "gstatic.com", 
+            "akamaihd.net", 
+            "licnd.com", 
+            "dmcdn.net"  
+        ]
+    },
+
+    "upload" : {
+        "enable" : true,
+        "max_queue" : 1000,
+        "max_batch" : 50,
+        "interval" : 1200,
+        "url" : "https://muse.inria.fr/fathomupload"
+    }
+}

@@ -14,7 +14,7 @@
  * @author Anna-Kaisa Pietilainen <anna-kaisa.pietilainen@inria.fr> 
  */
 (function() {
-	if (typeof self !== "undefined" && self.options.enableperf) {
+	if (typeof self !== "undefined") {
 	 	// delay slightly so we get the LoadEventEnd to the stats
  		setTimeout(function() {
 		    var ts = new Date();
@@ -34,6 +34,6 @@
 			    }
 			}
 			self.port.emit('perf', obj);
-		}, 5);
+		}, 10);
  	}
 }());

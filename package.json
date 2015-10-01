@@ -4,19 +4,20 @@
   "id": "jid1-o49GgyEaRRmXPA@jetpack",
   "description": "A Browser-based Network Measurement Platform",
   "homepage": "https://muse.inria.fr/fathom",
-  "author": "Anna-Kaisa Pietilainen",
+  "author": "MUSE Inria Paris-Rocquencourt <fathom@inria.fr>",
   "contributors": [
+    "Anna-Kaisa Pietilainen",  
     "Stéphane Archer",
+    "Mohan Dhawan",
     "Renata Teixeira",
     "Christian Kreibich",
-    "Mohan Dhawan",
     "Justin Samuel",
     "Nick Weaver",
     "Mark Allman",
     "Vern Paxson"
   ],
   "license": "MIT",
-  "version": "2.1.0-beta",
+  "version": "2.1.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/inria-muse/fathom.addon.git"
@@ -24,7 +25,8 @@
   "updateURL": "https://muse.inria.fr/fathom/fathom.update.rdf",
   "icon": "data/icons/icon-80.png",
   "permissions": {
-    "private-browsing": false
+    "private-browsing": false,
+    "multiprocess" : false
   },
   "main": "./lib/main.js",
   "engines": {

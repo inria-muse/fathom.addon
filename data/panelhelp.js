@@ -16,6 +16,9 @@
  * 
  * https://developer.mozilla.org/en-US/Add-ons/SDK/High-Level_APIs/panel#Scripting_trusted_panel_content
  *
+ * FIXME: does not seem to work under the multiprocess firefox. Needs to be converted to 
+ * a content script.
+ * 
  * @author Anna-Kaisa Pietilainen <anna-kaisa.pietilainen@inria.fr>
  */
 
