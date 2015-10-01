@@ -37,6 +37,7 @@
 
   <!-- The main template -->
   <script id="template" type="x-tmpl-mustache">
+    <div>
     {{#testsuites}}
       <div class="test-subhead">
         <h2>{{name}}</h2>
@@ -49,12 +50,13 @@
       <div id="test{{id}}"></div>
       {{/tests}}
     {{/testsuites}}
+    </div>
   </script>
 
   <!-- Template for tests tag -->
   <script id="testtemplate" type="x-tmpl-mustache">
     <div class="test {{status}}">
-    <span class="testname">{{name}}</span>
+      <span class="testname">{{name}}</span>
       <div class="floatright">
         <i>{{statustxt}}</i>
         {{#isrunning}}

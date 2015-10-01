@@ -375,7 +375,7 @@ var drawenvchart = function(range, data) {
     });
 
     // add edit and infopopover to the legend
-    var envtmpl = document.getElementById('envtmpl').innerHTML;
+    var envtmpl = $('#envtmpl').html();
     Mustache.parse(envtmpl);
 
     $('#legend-env > span').each(function() {
@@ -466,7 +466,7 @@ var loadgraphs = function(range) {
     });
 
     // upload preferences
-    var utemplate = document.getElementById('uploadtemplate').innerHTML;
+    var utemplate = $('#uploadtemplate').html();
     Mustache.parse(utemplate);
 
     fathom.internal(function(prefs) {
@@ -475,8 +475,7 @@ var loadgraphs = function(range) {
 				upload : (prefs[0] === 'always'),
 				uploadpl : (prefs[1] === 'always')
 		    });
-		var e = document.getElementById('upload');
-		e.innerHTML = rendered;
+		$('#upload').html(rendered);
 
 		$("#showdata").click(function() {
 		    fathom.internal(function(json) {
@@ -638,4 +637,3 @@ $(window).load(function() {
     // default view last 24h
     loadgraphs('day');
 });
-

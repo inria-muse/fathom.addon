@@ -1,5 +1,5 @@
 var timers = require('sdk/timers');
-var socketapi = require("./socketapi");
+var socketapi = require("../lib/socketapi");
 
 var manifest = {
     api : {"socket" : "*"},

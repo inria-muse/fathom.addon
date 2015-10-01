@@ -1,4 +1,4 @@
-var protoapi = require("./protoapi");
+var protoapi = require("../lib/protoapi");
 
 var manifest = {
     api : {"proto" : { '*' : true}},
@@ -17,14 +17,14 @@ var manifest = {
 
 exports["testcreate"] = function(assert, done) {
     protoapi.exec(function(id) {
-	assert.ok(id.error === undefined, "dns.create no error");
-	protoapi.exec(function(res) {
-	    assert.ok(res.error === undefined, "dns.close no error");
-	    done();
-	}, { module : "proto", 
-	     submodule: "dns", 
-	     method : 'close', 
-	     params : [id]}, manifest);
+		assert.ok(id.error === undefined, "dns.create no error");
+		protoapi.exec(function(res) {
+		    assert.ok(res.error === undefined, "dns.close no error");
+		    done();
+		}, { module : "proto", 
+		     submodule: "dns", 
+		     method : 'close', 
+		     params : [id]}, manifest);
     }, { module : "proto", 
 	 submodule: "dns", 
 	 method : 'create', 

@@ -1,5 +1,5 @@
-var tools = require("./toolsapi");
-require('./systemapi').setup();
+var tools = require("../lib/toolsapi");
+require('../lib/systemapi').setup();
 
 var manifest = {
     isaddon : true,
@@ -33,7 +33,7 @@ exports["testdnslookup2"] = function(assert, done) {
 				  res.answers[0] === '128.93.165.1', 
 				  "dnsLookup found correct ip");		
 		done();
-    }, { method : 'dnsLookup', params : ['muse.inria.fr', '192.168.1.1']});
+    }, { method : 'dnsLookup', params : ['muse.inria.fr', '208.67.222.222']});
 };
 
 exports["testdnslookup3"] = function(assert, done) {
@@ -58,7 +58,7 @@ exports["testdnslookup4"] = function(assert, done) {
 
 exports["testlookupmyip"] = function(assert, done) {
     tools.exec(function(res) {
-		console.log(res);
+		console.log(JSON.stringify(res,null,4));
 		assert.ok(!res.error, "lookupIP no error");
 		assert.ok(res.ip, "lookupIP returns " + res.ip);
 		done();
@@ -67,9 +67,9 @@ exports["testlookupmyip"] = function(assert, done) {
 
 exports["testlookupmac"] = function(assert, done) {
     tools.exec(function(res) {
-		console.log(res);
+        console.log(JSON.stringify(res,null,4));
 		assert.ok(!res.error, "lookupMAC no error");
-		assert.ok(res.company === "Apple", "lookupMAC ok");
+		assert.ok(res.result && res.result.company === "Apple", "lookupMAC ok");
 		done();
     }, { method : 'lookupMAC', params: ['54:26:96:ce:3d:89']});
 };

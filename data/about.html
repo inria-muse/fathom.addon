@@ -9,44 +9,37 @@
   </head>
 
   <body style="overflow:hidden;">
-
     <div class="splash-container">
       <div class="splash">
-
-        <h1 class="splash-head">
-	  <img src="icons/icon-32.png" alt="fathomlogo" />
-	  Fathom
-	</h1>
+        <h1 class="splash-head"><img src="icons/icon-32.png" alt="fathomlogo" />Fathom</h1>
 
         <div class="splash-subhead">
-	  Browser-based Network Measurement Platform
+      	  Browser-based Network Measurement Platform
         </div>
 
-	<div id="rendertarget" class="splash-text-left"></div>
+      	<div id="rendertarget" class="splash-text-left"></div>
 
         <div class="splash-text">
-	  <i class="fa fa-copyright fa-lg"></i>&nbsp;2014-2015 INRIA Paris-Roquencourt and ICSI Berkeley&nbsp;CA
+      	 <i class="fa fa-copyright fa-lg"></i>&nbsp;2014-2015 INRIA Paris-Roquencourt and ICSI Berkeley&nbsp;CA
         </div>
 
         <p class="splash-button">
-          <a onclick="opentab('https://muse.inria.fr/fathom');" 
-	     class="button-small pure-button">
-	    <i class="fa fa-external-link fa-lg"></i>More Info
-	  </a>
-	  <button onclick="closeme();" class="button-small pure-button">
-	    <i class="fa fa-close fa-lg"></i>Close
-	  </button>
-	</p>
+          <a onclick="emit('open', 'https://muse.inria.fr/fathom');" class="button-small pure-button">
+    	      <i class="fa fa-external-link fa-lg"></i>More Info
+	        </a>
+      	  <button onclick="emit('close');" class="button-small pure-button">
+      	    <i class="fa fa-close fa-lg"></i>Close
+      	  </button>
+      	</p>
 	
       </div>
     </div>
     <script id="rendertemplate" type="x-tmpl-mustache">
       <ul>
-	<li><strong>Fathom Version:</strong> {{fathom_version}}
-	<li><strong>Identifier:</strong> {{fathom_uuid}}
+      	<li><strong>Fathom Version:</strong> {{fathom_version}}
+      	<li><strong>Identifier:</strong> {{fathom_uuid}}
       </ul>
     </script>
-    <script src="extscripts/jquery.min.js"></script>
     <script src="extscripts/mustache.js"></script>
     <script src="panelhelp.js"></script>
   </body>

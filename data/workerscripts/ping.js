@@ -270,7 +270,7 @@
 
         var done = function() {
             settings.callback(undefined, rep.getreport(), true);
-            setTimeout(cleanup,0);
+            setTimeout(function() { cleanup(); }, 0);
         };
 
         // send/recv buffer
@@ -332,7 +332,7 @@
                 sleep = settings.interval*1000.0 - diff;
                 if (sleep<0)
                     sleep = 0;
-                setTimeout(snd, sleep);
+                setTimeout(function() { snd(); }, sleep);
             } else {
                 rcv(false); // make sure we have all answers
             }
@@ -409,7 +409,7 @@
                 // got all responses
                 done();
             } else if (!noloop) {
-                setTimeout(rcv,0); // keep reading
+                setTimeout(function() { rcv(); }, 0); // keep reading
             }
         }; // rcv
             
@@ -446,7 +446,7 @@
         pstats.rr = tr.getts();
         pstats.time = pstats.rr - pstats.s; // connection rtt
         rep.addextra('conn_setup', pstats);
-        setTimeout(snd,0);
+        setTimeout(function() { snd(); }, 0);
 
         // for cleanup with the socketworker
         return settings.socket; 
@@ -463,7 +463,7 @@
 
         var done = function() {
             settings.callback(undefined, rep.getreport(), true);
-            setTimeout(cleanup,0);
+            setTimeout(function() { cleanup(); }, 0);
         };
 
         // request sender
@@ -548,12 +548,12 @@
                 var sleep = settings.interval*1000.0 - diff;
                 if (sleep<0 || sent == 1) // dont sleep after first ping
                     sleep = 0;
-                setTimeout(snd, sleep);
+                setTimeout(function() { snd(); }, sleep);
             }
         }; // snd
 
         // start pinging
-        setTimeout(snd,0);
+        setTimeout(function() { snd(); }, 0);
 
         // dummy socketid (socketworker requires a ret value)
         return -1;  
@@ -571,7 +571,7 @@
 
         var done = function() {
             settings.callback(undefined, rep.getreport(), true);
-            setTimeout(cleanup,0);
+            setTimeout(function() { cleanup(); }, 0);
         };
 
         // request sender
@@ -592,7 +592,7 @@
                 var sleep = settings.interval*1000.0 - diff;
                 if (sleep<0) // dont sleep after first ping
                     sleep = 0;
-                setTimeout(snd, sleep);
+                setTimeout(function() { snd(); }, sleep);
             }
         }; // snd
 
@@ -611,7 +611,7 @@
             pstats.rr = tr.getts();
             pstats.time = pstats.rr - pstats.s; // connection rtt
             rep.addextra('conn_setup',pstats);
-            setTimeout(snd,0); // start pinging
+            setTimeout(function() { snd(); }, 0); // start pinging
         };
 
         s.onmessage = function(event) {
@@ -689,7 +689,7 @@
 
         var done = function() {
             settings.callback(undefined, rep.getreport(), true);
-            setTimeout(cleanup,0);
+            setTimeout(function() { cleanup(); }, 0);
         };
 
         // Practical limit for IPv4 TCP/UDP packet data length is 65,507 bytes.
@@ -760,7 +760,7 @@
                 sleep = settings.interval*1000.0 - diff;
                 if (sleep<0)
                     sleep = 0;
-                setTimeout(snd, sleep);
+                setTimeout(function() { snd(); }, sleep);
             } else {
                 rcv(false); // make sure we have all answers
             }
@@ -819,7 +819,7 @@
                 // got all responses
                 done();
             } else if (!noloop) {
-                setTimeout(rcv,0); // keep reading
+                setTimeout(function() { rcv(); }, 0); // keep reading
             }
         }; // rcv
 
@@ -848,7 +848,7 @@
             return {error : "Error connecting : code = " + NSPR.errors.PR_GetError()};
         }
 
-        setTimeout(snd,0);
+        setTimeout(function() { snd(); }, 0);
 
         // for cleanup with the socketworker
         return settings.socket; 
@@ -867,7 +867,7 @@
 
         var rcv = function() {
             if (worker.multirespstop) {
-                setTimeout(cleanup,0);
+                setTimeout(function() { cleanup(); }, 0);
                 return;
             }
 
@@ -878,7 +878,7 @@
             var prv = NSPR.sockets.PR_Poll(pd.address(), 1, 250);
 
             if (worker.multirespstop) {
-                setTimeout(cleanup,0);
+                setTimeout(function() { cleanup(); }, 0);
                 return;
             }
 
@@ -916,11 +916,11 @@
             } // else nothing to read
 
             if (worker.multirespstop) {
-                setTimeout(cleanup,0);
+                setTimeout(function() { cleanup(); }, 0);
                 return;
             }
 
-            setTimeout(rcv, 0); // reloop
+            setTimeout(function() { rcv(); }, 0); // reloop
         }; // rcv
 
         // create and connect the socket
@@ -943,7 +943,7 @@
             return {error : "Error binding : code = " + NSPR.errors.PR_GetError()};
         } 
 
-        setTimeout(rcv,0); // start receiving pings
+        setTimeout(function() { rcv(); }, 0); // start receiving pings
 
         return settings.socket;
     }; // serv

@@ -1,6 +1,6 @@
 #!/bin/bash
 REL=$1
-if [ -z "$REL" ]; then 
+if [ -z "$REL" ]; then
     echo "Usage: release.sh <VERSION>"
     exit 1
 fi
@@ -13,13 +13,19 @@ PKG=package.json
 cp $PKG $PKG.save
 sed 's/"version": ".*"/"version": "'$REL'"/' <$PKG.save >$PKG
 
-# build xpi
-XPI=fathom.xpi
+RDF=fathom.update.rdf
+cp $RDF $RDF.save
+sed 's/<em:version>.*<\/em:version>/<em:version>'$REL'<\/em:version>/' <$RDF.save >$REF
 
-cfx xpi --update-link https://muse.inria.fr/fathom/fathom.xpi --update-url https://muse.inria.fr/fathom/fathom.update.rdf
-if [ ! -f "$XPI" ]; then
+# build xpi
+XPI=jid1-o49GgyEaRRmXPA@jetpack-$REL.xpi
+
+jpm xpi
+
+if [ ! -f "$XPI" ] then
     echo "failed to build the xpi file $XPI ! aborting ..."
     mv $PKG.save $PKG
+    mv $RDF.save $RDF
     exit 1
 fi
 
@@ -31,9 +37,8 @@ git push
 cp $XPI dist/fathom-$REL.xpi
 
 # web release
-
-cp -f $XPI ../fathom.web/
-cp -f fathom.update.rdf ../fathom.web/
+cp -f $XPI ../fathom.web/fathom.xpi
+cp -f $RDF ../fathom.web/
 
 pushd ../fathom.web
 git commit -a -m "xpi release "$TAG

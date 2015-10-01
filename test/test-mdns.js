@@ -1,10 +1,10 @@
-var protoapi = require("./protoapi");
+var protoapi = require("../lib/protoapi");
 
 var manifest = {
     api : ["proto.*"],
     allowdst : {
-	"multicast" : {"224.0.0.251" : { 5353 : true }}, // mDNS discovery
-	"*" : {"{mdns}" : { "*" : true }}, // nodes found by mDNS
+    	"multicast" : {"224.0.0.251" : { 5353 : true }}, // mDNS discovery
+    	"*" : {"{mdns}" : { "*" : true }}, // nodes found by mDNS
     },
     neighbors : {},
     isaddonpage : false,
@@ -13,21 +13,21 @@ var manifest = {
 
 exports["testmdnsunknown"] = function(assert, done) {
     protoapi.exec(function(res) {
-	assert.ok(res.error !== undefined, "unknown method returns error");
-	done();
+    	assert.ok(res.error !== undefined, "unknown method returns error");
+    	done();
     }, { module : "proto", submodule: "mdns", method : 'asd'}, manifest);
 };
 
 exports["testmdnscreate"] = function(assert, done) {
     protoapi.exec(function(id) {
-	assert.ok(id.error === undefined, "mnds.create no error");
-	protoapi.exec(function(res) {
-	    assert.ok(res.error === undefined, "mdns.close no error");
-	    done();
-	}, { module : "proto", 
-	     submodule: "mdns", 
-	     method : 'close', 
-	     params : [id]}, manifest);
+    	assert.ok(id.error === undefined, "mnds.create no error");
+    	protoapi.exec(function(res) {
+    	    assert.ok(res.error === undefined, "mdns.close no error");
+    	    done();
+    	}, { module : "proto", 
+    	     submodule: "mdns", 
+    	     method : 'close', 
+    	     params : [id]}, manifest);
     }, { module : "proto", 
 	 submodule: "mdns", 
 	 method : 'create', 
@@ -43,12 +43,12 @@ exports["testmdnsdiscovery"] = function(assert, done) {
 	    console.log(dev);
 
 	    if (!dev.timeout)
-		assert.ok(dev.address !== undefined, 
-			  "mdns.discovery returns device with ip " + 
-			  dev.address);
+    		assert.ok(dev.address !== undefined, 
+    			  "mdns.discovery returns device with ip " + 
+    			  dev.address);
 
 	    if (doneflag)
-		done();
+    		done();
 
 	}, { module : "proto", 
 	     submodule: "mdns", 

@@ -1,5 +1,5 @@
 const timers = require("sdk/timers");
-const upload = require("upload");
+const upload = require("../lib/upload");
 
 exports["teststartstop"] = function(assert, done) {
 	const upload = require("upload");

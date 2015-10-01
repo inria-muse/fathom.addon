@@ -1,8 +1,8 @@
 // tests for opening up various dialogs
-var dialogs = require('./ui/dialogs');
+var dialogs = require('../lib/ui/dialogs');
 
 exports["testSecDialog"] = function(assert, done) {
-    var sec = require("./security");
+    var sec = require("../lib/security");
     var m = {
 	'location' : { href : 'http://foo.bar' },
 	'description' : 'testing security dialog',
@@ -16,22 +16,22 @@ exports["testSecDialog"] = function(assert, done) {
     };
     m = sec.parseManifest(m);
     dialogs.showSecurityDialog(function(res) {
-	assert.ok(true, "security dialog");
-	done();
+        assert.ok(true, "security dialog");
+	    done();
     }, m);
 };
 
 exports["testAboutDialog"] = function(assert, done) {
     dialogs.showAboutDialog(function() {
-	assert.ok(true, "about dialog");
-	done();
+	    assert.ok(true, "about dialog");
+	    done();
     });
 };
 
 exports["testUploadDialog"] = function(assert, done) {
     dialogs.showUploadDialog(function(res) {
-	assert.ok(true, "about dialog " + res);
-	done();
+        assert.ok(true, "about dialog " + res);
+	    done();
     },'asd');
 };
 

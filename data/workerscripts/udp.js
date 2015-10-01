@@ -176,15 +176,15 @@ socket.udpRecvStart = function(callback, s, asstring, size) {
 
         } else if (res.error && res.timeout) {
             // normal timeout - reloop
-            setTimeout(loop,0);
+            setTimeout(function() { loop(); }, 0);
 
         } else {
             // data and reloop
             callback(undefined, res, false);
-            setTimeout(loop,0);
+            setTimeout(function() { loop(); }, 0);
         }
     };
-    setTimeout(loop,0);
+    setTimeout(function() { loop(); }, 0);
     return {};
 };
 
@@ -204,15 +204,15 @@ socket.udpRecvFromStart = function(callback, s, asstring, size) {
 
         } else if (res.error && res.timeout) {
             // normal timeout - reloop
-            setTimeout(loop,0);
+            setTimeout(function() { loop(); }, 0);
 
         } else {
             // send recved data and reloop
             callback(undefined, res, false);
-            setTimeout(loop,0);
+            setTimeout(function() { loop(); }, 0);
         }
     };
-    setTimeout(loop,0);
+    setTimeout(function() { loop(); }, 0);
     return {};
 };
 

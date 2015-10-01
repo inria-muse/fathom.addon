@@ -1,4 +1,4 @@
-var Buffer = require('buffer').Buffer 
+var Buffer = require('buffer.js').Buffer; 
 
 exports["testBuffer"] = function(assert) {
     var buf = new Buffer('test');

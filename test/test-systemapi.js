@@ -1,5 +1,5 @@
-const config = require("config");
-const systemapi = require("systemapi");
+const config = require("../lib/config");
+const systemapi = require("../lib/systemapi");
 const system = require("sdk/system");
 const _ = require('underscore');
 
@@ -194,7 +194,7 @@ exports["testgetns"] = function(assert, done) {
 
 exports["testgetifacesact"] = function(assert, done) {
     systemapi.exec(function(res, doneflag) {
-		console.log(res);
+		console.log(JSON.stringify(res,null,4));
 		assert.ok(!res.error, "getActiveInterfaces no error");
 		assert.ok(res.result.length>0, "getActiveInterfaces found some interfaces");
 		done();
@@ -203,7 +203,7 @@ exports["testgetifacesact"] = function(assert, done) {
 
 exports["testgetifacesall"] = function(assert, done) {
     systemapi.exec(function(res, doneflag) {
-		console.log(res);
+		console.log(JSON.stringify(res,null,4));
 		assert.ok(!res.error, "getInterfaces no error");
 		assert.ok(res.result.length>0, "getInterfaces found some interfaces");
 		done();
@@ -212,7 +212,7 @@ exports["testgetifacesall"] = function(assert, done) {
 
 exports["testifacestats"] = function(assert, done) {
     systemapi.exec(function(res, doneflag) {
-		console.log(res);
+		console.log(JSON.stringify(res,null,4));
 		assert.ok(!res.error, "getIfaceStats no error");
 		assert.ok(_.keys(res.result).length>0, "getIfaceStats found some interfaces");
 		done();
@@ -221,7 +221,7 @@ exports["testifacestats"] = function(assert, done) {
 
 exports["testgetwifi"] = function(assert, done) {
     systemapi.exec(function(res, doneflag) {
-		console.log(res);
+		console.log(JSON.stringify(res,null,4));
 		if (!res.error && res.result.bssid) {
 		    assert.ok(res.result.bssid,"getWifiInterface bssid " + res.result.bssid);
 		    
@@ -249,7 +249,7 @@ exports["testgetwifi"] = function(assert, done) {
 
 exports["testmem"] = function(assert, done) {
     systemapi.exec(function(res, doneflag) {
-		console.log(res);
+		console.log(JSON.stringify(res,null,4));
 		if (system.platform !== 'darwin') {
 		    assert.ok(!res.error && res.result.memfree > 0, "getMemInfo");
 		} else {
@@ -261,7 +261,7 @@ exports["testmem"] = function(assert, done) {
 
 exports["testload"] = function(assert, done) {
     systemapi.exec(function(res, doneflag) {
-		console.log(res);
+		console.log(JSON.stringify(res,null,4));
 		if (system.platform !== 'winnt') 
 			assert.ok(!res.error, "getLoad no error");
 		else
@@ -281,7 +281,7 @@ exports["testload"] = function(assert, done) {
 
 exports["testbmem"] = function(assert, done) {
     systemapi.exec(function(res, doneflag) {
-		console.log(res);
+		console.log(JSON.stringify(res,null,4));
 		if (system.platform === 'darwin') {
 			assert.ok(res.error, "getBrowserMemoryUsage fails on darwin (expected)");
 		} else {
@@ -352,7 +352,7 @@ exports["testpromise"] = function(assert, done) {
 		systemapi.execp({ method : 'getBrowserMemoryUsage'}),
 		systemapi.execp({ method : 'getLoad'}),
 		systemapi.execp({ method : 'getNameservers'}),
-    ]).then(function (results) {
+    ]).then(function(results) {
 		// success function
 		console.log(JSON.stringify(results, null, 4));
 		assert.ok(results.length == 3, "got all results");

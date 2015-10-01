@@ -838,10 +838,10 @@ tools.iperf = (function() {
 		}
 
 		// else assume timeout and continue sending
-		setTimeout(finloop,0);
+		setTimeout(function() { finloop(); }, 0);
 
 	    }; // end finloop
-	    setTimeout(finloop,0);
+	    setTimeout(function() { finloop(); }, 0);
 	};
 
 	// main send loop
@@ -915,13 +915,13 @@ tools.iperf = (function() {
 		    // this will in fact be 15-20ms
 		    // delay as we give the control back to
 		    // the event loop
-		    setTimeout(loop, tv_msec(delay));
+		    setTimeout(function() { loop(); }, tv_msec(delay));
 		    return; // exit loop
 		} // else re-loop immediately
 
 	    } // end while
 	}; // end loop
-	setTimeout(loop, 0); // start with timeout to allow the return call
+	setTimeout(function() { loop(); }, 0); // start with timeout to allow the return call
 	return settings.mSock;
     }; // client
 
@@ -1004,7 +1004,7 @@ tools.iperf = (function() {
 
 	    var finloop = function() {
 		if (retryc == 0 || !settings.mSock || settings.mStopReq) {
-		    setTimeout(cb,0);
+		    setTimeout(function() { cb(); }, 0);
 		    return;
 		}
 
@@ -1025,22 +1025,22 @@ tools.iperf = (function() {
 						      ACK_RECV_TO);
 		    if (rv <= 0) {
 			// got nothing from the client - we're done
-			setTimeout(cb,0);
+			setTimeout(function() { cb(); }, 0);
 			return;
 		    }
 		} else {
 		    // errors in sending - stop trying
 		    debug("failed to send ack: " + NSPR.errors.PR_GetError());
-		    setTimeout(cb,0);
+		    setTimeout(function() { cb(); }, 0);
 		    return;
 		}
 		
 		// try sending again
-		setTimeout(finloop, 0);
+		setTimeout(function() { finloop(); }, 0);
 
 	    }; // end finloop
 
-	    setTimeout(finloop, 0);
+	    setTimeout(function() { finloop(); }, 0);
 
 	}; // end udp_fin
 
@@ -1103,7 +1103,7 @@ tools.iperf = (function() {
 			    curr_peeraddr = undefined;
 			    if (donecb && typeof donecb === 'function') {
 				settings.callback(report.finalres, false);
-				setTimeout(donecb,0);
+				setTimeout(function() { donecb(); }, 0);
 			    } else {
 				shutdown(report.finalres);
 			    }
@@ -1152,16 +1152,14 @@ tools.iperf = (function() {
 			}
 			done = true; // quit while
 			if (donecb && typeof donecb === 'function') {
-			    setTimeout(donecb,
-				       0,
-				       {error : "Error in recvfrom: code="+err});
+			    setTimeout(function() { donecb({error : "Error in recvfrom: code="+err}); }, 0);
 			} else {
 			    shutdown({error : "Error in recvfrom: code="+err});
 			}
 		    } else {
 			// there was recv timeout, loop back by the event loop
 			done = true; // quit while
-			setTimeout(loop, 0);
+			setTimeout(function() { loop(); }, 0);
 		    }
 		} else { // rv == 0
 		    if (report.totalDgrams>0) {
@@ -1170,9 +1168,7 @@ tools.iperf = (function() {
 		    }
 		    done = true; // quit while
 		    if (donecb && typeof donecb === 'function') {
-			setTimeout(donecb,
-				   0,
-				   {error : "Error in recvfrom: code="+err});
+			setTimeout(function() { donecb({error : "Error in recvfrom: code="+err}); }, 0);				   
 		    } else {
 			shutdown({error : "Error in recvfrom: code="+err});
 		    }
@@ -1183,12 +1179,12 @@ tools.iperf = (function() {
 		// Other option could be just kill the worker in fathom...
 		if (ts-lastreloop > 5000.0) {
 		    done = true; // quit while
-		    setTimeout(loop, 0); // this will incure 15-20ms delay
+		    setTimeout(function() { loop(); }, 0); // this will incure 15-20ms delay
 		}
 		// else stay in the tight while loop
 	    } // end while
 	}; // end loop
-	setTimeout(loop, 0);
+	setTimeout(function() { loop(); }, 0);
     }; // udp_single_server
 
     // tcp server worker
@@ -1277,14 +1273,14 @@ tools.iperf = (function() {
 			done = true; // quit while
 			if (donecb && typeof donecb === 'function') {
 			    settings.callback(report.finalres, false);
-			    setTimeout(donecb,0);		    
+			    setTimeout(function() { donecb(); }, 0);		    
 			} else {
 			    shutdown(report.finalres);
 			}
 		    } else {
 			// there was recv timeout, loop back by the event loop
 			done = true; // quit while
-			setTimeout(loop, 0);
+			setTimeout(function() { loop(); }, 0);
 		    }
 		} else { // rv == 0
 		    // connection closed - final report
@@ -1293,7 +1289,7 @@ tools.iperf = (function() {
 		    done = true; // quit while
 		    if (donecb && typeof donecb === 'function') {
 			settings.callback(report.finalres, false);
-			setTimeout(donecb,0);		    
+			setTimeout(function() { donecb(); }, 0);		    
 		    } else {
 			shutdown(report.finalres);
 		    }
@@ -1304,7 +1300,7 @@ tools.iperf = (function() {
 		// Other option could be just kill the worker in fathom...
 		if (ts-lastreloop > 5000.0) {
 		    done = true; // quit while
-		    setTimeout(loop, 0); // this will incure 15-20ms delay
+		    setTimeout(function() { loop(); }, 0); // this will incure 15-20ms delay
 		}
 		// else stay in the tight while loop
 
@@ -1312,7 +1308,7 @@ tools.iperf = (function() {
 	}; // end loop
 
 	// start receiving
-	setTimeout(loop,0);
+	setTimeout(function() { loop(); }, 0);
 	return undefined;
     };
 
@@ -1434,7 +1430,7 @@ tools.iperf = (function() {
 				// continue receiving clients, pass through 
 				// the main event loop in case somebody wants 
 				// to shut us down...
-				setTimeout(loop, 0);
+				setTimeout(function() { loop(); }, 0);
 			    } else {
 				// single connection done
 				shutdown();
@@ -1449,7 +1445,7 @@ tools.iperf = (function() {
 			shutdown({error: "Error recvfrom : code="+err });
 			return;
 		    } else {
-			setTimeout(loop, 0); // re-loop
+			setTimeout(function() { loop(); }, 0); // re-loop
 		    }
 		} else {
 		    shutdown({error: "Error recvfrom : conn closed"});	 
@@ -1485,7 +1481,7 @@ tools.iperf = (function() {
 			    // continue receiving clients, pass through 
 			    // the main event loop in case somebody wants 
 			    // to shut us down...
-			    setTimeout(loop, 0);
+			    setTimeout(function() { loop(); }, 0);
 			});
 		    }
 		} else {
@@ -1497,13 +1493,13 @@ tools.iperf = (function() {
 			// continue receiving clients, pass through 
 			// the main event loop in case somebody wants 
 			// to shut us down...
-			setTimeout(loop, 0);
+			setTimeout(function() { loop(); }, 0);
 		    }
 		}
 	    }
 	}; // end loop
 
-	setTimeout(loop, 0);
+	setTimeout(function() { loop(); }, 0);
 	return settings.mSock;
     }; // listener
 
@@ -1521,7 +1517,7 @@ tools.iperf = (function() {
 	
 	if (!settings.mStopReq)
 	    settings.callback(r, true);
-	setTimeout(cleanup,0);
+	setTimeout(function() { cleanup(); }, 0);
     };
     
 

@@ -1,118 +1,148 @@
 {
-    "name": "fathom",
-    "title": "Fathom",
-    "id": "jid1-o49GgyEaRRmXPA",
-    "description": "A Browser-based Network Measurement Platform",
-    "author": "Anna-Kaisa Pietilainen",
-    "license": "MIT",
-    "version": "2.0.38",
-    "contributors": "Stéphane Archer, Renata Teixeira, Christian Kreibich, Mohan Dhawan, Justin Samuel, Nick Weaver, Mark Allman, Vern Paxson",
-    "homepage": "https://muse.inria.fr/fathom",
-    "icon": "data/icons/icon-80.png",
-    "permissions": {
-        "private-browsing": false	
-    },
-    "dependencies": ["underscore","ipaddr","ieee754","base64-js","buffer","buffercursor","subprocess","addon-sdk"],
-    "preferences": [
-	    {
-            "name": "debugtoolupload",
-            "type": "radio",
-            "title": "Share 'Debug My Connection' Tool Reports",
-            "description" : "Allow uploading of 'Debug My Connection' tool reports to our secure servers for network research. No data is shared with third parties.",
-            "value": "askme",
-            "options": [
-    		{
-    		    "value": "askme",
-    		    "label": "Ask Me"
-    		},
-    		{
-    		    "value": "always",
-    		    "label": "Always"
-    		},
-    		{
-    		    "value": "never",
-    		    "label": "Never"
-    		}]
-    	},
-    	{
-            "name": "homenetupload",
-            "type": "radio",
-            "title": "Share 'Homenet Discovery' Tool Reports",
-            "description" : "Allow uploading of 'Homenet Discovery' tool reports to our secure servers for network research. No data is shared with third parties.",
-            "value": "askme",
-            "options": [
-    		{
-    		    "value": "askme",
-    		    "label": "Ask Me"
-    		},
-    		{
-    		    "value": "always",
-    		    "label": "Always"
-    		},
-    		{
-    		    "value": "never",
-    		    "label": "Never"
-    		}]
-    	},
-    	{
-            "type": "bool",
-            "name": "enablebaseline",
-            "value": true,
-            "title": "Enable Performance Monitoring of Your System and Network Connections",
-	        "description" : "Allow Fathom to system collect and network peformance metrics periodically on the background."
-    	},
-    	{
-            "name": "baselineupload",
-            "type": "radio",
-            "title": "Share Performance Monitoring Reports",
-            "description" : "Allow uploading of performance monitoring reports to our secure servers for network research. No data is shared with third parties.",
-            "value": "always",
-            "options": [
-    		{
-    		    "value": "always",
-    		    "label": "Always"
-    		},
-    		{
-    		    "value": "never",
-    		    "label": "Never"
-    		}]
-    	},
-    	{
-            "type": "bool",
-            "name": "enablepageload",
-            "value": true,
-            "title": "Enable Performance Monitoring of Pageload Times",
-    	    "description" : "Allow Fathom to monitor the pageload times of visited web pages."
-    	},
-    	{
-            "name": "pageloadupload",
-            "type": "radio",
-            "title": "Share Pageload Performance Reports",
-            "description" : "Allow uploading of pageload performance reports to our secure servers for network research. No data is shared with third parties.",
-            "value": "always",
-            "options": [
-    		{
-    		    "value": "always",
-    		    "label": "Always"
-    		},
-    		{
-    		    "value": "never",
-    		    "label": "Never"
-    		}]
-    	},
+  "name": "fathom",
+  "title": "Fathom",
+  "id": "jid1-o49GgyEaRRmXPA@jetpack",
+  "description": "A Browser-based Network Measurement Platform",
+  "homepage": "https://muse.inria.fr/fathom",
+  "author": "MUSE Inria Paris-Rocquencourt <fathom@inria.fr>",
+  "contributors": [
+    "Anna-Kaisa Pietilainen",  
+    "Stéphane Archer",
+    "Mohan Dhawan",
+    "Renata Teixeira",
+    "Christian Kreibich",
+    "Justin Samuel",
+    "Nick Weaver",
+    "Mark Allman",
+    "Vern Paxson"
+  ],
+  "license": "MIT",
+  "version": "2.1.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/inria-muse/fathom.addon.git"
+  },
+  "updateURL": "https://muse.inria.fr/fathom/fathom.update.rdf",
+  "icon": "data/icons/icon-80.png",
+  "permissions": {
+    "private-browsing": false,
+    "multiprocess" : false
+  },
+  "main": "./lib/main.js",
+  "engines": {
+    "firefox": ">=38.0a1",
+    "fennec": ">=38.0a1"
+  },
+  "dependencies": {
+    "buffer": "^3.4.3",
+    "buffercursor": "0.0.12",
+    "ipaddr.js": "^1.0.1",
+    "underscore": "^1.8.3"
+  },
+  "preferences": [
+    {
+      "name": "debugtoolupload",
+      "type": "radio",
+      "title": "Share 'Debug My Connection' Tool Reports",
+      "description": "Allow uploading of 'Debug My Connection' tool reports to our secure servers for network research. No data is shared with third parties.",
+      "value": "askme",
+      "options": [
         {
-            "type": "control",
-            "label": "Show",
-            "name": "whitelist",
-            "title": "Whitelisted Domains",
-            "description" : "The identity of visited web pages is anonymized when uploading the page load performance reports excluding a small set of popular domains (e.g. google.com). You can review and edit the whitelisted domains here."
+          "value": "askme",
+          "label": "Ask Me"
         },
         {
-            "name": "enablefathomapi",
-            "type": "bool",
-            "title": "Enable Fathom API for Regular Web Pages",
-            "description" : "Enable Fathom APIs for any regular web page. Fathom will always ask your approval everytime before a page can access any of the Fathom features. Only allow pages you trust to access the Fathom API!",
-            "value": false
-        }        
-    ]
+          "value": "always",
+          "label": "Always"
+        },
+        {
+          "value": "never",
+          "label": "Never"
+        }
+      ]
+    },
+    {
+      "name": "homenetupload",
+      "type": "radio",
+      "title": "Share 'Homenet Discovery' Tool Reports",
+      "description": "Allow uploading of 'Homenet Discovery' tool reports to our secure servers for network research. No data is shared with third parties.",
+      "value": "askme",
+      "options": [
+        {
+          "value": "askme",
+          "label": "Ask Me"
+        },
+        {
+          "value": "always",
+          "label": "Always"
+        },
+        {
+          "value": "never",
+          "label": "Never"
+        }
+      ]
+    },
+    {
+      "type": "bool",
+      "name": "enablebaseline",
+      "value": true,
+      "title": "Enable Performance Monitoring of Your System and Network Connections",
+      "description": "Allow Fathom to system collect and network peformance metrics periodically on the background."
+    },
+    {
+      "name": "baselineupload",
+      "type": "radio",
+      "title": "Share Performance Monitoring Reports",
+      "description": "Allow uploading of performance monitoring reports to our secure servers for network research. No data is shared with third parties.",
+      "value": "always",
+      "options": [
+        {
+          "value": "always",
+          "label": "Always"
+        },
+        {
+          "value": "never",
+          "label": "Never"
+        }
+      ]
+    },
+    {
+      "type": "bool",
+      "name": "enablepageload",
+      "value": true,
+      "title": "Enable Performance Monitoring of Pageload Times",
+      "description": "Allow Fathom to monitor the pageload times of visited web pages."
+    },
+    {
+      "name": "pageloadupload",
+      "type": "radio",
+      "title": "Share Pageload Performance Reports",
+      "description": "Allow uploading of pageload performance reports to our secure servers for network research. No data is shared with third parties.",
+      "value": "always",
+      "options": [
+        {
+          "value": "always",
+          "label": "Always"
+        },
+        {
+          "value": "never",
+          "label": "Never"
+        }
+      ]
+    },
+    {
+      "type": "control",
+      "label": "Show",
+      "name": "whitelist",
+      "title": "Whitelisted Domains",
+      "description": "The identity of visited web pages is anonymized when uploading the page load performance reports excluding a small set of popular domains (e.g. google.com). You can review and edit the whitelisted domains here."
+    },
+    {
+      "name": "enablefathomapi",
+      "type": "bool",
+      "title": "Enable Fathom API for Regular Web Pages",
+      "description": "Enable Fathom APIs for any regular web page. Fathom will always ask your approval everytime before a page can access any of the Fathom features. Only allow pages you trust to access the Fathom API!",
+      "value": false
+    }
+  ]
 }

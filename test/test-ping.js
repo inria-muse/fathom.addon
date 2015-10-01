@@ -1,4 +1,4 @@
-var socketapi = require("./socketapi");
+var socketapi = require("../lib/socketapi");
 socketapi.start();
 
 var manifest = {

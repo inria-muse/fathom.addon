@@ -1,5 +1,5 @@
-const baselinedb = require("./baselinedb");
-var config = require('config');
+const baselinedb = require("../lib/baselinedb");
+var config = require('../lib/config');
 const fileIO = require('sdk/io/file');
 const ss = require("sdk/simple-storage");
 const timers = require('sdk/timers');

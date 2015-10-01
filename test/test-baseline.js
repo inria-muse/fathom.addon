@@ -1,12 +1,13 @@
-var baseline = require("./baselineapi");
 var timers = require("sdk/timers");
 
-require('./systemapi').setup();
+var sysapi = require('../lib/systemapi');
+var baseline = require("../lib/baselineapi");
+sysapi.setup();
 baseline.setup();
 
 exports["testnetworkbasic"] = function(assert, done) {
     baseline.getnetworkenv(function(res) {
-		console.log(JSON.stringify(res));
+		console.log(JSON.stringify(res,null,4));
 		assert.ok(!res.error, "no error");
 		done();	
     });
@@ -17,10 +18,10 @@ exports["testnetworkfull"] = function(assert, done) {
     // delay so that the DB connection is up
     timers.setTimeout(function() {
 		baseline.getnetworkenv(function(res) {
-		    console.log(JSON.stringify(res));
+            console.log(JSON.stringify(res,null,4));
 		    assert.ok(!res.error, "no error");
 			baseline.getnetworkenv(function(res) {
-			    console.log(JSON.stringify(res));
+                console.log(JSON.stringify(res,null,4));
 			    assert.ok(!res.error, "no error");
 			    assert.ok(res.cached, "got cached on 2nd req");
 		    	baseline.stop();

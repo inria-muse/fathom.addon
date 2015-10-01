@@ -1,5 +1,4 @@
-var ipaddr = require('ipaddr');
-var _ = require('underscore');
+var ipaddr = require('ipaddr.js');
 
 exports["testRangeMatch"] = function(assert) {
     var addr = ipaddr.parse("2001:db8:1234::1");
@@ -11,8 +10,8 @@ exports["testRangeMatch"] = function(assert) {
 
     var addr2 = ipaddr.parse("128.93.62.141");
     console.log(addr2.range());
-    var range2 = ipaddr.parse("128.93.1.100");
 
+    var range2 = ipaddr.parse("128.93.1.100");
     assert.ok(addr2.match(range2, 16), "matches");
 };
 
@@ -31,13 +30,5 @@ exports["testParsing"] = function(assert) {
     assert.ok(ipaddr.parse('123456'), "long");
 
 };
-
-exports["teststuff"] = function(assert) {
-    var addr1 = ipaddr.parse("192.168.1.255");
-    console.log(addr1.range());
-    var addr2 = ipaddr.parse("127.0.0.1");
-    console.log(addr2.range());
-    assert.ok(ipaddr.parse("192.168.1.255").range() === 'broadcast', "bcast " + ipaddr.parse("192.168.1.255").range());
-}
 
 require("sdk/test").run(exports);

@@ -1,0 +1,10 @@
+.git
+.gitignore
+.jpmignore
+.DS_Store
+*.sublime*
+*.update.rdf
+*.zip
+*.xpi
+*.sh
+doc*

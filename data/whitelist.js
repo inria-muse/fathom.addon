@@ -21,17 +21,15 @@ window.onload = function() {
                 disabled : !($this.is(":checked"))
             });
         });
-
         window.fathom.internal(function(done) {
-	    alert("Changes saved!");
-	}, 'setwhitelist', whitelist);
+    	    alert("Changes saved!");
+	      }, 'setwhitelist', whitelist);
     });
     
     window.fathom.internal(function(res) {
-	var template = document.getElementById('template').innerHTML;
-	Mustache.parse(template);
-	var rendered = Mustache.render(template, { whitelist : res });
-	var e = document.getElementById('rendertarget');
-	e.innerHTML = rendered;
+      var template = $('#template').html();
+      Mustache.parse(template);
+      var rendered = Mustache.render(template, { whitelist : res });
+      $('#rendertarget').html(rendered);
     }, 'getwhitelist');
 };
