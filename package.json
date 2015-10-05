@@ -17,7 +17,7 @@
     "Vern Paxson"
   ],
   "license": "MIT",
-  "version": "2.1.2-beta",
+  "version": "2.1.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/inria-muse/fathom.addon.git"

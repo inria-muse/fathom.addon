@@ -22,7 +22,7 @@ XPI=jid1-o49GgyEaRRmXPA@jetpack-$REL.xpi
 
 jpm xpi
 
-if [ ! -f "$XPI" ] then
+if [! -f "$XPI"]; then
     echo "failed to build the xpi file $XPI ! aborting ..."
     mv $PKG.save $PKG
     mv $RDF.save $RDF
