@@ -37,6 +37,8 @@ git push
 cp $XPI dist/fathom-$REL.xpi
 
 # web release
+# FIXME: how to automate with AMO signing ..  ?
+
 cp -f $XPI ../fathom.web/fathom.xpi
 cp -f $RDF ../fathom.web/
 

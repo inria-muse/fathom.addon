@@ -361,7 +361,7 @@ if (document.baseURI.indexOf('about:neterror')>=0) {
         }
     }; // setup
 
-    if (self && !self.options.isaddon) {
+    if (typeof self !== "undefined" && !self.options.isaddon) {
         // this is a regular page, check if we should enable the API
         self.port.once('res', function(res) {
             if (res.data.enableapi)
@@ -379,6 +379,6 @@ if (document.baseURI.indexOf('about:neterror')>=0) {
         // content script on internal addon page ?
         let isaddon = (trusted || (typeof self !== "undefined" && self.options.isaddon));
         // setup the API
-        setup(self.options.version, trusted, isaddon);
+        setup("na", trusted, isaddon);
     }
 }
