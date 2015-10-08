@@ -4,7 +4,7 @@
   "id": "jid1-o49GgyEaRRmXPA@jetpack",
   "description": "A Browser-based Network Measurement Platform",
   "homepage": "https://muse.inria.fr/fathom",
-  "author": "MUSE Inria Paris-Rocquencourt <fathom@inria.fr>",
+  "author": "MUSE Inria Paris-Rocquencourt <muse.fathom@inria.fr>",
   "contributors": [
     "Anna-Kaisa Pietilainen",  
     "Stéphane Archer",
@@ -17,7 +17,7 @@
     "Vern Paxson"
   ],
   "license": "MIT",
-  "version": "2.1.2",
+  "version": "2.1.3-beta",
   "repository": {
     "type": "git",
     "url": "https://github.com/inria-muse/fathom.addon.git"

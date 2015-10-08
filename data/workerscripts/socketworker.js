@@ -153,7 +153,7 @@ onmessage = function(event) {
             typeof api[msg.method] === 'function') {
                 // open a new socket
             var s = api[msg.method].apply(null, msg.params);
-            if (s.error) {
+            if (!s || s.error) {
                 sendres(msg.id)(
                     "Failed to open socket: " + s.error,
                     undefined,
@@ -171,7 +171,7 @@ onmessage = function(event) {
             // start ping or iperf
             var args = [sendres(msg.id)].concat(msg.params);
             var s = api[msg.submodule][msg.method].apply(null, args);
-            if (s.error) {
+            if (!s || s.error) {
                 sendres(msg.id)(
                     "Failed to start: " + s.error,
                     undefined,

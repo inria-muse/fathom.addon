@@ -40,7 +40,8 @@ if (document.baseURI.indexOf('about:neterror')>=0) {
     fb.innerHTML = "Debug My Connection with Fathom";
 
     var b = document.getElementById('errorTryAgain');
-    b.parentNode.insertBefore(fb, b.nextSibling);
+    if (b)
+        b.parentNode.insertBefore(fb, b.nextSibling);
 
 } else {
     // The global Fathom object clone in page script context or 
@@ -54,6 +55,8 @@ if (document.baseURI.indexOf('about:neterror')>=0) {
     var setup = function(version, trusted, isaddon) {
         const REQ = "req";
         const RES = "res";
+
+        console.log('init fathom content script ' + version + " trusted="+trusted + " addon=" + isaddon);
 
         // fathom before init
         var dummyfathom = {
@@ -244,8 +247,8 @@ if (document.baseURI.indexOf('about:neterror')>=0) {
             };
         };
 
-        if (trusted) {
-            // simplified init for trusted addon pages            
+        if (trusted || isaddon) {
+            // simplified init for trusted and addon pages            
             dummyfathom.init = function(callback) {
                 var manifest = {
                     description : 'Fathom Tools',
@@ -274,46 +277,20 @@ if (document.baseURI.indexOf('about:neterror')>=0) {
                 makereq(undefined, 'internal', 'close', undefined);
             };
 
-            // expose directly via the window
-            window.fathom = fathom = dummyfathom;
+            if (trusted) {
+                // FIXME: this does not work anymore for multiprocess FF -- remove
+                window.fathom = fathom = dummyfathom;
+            } else {
+                fathom = cloneInto(
+                    dummyfathom, 
+                    unsafeWindow,
+                    { cloneFunctions: true });
+                unsafeWindow.fathom = fathom;
 
-        } else if (isaddon) {
-            // simplified init for addon pages
-            dummyfathom.init = function(callback) {
-                var manifest = {
-                    description : "Fathom Tools",
-                    api : [],
-                    destinations : [],
-                    location : window.location,
-                    isaddon : true
-                };
-                for (var api in fathomapi) {
-                    manifest.api.push(api+".*");
-                }
-                makereq(handleinit(callback), 'internal', 'init', manifest);
-            };
-
-            // expose the internal API directly to the addon pages
-            dummyfathom.internal = function(callback, method, params) {
-                makereq(callback, 'internal', method, params);
+                self.port.on("detach", function() {
+                    fathom = unsafeWindow.fathom = undefined;
+                });
             }
-
-            // shortcut for uploads
-            dummyfathom.uploaddata = function(data) {
-                makereq(undefined, 'internal', 'upload', data);
-            };
-
-            dummyfathom.close = function() {
-                makereq(undefined, 'internal', 'close', undefined);
-            };
-
-            // create initial Fathom object and expose it to page script(s)
-            fathom = cloneInto(
-                dummyfathom, 
-                unsafeWindow,
-                { cloneFunctions: true });
-
-            unsafeWindow.fathom = fathom;
 
         } else {
             // init for regular web pages
@@ -322,7 +299,10 @@ if (document.baseURI.indexOf('about:neterror')>=0) {
                     (manifest.api===undefined || 
                        manifest.destinations===undefined)) 
                 {
-                    callback({error : "missing or invalid manifest"});
+                    callback.call(
+                        null, 
+                        cloneInto({error : "missing or invalid manifest"}, unsafeWindow),
+                        true);  
                     return;
                 }
 
@@ -358,27 +338,20 @@ if (document.baseURI.indexOf('about:neterror')>=0) {
                 { cloneFunctions: true });
 
             unsafeWindow.fathom = fathom;
+
+            self.port.on("detach", function() {
+                fathom = unsafeWindow.fathom = undefined;
+            });
+
         }
     }; // setup
 
-    if (typeof self !== "undefined" && !self.options.isaddon) {
-        // this is a regular page, check if we should enable the API
-        self.port.once('res', function(res) {
-            if (res.data.enableapi)
-                setup(res.data.fathom_version, false, false);            
-        });
+    // trusted script ? TODO: remove
+    let trusted = (typeof addon !== "undefined");
 
-        self.port.emit('req', {
-            module : 'internal',
-            method : 'setup',
-            id : 0
-        });
-    } else {
-        // trusted script ?
-        let trusted = (typeof addon !== "undefined");
-        // content script on internal addon page ?
-        let isaddon = (trusted || (typeof self !== "undefined" && self.options.isaddon));
-        // setup the API
-        setup("na", trusted, isaddon);
-    }
+    // content script on internal addon page ?
+    let isaddon = (trusted || (typeof self !== "undefined" && self.options.isaddon));
+
+    // setup the API
+    setup((self ? self.options.version : "na"), trusted, isaddon);
 }

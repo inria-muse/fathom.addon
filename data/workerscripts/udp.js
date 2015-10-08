@@ -101,6 +101,9 @@ socket.udpRecvFrom = function(s, asstring, timeout, size) {
     // (65,535 - 8 byte UDP header - 20 byte IP header)
     var bufsize = (size && size>0 ? size : 65507);
     var recvbuf = getBuffer(bufsize);
+    if (!recvbuf) {
+        return { error : "Failed to allocate buffer" };
+    }
 
     var to = NSPR.sockets.PR_INTERVAL_NO_WAIT;
     if (timeout && timeout < 0) {
