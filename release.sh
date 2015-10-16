@@ -15,7 +15,7 @@ sed 's/"version": ".*"/"version": "'$REL'"/' <$PKG.save >$PKG
 
 RDF=fathom.update.rdf
 cp $RDF $RDF.save
-sed 's/<em:version>.*<\/em:version>/<em:version>'$REL'<\/em:version>/' <$RDF.save >$REF
+sed 's/<em:version>.*<\/em:version>/<em:version>'$REL'<\/em:version>/' <$RDF.save >$RDF
 
 # build xpi
 XPI=jid1-o49GgyEaRRmXPA@jetpack-$REL.xpi
