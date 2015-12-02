@@ -56,27 +56,9 @@ exports["testdnslookup4"] = function(assert, done) {
     }, { method : 'dnsLookup', params : ['muse.inria.fr', '1.2.3.4']});
 };
 
-exports["testlookupmyip"] = function(assert, done) {
-    tools.exec(function(res) {
-		console.log(JSON.stringify(res,null,4));
-		assert.ok(!res.error, "lookupIP no error");
-		assert.ok(res.ip, "lookupIP returns " + res.ip);
-		done();
-    }, { method : 'lookupIP'});
-};
-
-exports["testlookupmac"] = function(assert, done) {
-    tools.exec(function(res) {
-        console.log(JSON.stringify(res,null,4));
-		assert.ok(!res.error, "lookupMAC no error");
-		assert.ok(res.result && res.result.company === "Apple", "lookupMAC ok");
-		done();
-    }, { method : 'lookupMAC', params: ['54:26:96:ce:3d:89']});
-};
-
 exports["testdisclocal"] = function(assert, done) {
     tools.exec(function(res,dflag) {
-		console.log(res);
+		console.log(JSON.stringify(res, null, 4));
 	    assert.ok(res.type === 'local', "got correct node type");	
 		if (dflag) done();
     }, { method : 'discovery',
@@ -85,7 +67,7 @@ exports["testdisclocal"] = function(assert, done) {
 
 exports["testdiscinternet"] = function(assert, done) {
     tools.exec(function(res,dflag) {
-		console.log(res);
+		console.log(JSON.stringify(res, null, 4));
 	    assert.ok(res.type === 'internet', "got correct node type");	
 		if (dflag) done();
     }, { method : 'discovery',
@@ -271,7 +253,5 @@ exports["testfathomapicall"] = function(assert, done) {
 	 submodule : 'remoteapi',
 	 params : []}, manifest);
 };
-
-
 
 require("sdk/test").run(exports);

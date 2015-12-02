@@ -1,11 +1,11 @@
-const baselinedb = require("../lib/baselinedb");
+const baselinedb = require("../lib/db");
 var config = require('../lib/config');
 const fileIO = require('sdk/io/file');
 const ss = require("sdk/simple-storage");
 const timers = require('sdk/timers');
 
 exports["test1"] = function(assert, done) {
-	var db = new baselinedb.DB();
+	var db = baselinedb.getInstance();
 	var file = db.dbfile.path;
 	assert.ok(db!==undefined, 'created');
 	assert.ok(db.version < 0, 'schema not created ' + db.version);
@@ -48,7 +48,7 @@ exports["test2"] = function(assert, done) {
 	config.BASELINE_ROWS[0] = 20;
 	var start = Date.now();
 
-	var db = new baselinedb.DB();
+	var db = baselinedb.getInstance();
 	db.connect(function(res) {
 		assert.ok((!res || !res.error), 'no error');
 
@@ -118,7 +118,7 @@ exports["test2"] = function(assert, done) {
 exports["test3"] = function(assert, done) {
 	var start = Date.now();
 
-	var db = new baselinedb.DB();
+	var db = baselinedb.getInstance();
 	db.connect(function(res) {
 		assert.ok((!res || !res.error), 'no error on connect');
 

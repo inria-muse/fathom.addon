@@ -1,17 +1,31 @@
 {
     "config" : {
-        "version" : 0,
+        "version" : 1,
         "url" : "https://muse.inria.fr/fathom/fathom.json",
         "update_freq_days" : 3
     },
 
     "api" : {
-        "url" : "https://muse.inria.fr/fathomapi"
+        "url" : "https://muse.inria.fr/fathomapi",
+        "ipv4" : "128.93.165.1",
+        "city" : "Paris",
+        "country" : "FR"
     },
 
-    "mserver" : {
-        "hostname" : "62-210-73-169.rev.poneytelecom.eu",
-        "ipv4" : "62.210.73.169"
+    "mlab" : {
+        "getserverurl" : "https://mlab-ns.appspot.com/ndt"
+    },
+
+    "ripe" : {
+        "url" : "https://stat.ripe.net/data",
+        "names" : ["geoloc","prefix-overview","reverse-dns-ip"],
+        "sourceapp" : "fathom"
+    },
+
+    "environment" : {
+        "inactivity_ttl_sec" : 5,
+        "lookup_ttl_sec" : 240,
+        "full_lookup_ttl_days" : 5
     },
 
     "baseline" : {
@@ -28,13 +42,8 @@
             "count" : 3, 
             "timeout" : 3,
             "maxttl" : 20
-        }
-    },
-
-    "environment" : {
-        "ttl" : 300,
-        "activity_ttl" : 10,
-        "max_ttl" : 86400
+        },
+        "dnsreq_enable" : true
     },
 
     "pageload" : {

@@ -1561,27 +1561,6 @@ tools.dnsLookup = function(callback, hostname, server, port) {
 };
 
 /**
- * @description Device manufacturer lookup based on the MAC address. 
- *
- * @param {string} mac The mac addres.
- * @access private
- */
-tools.lookupMAC = function(callback, mac) {
-    makereq(callback, "tools", "lookupMAC", [mac]);
-};
-tools.lookupMAC.addononly = true;
-
-/**
- * @description get my current public IP.
- *
- * @access private
- */
-tools.lookupIP = function(callback) {
-    makereq(callback, "tools", "lookupIP", []);
-};
-tools.lookupIP.addononly = true;
-
-/**
  * @description Do network neighbour discovery.
  *
  * @access private
