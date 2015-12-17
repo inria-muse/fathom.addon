@@ -62,7 +62,7 @@ const linelabels = {
 		'rtt1' : 'Home gateway (1st hop)', 
 		'rtt2' : 'Access link (2nd hop)', 
 		'rtt3' : 'ISP (3rd hop)', 
-		'rttx' : 'Measurement server (in France)'
+		'rttx' : 'Closest MLAB server'
     },
     'pageload' : {
 		'pageload_total' : 'Page Load', 
