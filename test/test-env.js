@@ -1,4 +1,5 @@
 var env = require('../lib/env');
+const timers = require("sdk/timers");
 
 exports["testnetworklocal"] = function(assert, done) {
     env.getenvlocal(function(res) {
@@ -14,13 +15,6 @@ exports["testnetworkfull"] = function(assert, done) {
         assert.ok(!res.error, "no error");
         done(); 
     });
-};
-
-exports["testgetcurrent"] = function(assert, done) {
-    var res = env.getcurrent();
-    console.log(JSON.stringify(res,null,4));
-    assert.ok((res && !res.error), "no error");
-    done(); 
 };
 
 exports["testgetnetworkenv1"] = function(assert, done) {
@@ -54,7 +48,7 @@ exports["testgetnetworkenv3"] = function(assert, done) {
             env.getnetworkenv(function(res2) {
                 console.log(JSON.stringify(res2,null,4));
                 assert.ok(!res2.error, "no error");
-                assert.ok(res2.cached, "got cached on 2nd req");
+                assert.ok(res2.cached, "got cached on 2nd req (< 5s)");
                 db.getInstance().cleanup();
                 done(); 
             });
@@ -63,21 +57,24 @@ exports["testgetnetworkenv3"] = function(assert, done) {
 };
 
 exports["testgetnetworkenv4"] = function(assert, done) {
-    // test with db
     var db = require('../lib/db');
     db.getInstance().connect(function() {
-        // will do full resolve and cache to db
         env.getnetworkenv(function(res) {
+            // returns local info
+            console.log(JSON.stringify(res,null,4));
             assert.ok(!res.error, "no error");
+            assert.ok(!res.public_ip, "expected no public_ip");
 
-            // only does local lookup and gets rest from db
-            env.getenvlocal(function(res2) {
-                console.log(JSON.stringify(res2,null,4));
-                assert.ok(!res2.error, "no error");
-                assert.ok(res2.env_id === res.env_id, "got correct db match");
-                db.getInstance().cleanup();
-                done(); 
-            });
+            timers.setTimeout(function() {
+                env.getnetworkenv(function(res2) {
+                    console.log(JSON.stringify(res2,null,4));
+                    assert.ok(!res2.error, "no error");
+                    assert.ok(res2.public_ip && res2.public_ip!=='0.0.0.0', "got public_ip");
+                    assert.ok(res2.cached, "not cached on 2nd req (> 5s)");
+                    db.getInstance().cleanup();
+                    done(); 
+                });
+            }, 5010);
         });
     });
 };

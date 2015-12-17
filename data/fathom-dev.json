@@ -7,7 +7,7 @@
 
     "api" : {
         "url" : "https://muse.inria.fr/fathomapi",
-        "ipv4" : "128.93.165.1",
+        "ipv4" : "128.93.101.81",
         "city" : "Paris",
         "country" : "FR"
     },
@@ -24,7 +24,7 @@
 
     "environment" : {
         "inactivity_ttl_sec" : 5,
-        "lookup_ttl_sec" : 240,
+        "local_lookup_ttl_sec" : 300,
         "full_lookup_ttl_days" : 5
     },
 
