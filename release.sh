@@ -20,6 +20,9 @@ RDF=fathom.update.rdf
 cp $RDF $RDF.save
 sed 's/<em:version>.*<\/em:version>/<em:version>'$REL'<\/em:version>/' <$RDF.save >$RDF
 
+# cleanup debug builds
+rm *.xpi
+
 # build xpi
 XPI=jid1-o49GgyEaRRmXPA@jetpack-$REL.xpi
 
@@ -33,8 +36,9 @@ if [ ! -f "$XPI" ]; then
 fi
 
 # sign the xpi
-jpm sign --api-key $AMO_API_KEY --api-secret $AMO_API_SECRET --xpi $XPI
 SIGNED=fathom-$REL-fx+an.xpi
+
+jpm sign --api-key $AMO_API_KEY --api-secret $AMO_API_SECRET --xpi $XPI
 
 if [ ! -f "$SIGNED" ]; then
     echo "failed to sign the xpi file $XPI ! aborting ..."
@@ -43,12 +47,13 @@ if [ ! -f "$SIGNED" ]; then
     exit 1
 fi
 
+# keep the signed version in dist
+mv $SIGNED dist/fathom-$REL.xpi
+
+# all good, commit and tag to git
 git commit -a -m "xpi release "$TAG
 git tag $TAG
 git push
-
-# keep the signed version in dist
-mv $SIGNED dist/fathom-$REL.xpi
 
 # web release
 cp -f dist/fathom-$REL.xpi ../fathom.web/fathom.xpi
