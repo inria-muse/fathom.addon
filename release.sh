@@ -5,6 +5,9 @@ if [ -z "$REL" ]; then
     exit 1
 fi
 
+AMO_API_KEY=user:11854584:946
+AMO_API_SECRET=417710f9818e44c4fd7cd8804affe2165d50ee5af8413a9012b58bdc3c1c2a3b
+
 TAG=v$REL
 echo "prepare release " $TAG " ..."
 
@@ -29,17 +32,26 @@ if [ ! -f "$XPI" ]; then
     exit 1
 fi
 
+# sign the xpi
+jpm sign --api-key $AMO_API_KEY --api-secret $AMO_API_SECRET --xpi $XPI
+SIGNED=fathom-$REL-fx+an.xpi
+
+if [ ! -f "$SIGNED" ]; then
+    echo "failed to sign the xpi file $XPI ! aborting ..."
+    mv $PKG.save $PKG
+    mv $RDF.save $RDF
+    exit 1
+fi
+
 git commit -a -m "xpi release "$TAG
 git tag $TAG
 git push
 
-# keep a copy
-cp $XPI dist/fathom-$REL.xpi
+# keep the signed version in dist
+mv $SIGNED dist/fathom-$REL.xpi
 
 # web release
-# FIXME: how to automate with AMO signing ..  ?
-
-cp -f $XPI ../fathom.web/fathom.xpi
+cp -f dist/fathom-$REL.xpi ../fathom.web/fathom.xpi
 cp -f $RDF ../fathom.web/
 
 pushd ../fathom.web

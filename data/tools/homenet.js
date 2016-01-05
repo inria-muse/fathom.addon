@@ -1,7 +1,7 @@
 /*
    Fathom - Browser-based Network Measurement Platform
 
-   Copyright (C) 2011-2015 Inria Paris-Roquencourt 
+   Copyright (C) 2011-2016 Inria Paris-Roquencourt 
                            International Computer Science Institute (ICSI)
 
    See LICENSE for license and terms of usage. 
