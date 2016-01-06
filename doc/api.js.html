@@ -29,7 +29,7 @@
             <pre class="prettyprint source linenums"><code>/*
    Fathom - Browser-based Network Measurement Platform
 
-   Copyright (C) 2011-2015 Inria Paris-Roquencourt 
+   Copyright (C) 2011-2016 Inria Paris-Roquencourt 
                            International Computer Science Institute (ICSI)
 
    See LICENSE for license and terms of usage. 
@@ -1589,35 +1589,14 @@ tools.dnsLookup = function(callback, hostname, server, port) {
 };
 
 /**
- * @description Device manufacturer lookup based on the MAC address. 
- *
- * @param {string} mac The mac addres.
- * @access private
- */
-tools.lookupMAC = function(callback, mac) {
-    makereq(callback, "tools", "lookupMAC", [mac]);
-};
-tools.lookupMAC.addononly = true;
-
-/**
- * @description get my current public IP.
- *
- * @access private
- */
-tools.lookupIP = function(callback) {
-    makereq(callback, "tools", "lookupIP", []);
-};
-tools.lookupIP.addononly = true;
-
-/**
  * @description Do network neighbour discovery.
  *
  * @access private
- * @param {number} timeout - Time to wait devices (in seconds).
  * @param {Array} protocols - List of discovery protocols, valid values: 'local', 'route', 'internet', 'upnp', 'mdns', 'ping', 'arptable'.
+ * @param {number} timeout - Discovery timeout (in seconds). Applies to upnp, mdns and ping.
  */
-tools.discovery = function(callback, timeout, protocols) {
-    makereq(callback, "tools", "discovery", [timeout, protocols]);
+tools.discovery = function(callback, protocols, timeout) {
+    makereq(callback, "tools", "discovery", [protocols, timeout]);
 };
 tools.discovery.addononly = true;
 
@@ -1699,7 +1678,7 @@ var base = fathomapi.baseline = {};
  *
  * To fetch a single metric, you can use the helper methods.
  *
- * @param {string} range One of 'day' (default), 'week', 'month', 'year'.
+ * @param {string} range One of 'latest', day' (default), 'week', 'month', 'year'.
  * @param {Array}  what  List of metrics. Valid metrics are 'cpu', 'load', 
  *                       'tasks', 'mem', 'traffic', 'wifi' and 'rtt'. 
  *                       Undefined defaults to all metrics.
@@ -1714,7 +1693,7 @@ base.get = function(callback, range, what) {
  * @description Get historical CPU usage data from the baseline measurements. 
  * Returns approximately the last 'range' of values (if available).
  *
- * @param {string} range One of 'day' (default), 'week', 'month', 'year'.
+ * @param {string} range One of 'latest', 'day' (default), 'week', 'month', 'year'.
  */
 base.getCPU = function(callback, range) {
     if (!range) range = 'day';
@@ -1725,7 +1704,7 @@ base.getCPU = function(callback, range) {
  * @description Get historical CPU load data from the baseline measurements. 
  * Returns approximately the last 'range' of values (if available).
  *
- * @param {string} range One of 'day' (default), 'week', 'month', 'year'.
+ * @param {string} range One of 'latest', 'day' (default), 'week', 'month', 'year'.
  */
 base.getLoad = function(callback, range) {
     if (!range) range = 'day';
@@ -1736,7 +1715,7 @@ base.getLoad = function(callback, range) {
  * @description Get historical CPU tasks data from the baseline measurements. 
  * Returns approximately the last 'range' of values (if available).
  *
- * @param {string} range One of 'day' (default), 'week', 'month', 'year'.
+ * @param {string} range One of 'latest', 'day' (default), 'week', 'month', 'year'.
  */
 base.getTasks = function(callback, range) {
     if (!range) range = 'day';
@@ -1747,7 +1726,7 @@ base.getTasks = function(callback, range) {
  * @description Get historical memory usage data from the baseline measurements.
  * Returns approximately the last 'range' of values (if available).
  *
- * @param {string} range One of 'day' (default), 'week', 'month', 'year'.
+ * @param {string} range One of 'latest', 'day' (default), 'week', 'month', 'year'.
  */
 base.getMem = function(callback, range) {
     if (!range) range = 'day';
@@ -1759,7 +1738,7 @@ base.getMem = function(callback, range) {
  * measurements.
  * Returns approximately the last 'range' of values (if available).
  *
- * @param {string} range One of 'day' (default), 'week', 'month', 'year'.
+ * @param {string} range One of 'latest', 'day' (default), 'week', 'month', 'year'.
  */
 base.getTraffic = function(callback, range) {
     if (!range) range = 'day';
@@ -1771,7 +1750,7 @@ base.getTraffic = function(callback, range) {
  * measurements.
  * Returns approximately the last 'range' of values (if available).
  *
- * @param {string} range One of 'day' (default), 'week', 'month', 'year'.
+ * @param {string} range One of 'latest', 'day' (default), 'week', 'month', 'year'.
  */
 base.getWifi = function(callback, range) {
     if (!range) range = 'day';
@@ -1783,7 +1762,7 @@ base.getWifi = function(callback, range) {
  * the baseline measurements.
  * Returns approximately the last 'range' of values (if available).
  *
- * @param {string} range One of 'day' (default), 'week', 'month', 'year'.
+ * @param {string} range One of 'latest', 'day' (default), 'week', 'month', 'year'.
  */
 base.getRTT = function(callback, range) {
     if (!range) range = 'day';
@@ -1795,13 +1774,12 @@ base.getRTT = function(callback, range) {
  * measurements.
  * Returns approximately the last 'range' of values (if available).
  *
- * @param {string} range One of 'day' (default), 'week', 'month', 'year'.
+ * @param {string} range One of 'latest', 'day' (default), 'week', 'month', 'year'.
  */
 base.getEnv = function(callback, range) {
     if (!range) range = 'day';
     makereq(callback, "baseline", "get", ['env',range]);        
-};
-</code></pre>
+};</code></pre>
         </article>
     </section>
 
@@ -1817,7 +1795,7 @@ base.getEnv = function(callback, range) {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta1</a> on Thu Jun 04 2015 17:40:26 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.3</a> on Wed Jan 06 2016 14:45:52 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>

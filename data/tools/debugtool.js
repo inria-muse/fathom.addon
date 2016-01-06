@@ -22,16 +22,6 @@
     FAILURE :     'test-failure'
 };
 
-// measurement server IP (hosted server at online.net)
-// FIXME: should come from the extension (or defined runtime as closest mserver ... )
-const MSERVER = '62.210.73.169';
-
-// public DNS resolver (google resolver)
-const DNSSERVER = '8.8.8.8';
-
-// Host to check (DNS/HTTP)
-const HOST= 'www.google.com';
-
 /** Model: single test. */
 var Test = Backbone.Model.extend({
     defaults: {
@@ -172,7 +162,7 @@ var TestSuites = Backbone.Collection.extend({
 /**
  * Create a new collection of testsuites.
  */
- var create_testsuite = function(req) {
+ var create_testsuite = function(req, netenv) {
     // globally unique test id
     var testidx = 1;
     var addtest = function(suite, t) {
@@ -181,6 +171,17 @@ var TestSuites = Backbone.Collection.extend({
         suite.tests.add(t);
         testidx += 1;
     };
+
+    // muse.paris.inria.fr
+    var MUSESERVER = '128.93.101.81';
+
+    // public DNS resolver (google resolver)
+    var DNSSERVER = '8.8.8.8';
+
+    // Host to check (DNS/HTTP)
+    var HOST= 'www.google.com';
+
+    var MSERVER = (netenv ? netenv.mserver_ip : undefined);
 
     // new testsuite collection
     var testsuites = new TestSuites();
@@ -458,26 +459,29 @@ var TestSuites = Backbone.Collection.extend({
         }
     };
 
-    var nettest3 = new Test({
-        name: "Internet reachability",
-        shortname: 'net3',
-        help: "Checks if we can reach (ping) a Fathom test server in the internet. If the test has errors, this may just be a problem with ping (e.g. the network blocks ping or the Fathom server is temporarily down).",
-        'test-running-txt' : "trying to reach the Fathom test server ...",
-        'test-success-txt' : 'got a response from the Fathom test server',
-        'test-errors-txt' : 'no response from the Fathom test server'
-    });
-    nettest3.exec = function(next, res) {
-        var that = this;
-        that.start();
-        fathom.system.doPing(function(res1) {
-            if (!res1.error && res1.result.rtt.length >= 1) {
-                that.end(TESTSTATUS.SUCCESS,res1);
-            } else {
-                that.end(TESTSTATUS.ERRORS,res1);
-            }
-            next(false,undefined);
-        }, MSERVER, { count : 3, interval : 0.5, timeout : 5});
-    };
+    var nettest3 = undefined;
+    if (MSERVER) {
+        var nettest3 = new Test({
+            name: "Internet reachability",
+            shortname: 'net3',
+            help: "Checks if we can reach (ping) a test server (located at " + netenv.mserver_city + "," + netenv.mserver_country+ "). If the test has errors, this may just be a problem with ping (e.g. the network blocks ping or the test server is temporarily down).",
+            'test-running-txt' : "trying to reach the test server ...",
+            'test-success-txt' : 'got a response from the test server',
+            'test-errors-txt' : 'no response from the test server'
+        });
+        nettest3.exec = function(next, res) {
+            var that = this;
+            that.start();
+            fathom.system.doPing(function(res1) {
+                if (!res1.error && res1.result.rtt.length >= 1) {
+                    that.end(TESTSTATUS.SUCCESS,res1);
+                } else {
+                    that.end(TESTSTATUS.ERRORS,res1);
+                }
+                next(false,undefined);
+            }, MSERVER, { count : 3, interval : 0.5, timeout : 5});
+        };
+    }
 
     var nettest4 = new Test({
         name: "Internet reachability ("+HOST+")",
@@ -502,7 +506,8 @@ var TestSuites = Backbone.Collection.extend({
 
     addtest(testsuite3, nettest1);
     addtest(testsuite3, nettest2);
-    addtest(testsuite3, nettest3);
+    if (nettest3)
+        addtest(testsuite3, nettest3);
     addtest(testsuite3, nettest4);
     testsuites.add(testsuite3);
 
@@ -516,11 +521,11 @@ var TestSuites = Backbone.Collection.extend({
     var httptest1 = new Test({
         name: "HTTP page load",
         shortname: 'http1',
-        help: "Checks if we can retrieve a web page from a Fathom test server. If the test has errors, this may indicate a problem with your network connection. If it fails, the Fathom test server may be temporarily down.",
-        'test-running-txt' : 'retrieving a web page from the Fathom test server ...',
-        'test-success-txt' : 'HTTP download from the Fathom test server succeeded',
-        'test-errors-txt' : 'connection problem while trying to download from the Fathom test server', 
-        'test-failure-txt' : 'HTTP download from the Fathom test server failed'
+        help: "Checks if we can retrieve a web page from a test server "+MUSESERVER+" ('muse.inria.fr'). If the test has errors, this may indicate a problem with your network connection. If it fails, the test server may be temporarily down.",
+        'test-running-txt' : 'retrieving a web page from the test server ...',
+        'test-success-txt' : 'HTTP download from the test server succeeded',
+        'test-errors-txt' : 'connection problem while trying to download from the test server', 
+        'test-failure-txt' : 'HTTP download from the test server failed'
     });
     httptest1.exec = function(next,res) {
         var that = this;
@@ -534,7 +539,7 @@ var TestSuites = Backbone.Collection.extend({
                 that.end(TESTSTATUS.FAILURE,res1);
             }
             next(false,undefined);
-        }, MSERVER, { proto : 'xmlhttpreq', count : 1});
+        }, MUSESERVER, { proto : 'xmlhttpreq', count : 1});
     };
 
     var httptest2 = new Test({
@@ -777,30 +782,37 @@ window.onload = function() {
     }, 'getuserpref', 'debugtoolupload');
 
     fathom.init(function() {
-        var testsuites = create_testsuite(getQuery()); 
-        var mainview = new ResultView({model:testsuites});
+        fathom.baseline.getEnv(function(netenv) {
+            if (netenv && netenv.error) {
+                console.log(netenv.error);
+                netenv = undefined;
+            }
 
-        var ts = new Date(); // starttime
-        var startts = window.performance.now();
+            var testsuites = create_testsuite(getQuery(), netenv); 
+            var mainview = new ResultView({model:testsuites});
 
-        testsuites.exec(function(obj) {
-            var elapsed = (window.performance.now() - startts); // ms
-            var json = testsuites.toUploadJSON();
-            fathom.internal(function(userok) {
-                // update the upload block and handler for raw data link
-                renderu({upload : userok, ready : true});
-                $("#showdata").click(function() {
-                    var win = window.open("../rawdata.html");
-                    win.json = json;
+            var ts = new Date(); // starttime
+            var startts = window.performance.now();
+
+            testsuites.exec(function(obj) {
+                var elapsed = (window.performance.now() - startts); // ms
+                var json = testsuites.toUploadJSON();
+                fathom.internal(function(userok) {
+                    // update the upload block and handler for raw data link
+                    renderu({upload : userok, ready : true});
+                    $("#showdata").click(function() {
+                        var win = window.open("../rawdata.html");
+                        win.json = json;
+                    });
+                }, 'upload', { 
+                    ts : ts.getTime(),
+                    timezoneoffset : ts.getTimezoneOffset(),
+                    elapsed : elapsed,
+                    results : json
                 });
-            }, 'upload', { 
-                ts : ts.getTime(),
-                timezoneoffset : ts.getTimezoneOffset(),
-                elapsed : elapsed,
-                results : json
-            });
 
-            fathom.close();
-        }); // exec
+                fathom.close();
+            }); // exec
+        }, 'latest'); // baseline.getEnv
     }); // init
 }; // onload
