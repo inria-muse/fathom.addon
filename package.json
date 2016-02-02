@@ -85,7 +85,7 @@
     {
       "type": "bool",
       "name": "enablebaseline",
-      "value": true,
+      "value": false,
       "title": "Enable Performance Monitoring of Your System and Network Connections",
       "description": "Allow Fathom to system collect and network peformance metrics periodically on the background."
     },
@@ -109,7 +109,7 @@
     {
       "type": "bool",
       "name": "enablepageload",
-      "value": true,
+      "value": false,
       "title": "Enable Web Page Performance Monitoring",
       "description": "Allow Fathom to monitor the pageload times of visited web pages."
     },
@@ -135,7 +135,7 @@
       "name": "enablemediaload",
       "value": true,
       "title": "Enable Media Playback Performance Monitoring",
-      "description": "Allow Fathom to monitor the performance of media playback (video)."
+      "description": "Allow Fathom to monitor the performance of media playback (video and audio)."
     },
     {
       "name": "medialoadupload",
