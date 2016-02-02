@@ -17,7 +17,7 @@
     "Vern Paxson"
   ],
   "license": "MIT",
-  "version": "2.1.8",
+  "version": "2.1.9-beta",
   "repository": {
     "type": "git",
     "url": "https://github.com/inria-muse/fathom.addon.git"
@@ -110,14 +110,38 @@
       "type": "bool",
       "name": "enablepageload",
       "value": true,
-      "title": "Enable Performance Monitoring of Pageload Times",
+      "title": "Enable Web Page Performance Monitoring",
       "description": "Allow Fathom to monitor the pageload times of visited web pages."
     },
     {
       "name": "pageloadupload",
       "type": "radio",
-      "title": "Share Pageload Performance Reports",
-      "description": "Allow uploading of pageload performance reports to our secure servers for network research. No data is shared with third parties.",
+      "title": "Share Web Page Performance Reports",
+      "description": "Allow uploading of pagaload performance reports to our secure servers for network research. No data is shared with third parties.",
+      "value": "always",
+      "options": [
+        {
+          "value": "always",
+          "label": "Always"
+        },
+        {
+          "value": "never",
+          "label": "Never"
+        }
+      ]
+    },
+    {
+      "type": "bool",
+      "name": "enablemediaload",
+      "value": true,
+      "title": "Enable Media Playback Performance Monitoring",
+      "description": "Allow Fathom to monitor the performance of media playback (video)."
+    },
+    {
+      "name": "medialoadupload",
+      "type": "radio",
+      "title": "Share Media Playback Performance Reports",
+      "description": "Allow uploading of media playback performance reports to our secure servers for network research. No data is shared with third parties.",
       "value": "always",
       "options": [
         {
