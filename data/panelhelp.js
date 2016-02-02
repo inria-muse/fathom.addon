@@ -1,7 +1,7 @@
 /*
    Fathom - Browser-based Network Measurement Platform
 
-   Copyright (C) 2011-2015 Inria Paris-Roquencourt 
+   Copyright (C) 2011-2016 Inria Paris-Roquencourt 
                            International Computer Science Institute (ICSI)
 
    See LICENSE for license and terms of usage. 
@@ -90,12 +90,12 @@ addon.port.on("pageload", function(pl) {
     }
     
 	if (!pl.monitenabled) {
-		child = e.appendChild(document.createTextNode('monitoring disabled'));
-	} else if (pl.readyState === 'complete') {
-		child = e.appendChild(document.createTextNode(pl.objects + ' objects in ' + pl.pageloadtime + ' ms'));
-	} else if (pl.readyState === 'loading' || pl.readyState === 'interactive') {
-		child = e.appendChild(document.createTextNode('page loading ...'));
+		child = e.appendChild(document.createTextNode('pageload disabled'));
+    } else if (pl.loading) {
+        child = e.appendChild(document.createTextNode('page loading ...'));
+	} else if (!pl.loading && pl.url) {
+        child = e.appendChild(document.createTextNode(pl.objects + ' objects in ' + pl.pageloadtime + ' ms'));
 	} else {
-		child = e.appendChild(document.createTextNode('no page'));
+		child = e.appendChild(document.createTextNode('no pageload stats'));
 	}
 });

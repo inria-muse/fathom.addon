@@ -1,7 +1,7 @@
 /*
    Fathom - Browser-based Network Measurement Platform
 
-   Copyright (C) 2011-2015 Inria Paris-Roquencourt 
+   Copyright (C) 2011-2016 Inria Paris-Roquencourt 
                            International Computer Science Institute (ICSI)
 
    See LICENSE for license and terms of usage. 
@@ -62,7 +62,7 @@ const linelabels = {
 		'rtt1' : 'Home gateway (1st hop)', 
 		'rtt2' : 'Access link (2nd hop)', 
 		'rtt3' : 'ISP (3rd hop)', 
-		'rttx' : 'Measurement server (in France)'
+		'rttx' : 'Closest MLAB server'
     },
     'pageload' : {
 		'pageload_total' : 'Page Load', 

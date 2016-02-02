@@ -1,7 +1,7 @@
 /*
    Fathom - Browser-based Network Measurement Platform
 
-   Copyright (C) 2011-2015 Inria Paris-Roquencourt 
+   Copyright (C) 2011-2016 Inria Paris-Roquencourt 
                            International Computer Science Institute (ICSI)
 
    See LICENSE for license and terms of usage. 
@@ -1650,7 +1650,7 @@ var base = fathomapi.baseline = {};
  *
  * To fetch a single metric, you can use the helper methods.
  *
- * @param {string} range One of 'day' (default), 'week', 'month', 'year'.
+ * @param {string} range One of 'latest', day' (default), 'week', 'month', 'year'.
  * @param {Array}  what  List of metrics. Valid metrics are 'cpu', 'load', 
  *                       'tasks', 'mem', 'traffic', 'wifi' and 'rtt'. 
  *                       Undefined defaults to all metrics.
@@ -1665,7 +1665,7 @@ base.get = function(callback, range, what) {
  * @description Get historical CPU usage data from the baseline measurements. 
  * Returns approximately the last 'range' of values (if available).
  *
- * @param {string} range One of 'day' (default), 'week', 'month', 'year'.
+ * @param {string} range One of 'latest', 'day' (default), 'week', 'month', 'year'.
  */
 base.getCPU = function(callback, range) {
     if (!range) range = 'day';
@@ -1676,7 +1676,7 @@ base.getCPU = function(callback, range) {
  * @description Get historical CPU load data from the baseline measurements. 
  * Returns approximately the last 'range' of values (if available).
  *
- * @param {string} range One of 'day' (default), 'week', 'month', 'year'.
+ * @param {string} range One of 'latest', 'day' (default), 'week', 'month', 'year'.
  */
 base.getLoad = function(callback, range) {
     if (!range) range = 'day';
@@ -1687,7 +1687,7 @@ base.getLoad = function(callback, range) {
  * @description Get historical CPU tasks data from the baseline measurements. 
  * Returns approximately the last 'range' of values (if available).
  *
- * @param {string} range One of 'day' (default), 'week', 'month', 'year'.
+ * @param {string} range One of 'latest', 'day' (default), 'week', 'month', 'year'.
  */
 base.getTasks = function(callback, range) {
     if (!range) range = 'day';
@@ -1698,7 +1698,7 @@ base.getTasks = function(callback, range) {
  * @description Get historical memory usage data from the baseline measurements.
  * Returns approximately the last 'range' of values (if available).
  *
- * @param {string} range One of 'day' (default), 'week', 'month', 'year'.
+ * @param {string} range One of 'latest', 'day' (default), 'week', 'month', 'year'.
  */
 base.getMem = function(callback, range) {
     if (!range) range = 'day';
@@ -1710,7 +1710,7 @@ base.getMem = function(callback, range) {
  * measurements.
  * Returns approximately the last 'range' of values (if available).
  *
- * @param {string} range One of 'day' (default), 'week', 'month', 'year'.
+ * @param {string} range One of 'latest', 'day' (default), 'week', 'month', 'year'.
  */
 base.getTraffic = function(callback, range) {
     if (!range) range = 'day';
@@ -1722,7 +1722,7 @@ base.getTraffic = function(callback, range) {
  * measurements.
  * Returns approximately the last 'range' of values (if available).
  *
- * @param {string} range One of 'day' (default), 'week', 'month', 'year'.
+ * @param {string} range One of 'latest', 'day' (default), 'week', 'month', 'year'.
  */
 base.getWifi = function(callback, range) {
     if (!range) range = 'day';
@@ -1734,7 +1734,7 @@ base.getWifi = function(callback, range) {
  * the baseline measurements.
  * Returns approximately the last 'range' of values (if available).
  *
- * @param {string} range One of 'day' (default), 'week', 'month', 'year'.
+ * @param {string} range One of 'latest', 'day' (default), 'week', 'month', 'year'.
  */
 base.getRTT = function(callback, range) {
     if (!range) range = 'day';
@@ -1746,7 +1746,7 @@ base.getRTT = function(callback, range) {
  * measurements.
  * Returns approximately the last 'range' of values (if available).
  *
- * @param {string} range One of 'day' (default), 'week', 'month', 'year'.
+ * @param {string} range One of 'latest', 'day' (default), 'week', 'month', 'year'.
  */
 base.getEnv = function(callback, range) {
     if (!range) range = 'day';

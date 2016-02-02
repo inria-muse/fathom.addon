@@ -1,7 +1,7 @@
 /*
    Fathom - Browser-based Network Measurement Platform
 
-   Copyright (C) 2011-2015 Inria Paris-Roquencourt 
+   Copyright (C) 2011-2016 Inria Paris-Roquencourt 
                            International Computer Science Institute (ICSI)
 
    See LICENSE for license and terms of usage. 
@@ -62,7 +62,7 @@ if (document.baseURI.indexOf('about:neterror')>=0) {
         var dummyfathom = {
             about : "Fathom - Browser-based Network Measurements",
             version : version,
-            copyright : "Inria & ICSI, 2014-2015"
+            copyright : "Inria & ICSI, 2014-2016"
         };
 
         /* On-going requests and corresponding callbacks. */

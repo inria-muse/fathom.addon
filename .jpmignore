@@ -8,3 +8,7 @@
 *.xpi
 *.sh
 doc*
+test
+node_modules/*/bin
+node_modules/*/test
+*.save
