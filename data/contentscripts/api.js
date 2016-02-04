@@ -1573,6 +1573,13 @@ tools.discovery = function(callback, protocols, timeout) {
 tools.discovery.addononly = true;
 
 /**
+ * @description Resolve the nearest Mlab server.
+ */
+tools.getMlabServer = function(callback) {
+    makereq(callback, "tools", "getMlabServer", []);
+};
+
+/**
  * @description Fathom remote API implementation. Includes discovery and
  *              API server(s) and client functions. Implemented on top of
  *              the JSONRPC protocol using multicast for discovery, udp for

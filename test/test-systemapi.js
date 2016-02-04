@@ -3,7 +3,8 @@ const systemapi = require("../lib/systemapi");
 const system = require("sdk/system");
 const _ = require('underscore');
 
-systemapi.setup();
+// init stuff
+systemapi.start();
 
 exports["testerror"] = function(assert, done) {
 	systemapi.exec(function(res) {

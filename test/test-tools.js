@@ -1,10 +1,20 @@
+// required by tools
+require('../lib/systemapi').start();
 var tools = require("../lib/toolsapi");
-require('../lib/systemapi').setup();
 
 var manifest = {
     isaddon : true,
     winid : 'test',
     neighbors : {}
+};
+
+exports["testgetmlabserver"] = function(assert, done) {
+    tools.exec(function(res) {
+    	console.log(res);
+		assert.ok(res, 'got result');
+		assert.ok(!res.error, 'no error');
+		done();
+    }, { method : 'getMlabServer'});
 };
 
 exports["testisconnected"] = function(assert, done) {

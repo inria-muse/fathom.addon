@@ -1,6 +1,6 @@
 var timers = require("sdk/timers");
 var sysapi = require('../lib/systemapi');
-sysapi.setup();
+sysapi.start();
 
 exports["testmeasurements1"] = function(assert, done) {
     var baseline = require("../lib/baselineapi");
@@ -9,7 +9,6 @@ exports["testmeasurements1"] = function(assert, done) {
 		console.log(JSON.stringify(res.rtt, null, 4));
 		assert.ok(!res.error, "no error");
 		assert.ok(!res.traceroute.error, "no traceroute error");
-        baseline.cleanup();
 		done();	
     }, new Date(), 1);
 };
@@ -21,7 +20,6 @@ exports["testmeasurements2"] = function(assert, done) {
 		console.log(JSON.stringify(res.traceroute, null, 4));
 		assert.ok(!res.error, "no error");
 		assert.ok(res.traceroute.error, "traceroute not run");
-        baseline.cleanup();
 		done();	
     }, new Date(), 2);
 };
@@ -34,7 +32,6 @@ exports["testexecday1"] = function(assert, done) {
 		    assert.ok(res.data.length>0, "got data " + res.data.length);
 		    if (res.data.length>0)
 			    console.log(res.data[0]);
-            baseline.cleanup();
 		    done();	
 		}, { method : 'get', params : ['cpu','day']});
     }, 15);
