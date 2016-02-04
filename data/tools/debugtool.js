@@ -782,6 +782,7 @@ window.onload = function() {
     }, 'getuserpref', 'debugtoolupload');
 
     fathom.init(function() {
+        // TODO: could just use tools.getMlabServer instead ?
         fathom.baseline.getEnv(function(netenv) {
             if (netenv && netenv.error) {
                 console.log(netenv.error);

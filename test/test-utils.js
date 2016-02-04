@@ -1,13 +1,5 @@
 var u = require('../lib/utils');
 
-exports["testgetmserver"] = function(assert, done) {
-    u.getMlabServer(function(res) {
-        console.log(JSON.stringify(res,null,4));
-        assert.ok(!res.error, "no error");
-        done(); 
-    });
-};
-
 exports["testgetipinfo"] = function(assert, done) {
     u.getIpInfo(function(res) {
         console.log(JSON.stringify(res,null,4));
