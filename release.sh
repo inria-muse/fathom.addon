@@ -21,7 +21,7 @@ cp $RDF $RDF.save
 sed 's/<em:version>.*<\/em:version>/<em:version>'$REL'<\/em:version>/' <$RDF.save >$RDF
 
 # cleanup debug builds
-rm *.xpi
+#rm *.xpi
 
 # build xpi
 XPI=jid1-o49GgyEaRRmXPA@jetpack-$REL.xpi
@@ -36,12 +36,12 @@ if [ ! -f "$XPI" ]; then
 fi
 
 # sign the xpi
-SIGNED=fathom-$REL-fx+an.xpi
+SIGNED=fathom-$REL-an+fx.xpi
 
-jpm sign --api-key $AMO_API_KEY --api-secret $AMO_API_SECRET --xpi $XPI
+#jpm sign --api-key $AMO_API_KEY --api-secret $AMO_API_SECRET --xpi $XPI
 
 if [ ! -f "$SIGNED" ]; then
-    echo "failed to sign the xpi file $XPI ! aborting ..."
+    echo "failed to sign the xpi file $XPI ! $SIGNED not found ..."
     mv $PKG.save $PKG
     mv $RDF.save $RDF
     exit 1
