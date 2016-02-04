@@ -5,9 +5,6 @@ if [ -z "$REL" ]; then
     exit 1
 fi
 
-AMO_API_KEY=user:11854584:946
-AMO_API_SECRET=417710f9818e44c4fd7cd8804affe2165d50ee5af8413a9012b58bdc3c1c2a3b
-
 TAG=v$REL
 echo "prepare release " $TAG " ..."
 
