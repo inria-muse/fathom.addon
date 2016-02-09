@@ -1,4 +1,8 @@
+var socketapi = require("../lib/socketapi");
 var protoapi = require("../lib/protoapi");
+
+socketapi.start();
+protoapi.start();
 
 var manifest = {
     neighbors : {},
@@ -8,21 +12,21 @@ var manifest = {
 
 exports["testunknown"] = function(assert, done) {
     protoapi.exec(function(res) {
-	assert.ok(res.error !== undefined, "unknown method returns error");
-	done();
+		assert.ok(res.error !== undefined, "unknown method returns error");
+		done();
     }, { module : "proto", submodule: "jsonrpc", method : 'asd'}, manifest);
 };
 
 exports["testcreatecli"] = function(assert, done) {
     protoapi.exec(function(id) {
-	assert.ok(id.error === undefined, "jsonrpc.create no error");
-	protoapi.exec(function(res) {
-	    assert.ok(res.error === undefined, "jsonrpc.close no error");
-	    done();
-	}, { module : "proto", 
-	     submodule: "jsonrpc", 
-	     method : 'close', 
-	     params : [id]}, manifest);
+		assert.ok(id.error === undefined, "jsonrpc.create no error");
+		protoapi.exec(function(res) {
+		    assert.ok(res.error === undefined, "jsonrpc.close no error");
+		    done();
+		}, { module : "proto", 
+		     submodule: "jsonrpc", 
+		     method : 'close', 
+		     params : [id]}, manifest);
     }, { module : "proto", 
 	 submodule: "jsonrpc", 
 	 method : 'create', 
@@ -31,14 +35,14 @@ exports["testcreatecli"] = function(assert, done) {
 
 exports["testcreateserv"] = function(assert, done) {
     protoapi.exec(function(id) {
-	assert.ok(id.error === undefined, "jsonrpc.create no error");
-	protoapi.exec(function(res) {
-	    assert.ok(res.error === undefined, "jsonrpc.close no error");
-	    done();
-	}, { module : "proto", 
-	     submodule: "jsonrpc", 
-	     method : 'close', 
-	     params : [id]}, manifest);
+		assert.ok(id.error === undefined, "jsonrpc.create no error");
+		protoapi.exec(function(res) {
+		    assert.ok(res.error === undefined, "jsonrpc.close no error");
+		    done();
+		}, { module : "proto", 
+		     submodule: "jsonrpc", 
+		     method : 'close', 
+		     params : [id]}, manifest);
     }, { module : "proto", 
 	 submodule: "jsonrpc", 
 	 method : 'create', 
@@ -47,69 +51,77 @@ exports["testcreateserv"] = function(assert, done) {
 
 exports["testudp"] = function(assert, done) {
     var docli = function() {
-	protoapi.exec(function(id) {
-	    assert.ok(id.error === undefined, "jsonrpc.create no error");
+		protoapi.exec(function(id) {
+		    assert.ok(id.error === undefined, "jsonrpc.create no error");
 
-	    protoapi.exec(function(res) {
-		console.log(res);
-		assert.ok(res.error === undefined, "jsonrpc.makereq no error");
-		assert.ok(res.result === "pong", "jsonrpc.makereq got pong");
+		    protoapi.exec(function(res) {
+				console.log(res);
 
-		protoapi.exec(function(res) {
-		    assert.ok(res.error === undefined, 
-			      "jsonrpc.close no error");
-		    done();
+				assert.ok(res.error === undefined, "jsonrpc.makereq no error");
+				assert.ok(res.result === "pong", "jsonrpc.makereq got pong");
+
+				protoapi.exec(function(res) {
+				    assert.ok(res.error === undefined, 
+					      "jsonrpc.close no error");
+				    done();
+
+				}, { module : "proto", 
+				     submodule: "jsonrpc", 
+				     method : 'close', 
+				     params : [id]}, manifest);
+
+		    }, { module : "proto", 
+			 submodule: "jsonrpc", 
+			 method : 'makereq', 
+			 params : [id,"ping"]}, manifest);
 
 		}, { module : "proto", 
 		     submodule: "jsonrpc", 
-		     method : 'close', 
-		     params : [id]}, manifest);
+		     method : 'create', 
+		     params : ["127.0.0.1",2343,false,"udp"]}, manifest);	
 
-	    }, { module : "proto", 
-		 submodule: "jsonrpc", 
-		 method : 'makereq', 
-		 params : [id,"ping"]}, manifest);
+	}; // docli
 
-	}, { module : "proto", 
-	     submodule: "jsonrpc", 
-	     method : 'create', 
-	     params : ["127.0.0.1",2343,false,"udp"]}, manifest);	
-    };
 
+	// create server
     protoapi.exec(function(id) {
-	assert.ok(id.error === undefined, "jsonrpc.create no error");
+		assert.ok(id.error === undefined, "jsonrpc.create server no error");
 
-	protoapi.exec(function(req) {
-	    console.log(req)
-	    assert.ok(req.error === undefined, "jsonrpc.listen no error");
-	    assert.ok(req.method === "ping", "jsonrpc.listen got ping");
+		// start listening for requests
+		protoapi.exec(function(req) {
+		    console.log(req)
+		    
+		    assert.ok(req.error === undefined, "jsonrpc.listen no error");
+		    assert.ok(req.method === "ping", "jsonrpc.listen got ping");
 
-	    req.result = "pong";
+		    req.result = "pong";
 
-	    protoapi.exec(function(res) {
-		console.log(res);
-		assert.ok(res.error === undefined, "jsonrpc.sendres no error");
+		    protoapi.exec(function(res) {
+				console.log(res);
+				assert.ok(res.error === undefined, "jsonrpc.sendres no error");
 
-		protoapi.exec(function(res) {
-		    assert.ok(res.error === undefined, 
-			      "jsonrpc.close no error");		    
+				protoapi.exec(function(res) {
+				    assert.ok(res.error === undefined, 
+					      "jsonrpc.close no error");		    
+
+			}, { module : "proto", 
+			     submodule: "jsonrpc", 
+			     method : 'close', 
+			     params : [id]}, manifest);
+
+		    }, { module : "proto", 
+			 submodule: "jsonrpc", 
+			 method : 'sendres', 
+			 params : [id,req]}, manifest);
 
 		}, { module : "proto", 
 		     submodule: "jsonrpc", 
-		     method : 'close', 
+		     method : 'listen', 
 		     params : [id]}, manifest);
 
-	    }, { module : "proto", 
-		 submodule: "jsonrpc", 
-		 method : 'sendres', 
-		 params : [id,req]}, manifest);
+		// make ping
+		docli();
 
-	}, { module : "proto", 
-	     submodule: "jsonrpc", 
-	     method : 'listen', 
-	     params : [id]}, manifest);
-
-	docli();
     }, { module : "proto", 
 	 submodule: "jsonrpc", 
 	 method : 'create', 
