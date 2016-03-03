@@ -7,6 +7,8 @@ fi
 
 TAG=v$REL
 echo "prepare release " $TAG " ..."
+echo $AMO_API_KEY
+
 
 # update package.json + update.rdf
 PKG=package.json
@@ -18,13 +20,14 @@ cp $RDF $RDF.save
 sed 's/<em:version>.*<\/em:version>/<em:version>'$REL'<\/em:version>/' <$RDF.save >$RDF
 
 # cleanup debug builds
-rm *.xpi
+#rm *.xpi
+#rm install.rdf
+#rm bootstrap.js
 
 # build xpi
+
+#jpm xpi
 XPI=jid1-o49GgyEaRRmXPA@jetpack-$REL.xpi
-
-jpm xpi
-
 if [ ! -f "$XPI" ]; then
     echo "failed to build the xpi file $XPI ! aborting ..."
     mv $PKG.save $PKG
@@ -33,10 +36,8 @@ if [ ! -f "$XPI" ]; then
 fi
 
 # sign the xpi
+#jpm sign --api-key $AMO_API_KEY --api-secret $AMO_API_SECRET --xpi $XPI
 SIGNED=fathom-$REL-fx+an.xpi
-
-jpm sign --api-key $AMO_API_KEY --api-secret $AMO_API_SECRET --xpi $XPI
-
 if [ ! -f "$SIGNED" ]; then
     echo "failed to sign the xpi file $XPI ! $SIGNED not found ..."
     mv $PKG.save $PKG
