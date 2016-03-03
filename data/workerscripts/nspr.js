@@ -134,8 +134,6 @@ NSPR = (function() {
             }
         
             var offset = getOffset();
-            PR_Close(fd);
-
 
             // If we didn't find the offset, try a few more times to make 
             // sure it wasn't coincidence with uninitialized data matching 
@@ -148,6 +146,9 @@ NSPR = (function() {
             if (offset == -1) {
                 offset = getOffset();
             }
+
+            // cleanup!!!
+            PR_Close(fd);
             
             var firstnetaddrpad = -1;
             if (offset == -1) {
