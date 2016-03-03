@@ -28,7 +28,7 @@ exports["testunknown"] = function(assert, done) {
     }, { method : 'asd'}, manifest);
 };
 
-exports["testudp"] = function(assert, done) {
+exports["testudpsimple"] = function(assert, done) {
     socketapi.start();
     var reqid = 0;
     var getreq = function(method, params, cont) {
@@ -62,10 +62,12 @@ exports["testudp"] = function(assert, done) {
                         assert.ok(res && res.data === "foo", 
                               "client socket.udp.recv got pong");
 
-                        socketapi.exec(function() {}, getreq('close',[s]));
+                        timers.setTimeout(function() {
+                            socketapi.exec(function() {}, getreq('close',[s]));
+                        },3000);
 
-                    },getreq('recv',[s,true,2000]),manifest);
-                },getreq('send',[s,"foo"]),manifest);       
+                    },getreq('recv',[s,true,1000]),manifest);
+                },getreq('send',[s,'foo']),manifest);       
             }, getreq('udpConnect',[s, "127.0.0.1", PORT]),manifest);
         }, getreq('udpOpen',[]),manifest);  
     };
@@ -84,7 +86,7 @@ exports["testudp"] = function(assert, done) {
                 socketapi.exec(function(res) {
                     socketapi.exec(function() {}, getreq('close',[s]));
                     socketapi.stop();
-                    done();                 
+                    timers.setTimeout(done,1000);                 
                 }, getreq('udpRecvStop',[s]),manifest);
             }
         };
@@ -122,7 +124,7 @@ exports["testudp"] = function(assert, done) {
 };
 
 
-exports["testudpmany"] = function(assert, done) {
+exports["testudpmanydummy"] = function(assert, done) {
     socketapi.start();
     var reqid = 0;
     var getreq = function(method, params, cont) {
@@ -143,16 +145,16 @@ exports["testudpmany"] = function(assert, done) {
             assert.ok(s.error === undefined, 
                   "client socket.udp.openSocket no error");
 
-            socketapi.exec(function(res) {
-                assert.ok(res.error === undefined, 
-                      "client socket.udp.udpConnect no error");
+//            socketapi.exec(function(res) {
+//                assert.ok(res.error === undefined, 
+//                      "client socket.udp.udpConnect no error");
 
                 socketapi.exec(function(res) {
-
                     assert.ok(res.error === undefined,                      
                           "client socket.udp.send no error");
 
-                    socketapi.exec(function(res) {
+                    timers.setTimeout(function() { 
+//                    socketapi.exec(function(res) {
                         // don't expect to receive anything - just close down
                         socketapi.exec(function() { 
                             cnt += 1; 
@@ -162,10 +164,12 @@ exports["testudpmany"] = function(assert, done) {
                                 socketapi.stop();
                                 done();
                             }
+
                         }, getreq('close',[s]), manifest);
-                    },getreq('recv',[s,true,500]), manifest);
-                },getreq('send',[s,"foo"]), manifest);       
-            }, getreq('udpConnect',[s, "123.123.123.123", PORT]), manifest);
+                    }, 5000);
+//                    },getreq('recv',[s,true,500]), manifest);
+                },getreq('udpSendTo',[s,"foo", "123.123.123.123", PORT]), manifest);       
+//            }, getreq('udpConnect',[s, "123.123.123.123", PORT]), manifest);
         }, getreq('udpOpen',[]), manifest);  
     };
 
@@ -175,6 +179,113 @@ exports["testudpmany"] = function(assert, done) {
     }
 };
 
+
+exports["testudpmanywithserver"] = function(assert, done) {
+    socketapi.start();
+
+    var tests = 100;
+
+    var reqid = 0;
+    var getreq = function(method, params, cont) {
+        reqid += 1; 
+        cont = (cont !== undefined ? cont : false);
+        return { module : 'socket', 
+             submodule : 'udp', 
+             id : reqid,
+             multiresp : cont, // multiresponse request
+             method : method, 
+             params : params};
+    };
+
+    var cnt = 0;
+    var cli = function() {
+        socketapi.exec(function(s) {
+            assert.ok(s.error === undefined, 
+                  "client socket.udp.openSocket no error");
+
+            socketapi.exec(function(res) {
+                assert.ok(res.error === undefined, 
+                      "client socket.udp.udpConnect no error");
+
+                socketapi.exec(function(res) {
+                    assert.ok(res.error === undefined, 
+                          "client socket.udp.send no error");
+
+                    socketapi.exec(function(res) {
+                        assert.ok(res.error === undefined, 
+                              "client socket.udp.recv no error");
+                        
+                        assert.ok(res && res.data === "foo", 
+                              "client socket.udp.recv got pong");
+
+                        socketapi.exec(function() { 
+                            cnt += 1; 
+                            if (cnt >= tests) {
+                                assert.ok(cnt == tests, 
+                                      "all closed - done");
+                                socketapi.stop();
+                                done();
+                            }
+                        }, getreq('close',[s]), manifest);
+
+                    },getreq('recv',[s,true,2000]),manifest);
+                },getreq('sendTo',[s,"127.0.0.1", PORT,"foo"]),manifest);       
+            }, getreq('udpConnect',[s, "127.0.0.1", PORT]),manifest);
+        }, getreq('udpOpen',[]),manifest);  
+    };
+
+    // start server
+    socketapi.exec(function(s) {
+        assert.ok(s.error === undefined, 
+              "server socket.udp.openSocket no error");
+
+        var stimer = undefined;
+        var serverclose = function(ok) {
+            if (stimer)
+                timers.clearTimeout(stimer);
+            stimer = undefined;
+            if (s) {
+                socketapi.exec(function(res) {
+                    socketapi.exec(function() {}, getreq('close',[s]));
+                    socketapi.stop();
+                    done();                 
+                }, getreq('udpRecvStop',[s]),manifest);
+            }
+        };
+        //stimer = timers.setTimeout(serverclose, 5000); // test will end in 5s
+
+        socketapi.exec(function(res) {
+            assert.ok(res.error === undefined, 
+                  "server socket.udp.udpBind no error");
+
+            // start bunch of cli's in parallel
+            for (var i = 0; i < tests; i++) {
+                timers.setTimeout(cli,0);
+            }
+
+            socketapi.exec(function(res) {
+                assert.ok((res.error === undefined), 
+                      "server socket.udp.udpRecvFromStart no error");
+                
+                if (res.data && res.data === "foo") { // got ping - send pong
+                    assert.ok(true, 
+                          "server socket.udp.udpRecvFromStart got ping");
+
+                    // add the host to the server list so that we can send
+                    // data back
+                    manifest.neighbors['server'] = {};
+                    manifest.neighbors['server'][res.address] = true;
+
+                    socketapi.exec(function(res) {
+                        assert.ok(res.error === undefined, 
+                              "server socket.udp.udpSendTo no error");
+
+                    }, getreq('udpSendTo',[s,res.data,res.address,res.port]),manifest);
+                }
+            }, getreq('udpRecvFromStart', [s, true], true),manifest);
+        }, getreq('udpBind',[s, 0, PORT, true]),manifest);
+    }, getreq('udpOpen',[]),manifest);
+};
 
 exports["testtcp"] = function(assert, done) {
     socketapi.start();
@@ -262,7 +373,7 @@ exports["testtcpmany"] = function(assert, done) {
                         cnt += 1;
                         if (cnt==tests) {
                             socketapi.stop();
-                            done();
+                            //done();
                         }
 
                     }, getreq('close',[s]), manifest);
@@ -272,7 +383,7 @@ exports["testtcpmany"] = function(assert, done) {
     };
 
     for (var i = 0; i < tests; i++ ) {
-        timers.setTimeout(cli,20);
+        timers.setTimeout(cli,0);
     }
 };
 

@@ -70,14 +70,12 @@ var getBuffer = function(len) {
 };
 
 var cleanup = function() {
-    if (worker.socket && worker.socket !== -1) {
+    if (worker.socket) {
         NSPR.sockets.PR_Close(worker.socket);
     }
     worker.socket = undefined;
-    if (NSPR.closeLib)
-        NSPR.closeLib();
+    NSPR.closeLib();
     NSPR = {}    
-    close();
 };
 
 var sendres = function(id) {
@@ -158,7 +156,7 @@ onmessage = function(event) {
                     "Failed to open socket: " + s.error,
                     undefined,
                     true);
-                setTimeout(function() { cleanup(); },0); // kill the worker too
+                setTimeout(function() { cleanup(); },0);
 
             } else {
                 // ok
@@ -176,7 +174,7 @@ onmessage = function(event) {
                     "Failed to start: " + s.error,
                     undefined,
                     true);
-                setTimeout(function() { cleanup(); },0); // kill the worker too
+                setTimeout(function() { cleanup(); },0);
             } else {
                 // started ok
                 worker.socket = s;
@@ -248,4 +246,5 @@ onerror = function(event) {
     error(tag,JSON.stringify(event));
     postMessage(JSON.stringify({error : event, done : true}));
     cleanup();
+    close();
 };
