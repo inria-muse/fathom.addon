@@ -70,7 +70,7 @@ var getBuffer = function(len) {
 };
 
 var cleanup = function() {
-    if (worker.socket) {
+    if (worker.socket && worker.socket >= 0) {
         NSPR.sockets.PR_Close(worker.socket);
     }
     worker.socket = undefined;

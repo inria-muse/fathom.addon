@@ -9,6 +9,7 @@ TAG=v$REL
 echo "prepare release " $TAG " ..."
 echo $AMO_API_KEY
 
+mkdir dist
 
 # update package.json + update.rdf
 PKG=package.json
@@ -20,14 +21,17 @@ cp $RDF $RDF.save
 sed 's/<em:version>.*<\/em:version>/<em:version>'$REL'<\/em:version>/' <$RDF.save >$RDF
 
 # cleanup debug builds
-#rm *.xpi
-#rm install.rdf
-#rm bootstrap.js
+rm *.xpi
+rm install.rdf
+rm bootstrap.js
 
 # build xpi
+jpm xpi
 
-#jpm xpi
-XPI=jid1-o49GgyEaRRmXPA@jetpack-$REL.xpi
+# NOTE: the out xpi name keeps changeing depending on jpm version ...
+#XPI=jid1-o49GgyEaRRmXPA@jetpack-$REL.xpi
+XPI=fathom.xpi
+
 if [ ! -f "$XPI" ]; then
     echo "failed to build the xpi file $XPI ! aborting ..."
     mv $PKG.save $PKG
@@ -36,8 +40,14 @@ if [ ! -f "$XPI" ]; then
 fi
 
 # sign the xpi
-#jpm sign --api-key $AMO_API_KEY --api-secret $AMO_API_SECRET --xpi $XPI
+jpm sign --api-key $AMO_API_KEY --api-secret $AMO_API_SECRET --xpi $XPI
+
+# the signed xpi name keeps changeing too ...
 SIGNED=fathom-$REL-fx+an.xpi
+if [ ! -f "$SIGNED" ]; then
+    SIGNED=fathom-$REL-an+fx.xpi
+fi
+
 if [ ! -f "$SIGNED" ]; then
     echo "failed to sign the xpi file $XPI ! $SIGNED not found ..."
     mv $PKG.save $PKG
@@ -53,15 +63,4 @@ git commit -a -m "xpi release "$TAG
 git tag $TAG
 git push
 
-# web release
-cp -f dist/fathom-$REL.xpi ../fathom.web/fathom.xpi
-cp -f $RDF ../fathom.web/
-
-pushd ../fathom.web
-git commit -a -m "xpi release "$TAG
-git push
-popd
-
-ssh apietila@muse.inria.fr 'cd fathom; git pull;'
-
-echo 'ready'
+echo "new release available at dist/fathom-$REL.xpi"
