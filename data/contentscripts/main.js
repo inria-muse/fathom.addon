@@ -209,7 +209,7 @@ if (document.baseURI.indexOf('about:neterror')>=0) {
 
                     if (typeof fathomapi[module][submodule] === 'object' && 
                         (methods[module]['*'] || 
-                           methods[module][submodule]['*']) && 
+                           (methods[module][submodule] && methods[module][submodule]['*'])) && 
                         (isaddon || !fathomapi[module][submodule].addononly)) 
                     {
                         // requested module.[*|submodule.*] => export all funcs
@@ -221,7 +221,7 @@ if (document.baseURI.indexOf('about:neterror')>=0) {
                     for (var func in fathomapi[module][submodule]) {
                         if (typeof fathomapi[module][submodule][func] === 'function' && 
                             (methods[module]['*'] || 
-                               methods[module][submodule][func]) &&
+                               (methods[module][submodule] && methods[module][submodule][func])) &&
                             (isaddon || 
                                !fathomapi[module][submodule][func].addononly)) 
                         {
