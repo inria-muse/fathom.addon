@@ -1,44 +1,52 @@
 const timers = require("sdk/timers");
 const upload = require("../lib/upload");
 
+const ss = require("sdk/simple-storage");
+ss.storage['uuid'] = 'testscript-dev';
+
+//const HOST = 'http://localhost:3000';
+const HOST = 'http://muse2.paris.inria.fr/fathomupload';
+
 exports["teststartstop"] = function(assert, done) {
-	const upload = require("upload");
-    upload.start(function(ok) {
-	assert.ok(ok, "start ok");
-	upload.stop(function(ok) {
-	    assert.ok(ok, "stop ok");
-	    done();
-	});
-    });
+    upload.start();
+    timers.setTimeout(function() {
+		upload.stop();
+		assert.ok(true, "start-stop ok");
+		done();
+	}, 1000);
 };
 
 exports["testadduploadgood"] = function(assert, done) {
     // queue some items to the storage 
-    upload.start(function(ok) {
-		assert.ok(ok, "start ok");
+    console.log('test uplaod to ' + HOST);
+    upload.start();
+    timers.setTimeout(function() {
+		console.log('add items');
 		upload.addUploadItem(
 		    'test',                                 // collection
 		    [{values : [1,2,3,4], ts : Date.now()}, // data
 		     {values : [8,2,2,4], ts : Date.now()}], 
 		    function(succ) {
 				// add done
+				console.log('add items: ' + succ);
 				assert.ok(succ, "add item(s) ok");
 
 				// req upload
 				upload.uploadItems(function(succ) {
 				    // upload done
+					console.log('upload items: ' + succ);
 				    assert.ok(succ, "upload item(s) ok");
 				    done();
-				}, 'http://localhost:3000');
+				}, HOST);
 		    }
 		);
-    });
+    }, 1000);
 };
 
 exports["testadduploadbad"] = function(assert, done) {
     // queue some items to the storage 
-    upload.start(function(ok) {
-		assert.ok(ok, "start ok");
+    upload.start();
+    timers.setTimeout(function() {
 		upload.addUploadItem(
 		    'test',                                 // collection
 		    [{'val.ues' : [8,1,1,4], ts : Date.now()},
@@ -53,17 +61,17 @@ exports["testadduploadbad"] = function(assert, done) {
 				    // upload done
 				    assert.ok(succ, "upload item(s) ok");
 				    done();
-				}, 'http://localhost:3000');
+				}, HOST);
 		    }
 		);
-    });
+    }, 1000);
 };
 
 
 exports["testadduploaddupl"] = function(assert, done) {
     // queue some items to the storage 
-    upload.start(function(ok) {
-		assert.ok(ok, "start ok");
+    upload.start();
+    setTimeout(function() {
 		upload.addUploadItem(
 		    'test',                                 // collection
 		    [{'values' : [8,1,1,4], ts : Date.now(), objectid : 1},
@@ -78,11 +86,11 @@ exports["testadduploaddupl"] = function(assert, done) {
 					    // upload done
 					    assert.ok(succ, "upload item(s) ok");
 					    done();
-					}, 'http://localhost:3000');
+					}, HOST);
 			    }, 100);
 		    }
 		);
-    });
+    }, 1000);
 };
 
 

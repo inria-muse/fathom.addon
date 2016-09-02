@@ -17,13 +17,13 @@ To run a firefox with temporary profile and the addon installed:
 
 ```
 $ cd <path-to>/fathom.git
-$ jpm run
+$ jpm run [-b <pathtofirefox>]
 ```
 
-To run the unit tests:
+To run the unit tests (-f to select particular file and test):
 
 ```
-$ jpm test
+$ jpm test [-b <pathtofirefox>] [-f <test-xxx>:<test-name>]
 ```
 
 More info on jpm: https://developer.mozilla.org/en-US/Add-ons/SDK/Tools/jpm
